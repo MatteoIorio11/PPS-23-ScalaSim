@@ -20,12 +20,12 @@
     * Operazioni aritmetiche: Somma, Co-varianza
     * Creazione del linguaggio DSL
     * Strategia di lavoro dato un singolo file
-    * Implementazione della strategia risolutiva basata su Executors dati più file
+    * Implementazione della strategia risolutiva basata su più file
 2. Iorio:
     * Operazioni aritmetiche: Max, Varianza
     * Operazioni di filtraggio
     * Creazione della strategia per il riconoscimento del tipo contenuto nel file
-    * Implementazione della strategia risolutiva basata su Executors dato un singolo file
+    * Implementazione della strategia risolutiva basata su singolo file
 3. Vincenzi: 
     * Operazioni aritmetiche: Min, Media
     * Interfaccia grafica
@@ -38,7 +38,7 @@ Nella realizzazione di questo progetto sarà estremamente necessario individuare
 
 **Elenco delle funzionalità offerte dal sistema**: 
 + Modellare in maniera estendibile le strategie col la quale eseguire le operazioni messe a disposizione dal sistema tramite l'utilizzo dei *Mixin*;
-+ Implementare una strategia risolutiva tramite framework Executors;
++ Implementare una strategia risolutiva tramite algoritmo distribuito;
 + Gestione di un singolo file;
 + Gestione di più file contemporaneamente;
 + Gestione di file in formato CSV e JSON;
