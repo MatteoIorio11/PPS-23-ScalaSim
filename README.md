@@ -26,11 +26,12 @@
     * Operazioni di filtraggio
     * Creazione della strategia per il riconoscimento del tipo contenuto nel file
     * Implementazione della strategia risolutiva basata su singolo file
+    * Gestione concatenazione di operazioni
 3. Vincenzi: 
     * Operazioni aritmetiche: Min, Media
     * Interfaccia grafica
     * Gestione file nei diversi formati CSV e JSON
-    * Gestione di più file contemporaneamente
+    * Gestione dei file
 
 **Sintesi dei requisiti di massima del sistema da realizzare**: Il fine del nostro progetto è quello di realizzare tramite un'architettura Client-Server, un sistema distribuito per l'esecuzione di calcoli dati uno o più file.
 
