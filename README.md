@@ -17,10 +17,10 @@
 
 **Compiti di ogni studente**: 
 1. Furi:
-    * Operazioni aritmetiche: Somma, Co-varianza
+    * Operazioni aritmetiche: Somma, Mediana
     * Creazione del linguaggio DSL
-    * Strategia di lavoro dato un singolo file
     * Implementazione della strategia risolutiva basata su più file
+    * Implementare un algoritmo di ordinamento
 2. Iorio:
     * Operazioni aritmetiche: Max, Varianza
     * Operazioni di filtraggio
@@ -47,6 +47,7 @@ Nella realizzazione di questo progetto sarà estremamente necessario individuare
 + Esecuzione di analisi su file per riconoscere il tipo dei valori contenuti in esso;
 + Implementazione di operazioni aritmetiche distribuite generiche su un dato file (Somma, Sottrazione, Min, Max, ...) tramite l'utilizzo dei *Mixin*, su qualsiasi tipologia di file;
 + Implmentazione di operazioni di filtraggio dati sulla base di certi criteri;
++ Operazioni di ordinamento;
 + Concatenazione di più operazioni aritmetiche gestendo anche il loro ordine;
 + Introduzione di un linguaggio DSL per eseguire le operazioni scelte;
 + Interfaccia grafica lato client realizzate tramite Scala.js;
