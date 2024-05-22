@@ -1,4 +1,4 @@
-# Proposta PPS
+# PPS-23-ScalaSim
 
 Deadline: 22 Luglio 2024
 
