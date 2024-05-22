@@ -1,55 +1,46 @@
-# PPS-23-ScalaCalc
+# Proposta PPS
 
-**Deadline**: 9 luglio 2024
+Deadline: 22 Luglio 2024
 
-**Acronimo**: ScalaCalc
+Acronimo: ScalaSim
 
-**Cognomi dei membri**: Furi, Iorio, Vincenzi
+Cognomi dei Membri: Iorio, Furi, Vincenzi
 
-**Titolo**: ScalaCalculus
+Titolo: Scala Cellular Automata Simulator
 
 **Indirizzi Mail**: 
-1. "Stefano Furi - stefano.furi@studio.unibo.it"
-2. "Matteo Iorio - matteo.iorio2@studio.unibo.it"
-3. "Fabio Vincenzi - fabio.vincenzi2@studio.unibo.it"
 
-**Processo di Sviluppo**: Il nostro gruppo intende adottare come processo di sviluppo la metodologia SCRUM
+- "Matteo Iorio - matteo.iorio2@studio.unibo.it"
+- "Stefano Furi - stefano.furi@studio.unibo.it"
+- "Fabio Vincenzi - fabio.vincenzi2@studio.unibo.it"
 
-**Compiti di ogni studente**: 
-1. Furi:
-    * Operazioni aritmetiche: Somma, Mediana
-    * Creazione del linguaggio DSL
-    * Implementazione della strategia risolutiva basata su più file
-    * Implementare un algoritmo di ordinamento
-2. Iorio:
-    * Operazioni aritmetiche: Max, Varianza
-    * Operazioni di filtraggio
-    * Creazione della strategia per il riconoscimento del tipo contenuto nel file
-    * Implementazione della strategia risolutiva basata su singolo file
-    * Gestione concatenazione di operazioni
-3. Vincenzi: 
-    * Operazioni aritmetiche: Min, Media
-    * Interfaccia grafica
-    * Gestione file nei diversi formati CSV e JSON
-    * Gestione dei file
+**Processo di Sviluppo**: Il nostro gruppo intende adottare come processo di sviluppo la metodologia SCRUM.
 
-**Sintesi dei requisiti di massima del sistema da realizzare**: Il fine del nostro progetto è quello di realizzare tramite un'architettura Client-Server, un sistema distribuito per l'esecuzione di calcoli dati uno o più file.
+**Divisione del Lavoro tra studenti**:
+Inizialmente si coopererà per definire in modo più specifico i requisiti del
+sistema, per poi successivamente elaborare un design dell'elaborato in grado di
+sfruttare al meglio il pradigma FP. Una volta definito il design
+dell'elaborato, il lavoro verrà suddiviso equamente in 3 macro categorie:
+Engine, Configurazione Simulazioni (attraverso DSL) e resa grafica (attraverso
+GUI oppure immagini PNG). Ogni componenete contribuirà in maniera equa ad ognuna
+di queste categorie (la suddivisione del lavoro verrà illustrata in dettaglio
+all'interno della relazione finale).
 
-Nella realizzazione di questo progetto sarà estremamente necessario individuare un design semplice ed estendibile, rispettando le best-practices affrontate durante il corso. Utilizzando inoltre come strategia di sviluppo il TDD.
+**Sintesi dei Requisiti di Sistema**:
+Si vuole realizzare un simulatore di Cellular Automaton, sfruttando il paradigma
+FP e il linguaggio scala. Il simulatore dovrà essere in grado di rappresentare le più
+comuni simulazioni di automi cellulari (e.g. Game of Life, Predators and Prey, ...).
 
-**Elenco delle funzionalità offerte dal sistema**: 
-+ Modellare in maniera estendibile le strategie col la quale eseguire le operazioni messe a disposizione dal sistema tramite l'utilizzo dei *Mixin*;
-+ Implementare una strategia risolutiva tramite algoritmo distribuito;
-+ Gestione di un singolo file;
-+ Gestione di più file contemporaneamente;
-+ Gestione di file in formato CSV e JSON;
-+ Gestione per la tipologia file con singolo valore (file multi-linea con singola colonna);
-+ Gestione per la tipologia file con coppia chiave-valore (file multi-linea con due colonne una per la chiave ed una per il valore);
-+ Esecuzione di analisi su file per riconoscere il tipo dei valori contenuti in esso;
-+ Implementazione di operazioni aritmetiche distribuite generiche su un dato file (Somma, Sottrazione, Min, Max, ...) tramite l'utilizzo dei *Mixin*, su qualsiasi tipologia di file;
-+ Implmentazione di operazioni di filtraggio dati sulla base di certi criteri;
-+ Operazioni di ordinamento;
-+ Concatenazione di più operazioni aritmetiche gestendo anche il loro ordine;
-+ Introduzione di un linguaggio DSL per eseguire le operazioni scelte;
-+ Interfaccia grafica lato client realizzate tramite Scala.js;
-
+Nel seguento sono riassunte le specifiche principali del sistema:
+- Motore per l'esecuzione automatica delle simulazioni.
+- Astrazione dell'ambiente (e.g. ambiente 1D, 2D, 3D).
+- Astrazione della definizione dell'automa cellulare.
+- Astrazione del comportamento che renda semplice definire un nuovo comportamento di automa.
+- Definizione comportamento automa attraverso DSL.
+- Configurazione della simulazione attraverso DSL.
+- Realizzazione GUI oppure motore di esportazione grafica (e.g. immagini PNG, video, ...).
+- Implementazione di almeno 2 tra le seguenti simulazioni:
+    - [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
+    - [Brian's Brain](https://en.wikipedia.org/wiki/Brian's_Brain)
+    - [Predators And Prey](https://en.wikipedia.org/wiki/Wa-Tor)
+    - [Langton's Ant](https://en.wikipedia.org/wiki/Langton%27s_ant)
