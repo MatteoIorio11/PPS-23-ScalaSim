@@ -1,12 +1,12 @@
 # PPS-23-ScalaSim
 
-Deadline: 22 Luglio 2024
+**Deadline**: 22 Luglio 2024
 
-Acronimo: ScalaSim
+**Acronimo**: ScalaSim
 
-Cognomi dei Membri: Iorio, Furi, Vincenzi
+**Cognomi dei Membri**: Iorio, Furi, Vincenzi
 
-Titolo: Scala Cellular Automata Simulator
+**Titolo**: Scala Cellular Automata Simulator
 
 **Indirizzi Mail**: 
 
