@@ -5,7 +5,8 @@
 hs_err_pid*
 
 .DS_Store
-
+.gradle
+.metals
 #
 # Are you tempted to edit this file?
 #
