@@ -1,14 +1,14 @@
 package domain
 
 import scala.collection.mutable.ArrayBuffer
-import domain.Dimension.*
+import domain.Dimensions.*
 
-trait Environment:
+trait Environment[D <: Dimension]:
     // -- Attributes
-    type Matrix = Array[Array[Cell[D: Dimension]]]
+    type Matrix = Array[Array[Cell[D]]]
     def cellularAutomata: CellularAutomata
 
     // -- Methods
-    def getNeighbours(cell: Cell[D: Dimension]): List[Cell[D: Dimension]]
+    def getNeighbours(cell: Cell[D]): List[Cell[D]]
     def start(): Unit
     def nextIteration(): Unit
