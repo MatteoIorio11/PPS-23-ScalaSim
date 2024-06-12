@@ -1,3 +1,5 @@
 package domain
 
-trait Cell
+trait Cell[D: Dimension]:
+    def position: Dimension
+    def state: State
