@@ -1,10 +1,10 @@
 package domain
 
-object  State:
+object CellState:
     enum State:
         case Alive
         case Dead
 
 trait Cell[D <: Dimension]:
     def position: D
-    def state: State
+    def state: CellState.State
