@@ -4,6 +4,7 @@ import org.scalatest.matchers.should.Matchers.*
 
 import domain.Neighbor.Position.*
 import domain.Neighbor.Position
+import domain.Dimensions.TwoDimensionalSpace
 
 class PositionTest extends org.scalatest.funsuite.AnyFunSuite:
 
@@ -24,3 +25,8 @@ class PositionTest extends org.scalatest.funsuite.AnyFunSuite:
     val p = Position((10, 20, 30))
     p.coordinates shouldBe (10, 20, 30)
     p.isInstanceOf[Position3D] shouldBe true
+
+  test("Casting with `asPosition` should work as expected"):
+    val p1: Position2D = Position((1, 2)).asPosition[Position2D]
+    val p2: Position3D = Position((1, 2, 3)).asPosition[Position3D]
+
