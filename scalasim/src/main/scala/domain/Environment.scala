@@ -5,7 +5,7 @@ import domain.Dimensions.*
 
 trait Environment[D <: Dimension]:
     // -- Attributes
-    type Matrix = Array[Array[Cell[D]]]
+    type Matrix
     def cellularAutomata: CellularAutomata
 
     // -- Methods
