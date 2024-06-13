@@ -13,7 +13,7 @@ trait CellularAutomata[D <: Dimension]:
     def getNeighbours(cell: Cell[D]): List[Cell[D]]
 
 
-class CellularAutomata2D[TwoDimensionalSpace]() extends CellularAutomata[TwoDimensionalSpace]:
+class CellularAutomata2D() extends CellularAutomata[TwoDimensionalSpace]:
     override type Rules = Map[CellState.State, NeighborRule]
     val ruleCollection: Rules = Map()
     val dimension: Dimension = TwoDimensionalSpace()
