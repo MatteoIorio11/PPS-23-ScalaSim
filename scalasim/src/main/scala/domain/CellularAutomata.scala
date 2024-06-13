@@ -1,9 +1,10 @@
+package domain
 
 import domain.Dimensions.*
-import domain.NeighborRule.*
-import java.awt.Dimension
+import domain.NeighborRules.*
+import domain.CellState.*
 
-trait CellularAutomata[D: Dimension]
+trait CellularAutomata[D <: Dimension]:
     type Rules
     def ruleCollection: Rules
     def dimension: D
@@ -15,7 +16,7 @@ trait CellularAutomata[D: Dimension]
 class CellularAutomata2D[TwoDimensionalSpace]() extends CellularAutomata[TwoDimensionalSpace]:
     override type Rules = Map[CellState.State, NeighborRule]
     val ruleCollection: Rules = Map()
-    val dimension: TwoDimensionalSpace = TwoDimensionalSpace()
+    val dimension: Dimension = TwoDimensionalSpace()
 
     def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: List[Cell[TwoDimensionalSpace]]): Cell[TwoDimensionalSpace] = ???
     def getNeighbours(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = ???
