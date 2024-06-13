@@ -12,3 +12,4 @@ trait Environment[D <: Dimension]:
     def getNeighbours(cell: Cell[D]): List[Cell[D]]
     def start(): Unit
     def nextIteration(): Unit
+
