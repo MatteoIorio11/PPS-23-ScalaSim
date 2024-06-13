@@ -1,5 +1,7 @@
 package domain
 
+import domain.Dimensions.*
+
 object CellState:
     /**
       * Cell state that will represent all the Cell's state for Its execution.
