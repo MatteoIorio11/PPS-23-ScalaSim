@@ -1,7 +1,7 @@
 package domain
 
 import domain.Dimensions.*
-import domain.NeighborRules.*
+import domain.Neighbor.*
 import domain.CellState.*
 
 trait CellularAutomata[D <: Dimension]:
