@@ -12,9 +12,10 @@ trait CellularAutomata[D: Dimension]
     def getNeighbours(cell: Cell[D]): List[Cell[D]]
 
 
-class CellularAutomata2D[TwoDimensionalSpace](private val dimension: TwoDimensionalSpace) extends CellularAutomata[TwoDimensionalSpace]:
+class CellularAutomata2D[TwoDimensionalSpace]() extends CellularAutomata[TwoDimensionalSpace]:
     override type Rules = Map[CellState.State, NeighborRule]
     val ruleCollection: Rules = Map()
+    val dimension: TwoDimensionalSpace = TwoDimensionalSpace()
 
     def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: List[Cell[TwoDimensionalSpace]]): Cell[TwoDimensionalSpace] = ???
     def getNeighbours(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = ???
