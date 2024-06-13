@@ -14,7 +14,7 @@ trait CellularAutomata[D <: Dimension]:
 
 
 class CellularAutomata2D() extends CellularAutomata[TwoDimensionalSpace]:
-    override type Rules = Map[CellState.State, NeighborRule]
+    override type Rules = Map[CellState.State, NeighborRule[TwoDimensionalSpace]]
     val ruleCollection: Rules = Map()
     val dimension: Dimension = TwoDimensionalSpace()
 
