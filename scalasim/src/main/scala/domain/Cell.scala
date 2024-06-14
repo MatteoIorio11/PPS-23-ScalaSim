@@ -1,11 +1,8 @@
 package domain
 
 import domain.Dimensions.*
-
+import domain.CellularAutomata.*
 object Cell:
-    enum State:
-        case Alive
-        case Dead
 
     trait Cell[D <: Dimension]:
         def position: D
