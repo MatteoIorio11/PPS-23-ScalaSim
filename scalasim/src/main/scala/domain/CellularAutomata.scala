@@ -14,14 +14,15 @@ object CellularAutomata:
         def getRules: Rules
         def addRule(cellState: State, neighborRule: NeighborRule[D]): Unit
 
-    case class CellularAutomata2D() extends CellularAutomata[TwoDimensionalSpace]:
+    object CellularAutomata2D:
         enum CellularState extends State:
             case ALIVE
             case DEAD
-        type Rules = Map[State, NeighborRule[TwoDimensionalSpace]]
-        override val ruleCollection: Rules = Map()
-        override val dimension: TwoDimensionalSpace = TwoDimensionalSpace()
-        override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: List[Cell[TwoDimensionalSpace]]): Cell[TwoDimensionalSpace] = ???
-        override def getNeighbours(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = ???
-        override def getRules: Rules = ruleCollection
-        override def addRule(cellState: State, neighborRule: NeighborRule[TwoDimensionalSpace]): Unit = ???
+        case class CellularAutomata2D() extends CellularAutomata[TwoDimensionalSpace]:
+           type Rules = Map[State, NeighborRule[TwoDimensionalSpace]]
+            override val ruleCollection: Rules = Map()
+            override val dimension: TwoDimensionalSpace = TwoDimensionalSpace()
+            override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: List[Cell[TwoDimensionalSpace]]): Cell[TwoDimensionalSpace] = ???
+            override def getNeighbours(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = ???
+            override def getRules: Rules = ruleCollection
+            override def addRule(cellState: State, neighborRule: NeighborRule[TwoDimensionalSpace]): Unit = ???
