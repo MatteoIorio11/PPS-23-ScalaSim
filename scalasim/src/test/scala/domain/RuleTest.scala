@@ -6,14 +6,13 @@ import domain.CellularAutomata.CellularAutomata
 import domain.CellularAutomata.CustomCellularAutomata.CellularAutomata2D
 
 class RuleTest extends org.scalatest.funsuite.AnyFunSuite:
-
-  class IdentityRule extends Rule[TwoDimensionalSpace]:
-    type TransitionFunction =  CellularAutomata[TwoDimensionalSpace] => CellularAutomata[TwoDimensionalSpace]
-
-    override def applyTransformation(ca: CellularAutomata[TwoDimensionalSpace])(using tFunc: TransitionFunction): CellularAutomata[TwoDimensionalSpace] = tFunc(ca)
+  val ca = CellularAutomata2D()
 
   test("An identity Rule should return the same automaton"):
-    val ca = CellularAutomata2D()
-    val rule = IdentityRule()
+    val identityRule = new Rule[TwoDimensionalSpace] {
+      type TransitionFunction =  CellularAutomata[TwoDimensionalSpace] => CellularAutomata[TwoDimensionalSpace]
 
-    rule.applyTransformation(ca) shouldBe ca
+      override def applyTransformation(ca: CellularAutomata[TwoDimensionalSpace])(using tFunc: TransitionFunction): CellularAutomata[TwoDimensionalSpace] = tFunc(ca)
+    }
+
+    identityRule.applyTransformation(ca) shouldBe ca
