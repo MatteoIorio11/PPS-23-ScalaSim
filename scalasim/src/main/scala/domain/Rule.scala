@@ -4,6 +4,19 @@ import domain.Dimensions.*
 import domain.Position
 import domain.CellularAutomata.CellularAutomata
 
+trait Rule[D <: Dimension]:
+  
+  type TransitionFunction
+
+  /**
+    * Applies the transition function specified by this rule to the given automaton
+    *
+    * @param ca the cellular automaton to apply the transistion function
+    * @param tFunc the transition function given by a context.
+    * @return the cellular automaton after computing the provided transition function.
+    */
+  def applyTransformation(ca: CellularAutomata[D])(using tFunc: TransitionFunction): CellularAutomata[D]
+
 object Neighbor:
   /**
     * A NeighborRule represent the set of neighbors position that are needed
@@ -30,15 +43,3 @@ object Neighbor:
     * 
     * @param D the dimension of the space.
     */
-  trait Rule[D <: Dimension]:
-    
-    type TransitionFunction
-
-    /**
-      * Applies the transition function specified by this rule to the given automaton
-      *
-      * @param ca the cellular automaton to apply the transistion function
-      * @param tFunc the transition function given by a context.
-      * @return the cellular automaton after computing the provided transition function.
-      */
-    def applyTransformation(ca: CellularAutomata[D])(using tFunc: TransitionFunction): CellularAutomata[D]
