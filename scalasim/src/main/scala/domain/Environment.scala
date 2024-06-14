@@ -3,6 +3,7 @@ package domain
 import scala.collection.mutable.ArrayBuffer
 import domain.Dimensions.*
 import domain.CellularAutomata.*
+import domain.Cell.*
 
 object Environment:
     trait Environment[D <: Dimension]:
