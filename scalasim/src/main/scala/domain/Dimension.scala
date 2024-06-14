@@ -1,6 +1,6 @@
 package domain
 
-import domain.Neighbor.Position
+import domain.Position
 
 object Dimensions:
   trait Dimension:
