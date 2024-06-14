@@ -4,7 +4,7 @@ import domain.Dimensions.*
 import domain.Neighbor.*
 import domain.Cell.*
 object CellularAutomata:
-    trait State extends Enumeration
+    trait State
     trait CellularAutomata[D <: Dimension]:
         type Rules
         def ruleCollection: Rules
@@ -18,8 +18,9 @@ object CellularAutomata:
         enum CellularState extends State:
             case ALIVE
             case DEAD
-        def apply(dimension: Dimension): CellularAutomata[Dimension] = dimension match
-            case x isInstanceOf TwoDimensionalSpace => CellularAutomata2D[TwoDimensionalSpace]()
+        def apply(dimension: Dimension): CellularAutomata[? <: Dimension] = dimension match
+            case x: TwoDimensionalSpace => CellularAutomata2D()
+            case _ => ???
         
         case class CellularAutomata2D() extends CellularAutomata[TwoDimensionalSpace]:
            type Rules = Map[State, NeighborRule[TwoDimensionalSpace]]
