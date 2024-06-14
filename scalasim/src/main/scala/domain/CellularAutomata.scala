@@ -4,7 +4,11 @@ import domain.Dimensions.*
 import domain.Neighbor.*
 import domain.Cell.*
 object CellularAutomata:
+    object State extends Enumeration:
+        type State = Value
+        val ALIVE, DEAD = Value
     trait CellularAutomata[D <: Dimension]:
+        import State.*
         type Rules
         def ruleCollection: Rules
         def dimension: D
@@ -13,12 +17,9 @@ object CellularAutomata:
         def getRules: Rules
         def addRule(cellState: State, neighborRule: NeighborRule[D]): Unit
 
-    case class CellularAutomata2D() extends CellularAutomata[TwoDimensionalSpace] with Cell[TwoDimensionalSpace]:
-        enum State:
-          case Alive
-          case Dead
-          case StandBy
-        override type Rules = Map[State, NeighborRule[TwoDimensionalSpace]]
+    case class CellularAutomata2D() extends CellularAutomata[TwoDimensionalSpace]:
+        import State.*
+        type Rules = Map[State, NeighborRule[TwoDimensionalSpace]]
         override val ruleCollection: Rules = Map()
         override val dimension: TwoDimensionalSpace = TwoDimensionalSpace()
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: List[Cell[TwoDimensionalSpace]]): Cell[TwoDimensionalSpace] = ???
