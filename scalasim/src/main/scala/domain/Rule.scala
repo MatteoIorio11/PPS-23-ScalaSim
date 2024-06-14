@@ -4,6 +4,12 @@ import domain.Dimensions.*
 import domain.Position
 import domain.CellularAutomata.CellularAutomata
 
+/**
+  * Generic rule in a N dimensional space that spacefies how cellular 
+  * automata of a simulation should transition from a state to another.
+  * 
+  * @param D the dimension of the space.
+  */
 trait Rule[D <: Dimension]:
   
   type TransitionFunction
@@ -36,10 +42,3 @@ object Neighbor:
     def neighborhood(ca: CellularAutomata[D]): Neighborhood
 
     type TransitionFunction = (Neighborhood) => (CellularAutomata[D])
-  
-  /**
-    * Generic rule in a N dimensional space that spacefies how cellular 
-    * automata of a simulation should transition from a state to another.
-    * 
-    * @param D the dimension of the space.
-    */
