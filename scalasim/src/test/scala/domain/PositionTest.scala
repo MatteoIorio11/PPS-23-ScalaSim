@@ -2,8 +2,8 @@ package domain
 
 import org.scalatest.matchers.should.Matchers.*
 
-import domain.Neighbor.Position.*
-import domain.Neighbor.Position
+import domain.Position
+import domain.Position.*
 import domain.Dimensions.TwoDimensionalSpace
 
 class PositionTest extends org.scalatest.funsuite.AnyFunSuite:
