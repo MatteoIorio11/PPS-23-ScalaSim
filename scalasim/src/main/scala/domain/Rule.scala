@@ -2,7 +2,7 @@ package domain
 
 import domain.Dimensions.*
 import domain.Position
-import domain.CellularAutomata.CellularAutomata
+import domain.Cell.Cell
 
 /**
   * Generic rule in a N dimensional space that spacefies how cellular 
@@ -41,4 +41,4 @@ object Neighbor:
       */
     def neighborhood(ca: Cell[D]): Neighborhood
 
-    type TransitionFunction = (Neighborhood) => (CellularAutomata[D])
+    type TransitionFunction = (Neighborhood) => (Cell[D])
