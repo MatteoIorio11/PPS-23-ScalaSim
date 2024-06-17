@@ -10,7 +10,7 @@ object Position:
   def apply(coordinates: Tuple): Position[? <: Dimension] = coordinates match
     case (x: Int, y: Int) => Position2D((x, y))
     case (x: Int, y: Int, z: Int) => Position3D((x, y, z))
-    case _ => ???
+    case _ => throw new NotImplementedError(s"Position${coordinates.size}D is not yet implemented")
 
   class Position2D(private val _coordinates: (Int, Int)) extends Position[TwoDimensionalSpace]:
     override def coordinates: (Int, Int) = _coordinates
