@@ -21,7 +21,7 @@ trait Rule[D <: Dimension]:
     * @param tFunc the transition function given by a context.
     * @return the cellular automaton after computing the provided transition function.
     */
-  def applyTransformation(ca: CellularAutomata[D])(using tFunc: TransitionFunction): CellularAutomata[D]
+  def applyTransformation(ca: Cell[D])(using tFunc: TransitionFunction): Cell[D]
 
 object Neighbor:
   /**
@@ -39,6 +39,6 @@ object Neighbor:
       * @param ca the {@link CellularAutomata}
       * @return the given cellular automaton neighborhood.
       */
-    def neighborhood(ca: CellularAutomata[D]): Neighborhood
+    def neighborhood(ca: Cell[D]): Neighborhood
 
     type TransitionFunction = (Neighborhood) => (CellularAutomata[D])
