@@ -14,10 +14,10 @@ object CellularAutomata2D:
         case ALIVE
         case DEAD
     case class CellularAutomata2DImpl() extends CellularAutomata[TwoDimensionalSpace]:
-        type Rules = Map[State, NeighborRule[TwoDimensionalSpace]]
+        type Rules = Map[State, Rule[TwoDimensionalSpace]]
         override val ruleCollection: Rules = Map()
         override val dimension: TwoDimensionalSpace = TwoDimensionalSpace()
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: List[Cell[TwoDimensionalSpace]]): Cell[TwoDimensionalSpace] = ???
         override def getNeighbours(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = ???
         override def getRules: Rules = ruleCollection
-        override def addRule(cellState: State, neighborRule: NeighborRule[TwoDimensionalSpace]): Unit = ???
+        override def addRule(cellState: State, neighborRule: Rule[TwoDimensionalSpace]): Unit = ???
