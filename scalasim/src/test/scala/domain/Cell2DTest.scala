@@ -21,6 +21,6 @@ class Cell2DTest extends AnyFunSuite:
     
     test("Creation of a Cell with dimension and state not null should be ok"):
         val state: State = MyState.TEST
-        val position: Position2D = Position2D(0, 0)
+        val position: Position2D = Position2D((0, 0).toList)
         val cell = Cell2D(position, state)
   
