@@ -12,7 +12,7 @@ class CellularAutomataTest extends AnyFunSuite:
   val cellularAutomata2D = CellularAutomata2D()
 
   test("Cellular Automata's map rule should be empty"):
-    this.cellularAutomata2D.getRules should be (Map())
+    this.cellularAutomata2D.rules should be (Map())
 
   test("Add new rule for the Cellular Automata"):
     val state: State = CellularState.ALIVE
