@@ -18,7 +18,7 @@ object NeighborRuleUtility:
       def relativeNeighborsLocations: Iterable[Position[D]]
       def absoluteNeighborsLocations(center: Position[D]): Iterable[Position[? <: Dimension]] =
          relativeNeighborsLocations.map(c =>
-            Position((center.coordinates zip c.coordinates) map { case (a, b) => a - b})
+            Position((center.coordinates zip c.coordinates) map { case (a, b) => a + b})
          )
 
    def getNeighboursWithState[D <: Dimension](state: State, neighbours: Neighbor[D]): List[Cell[D]] = ???
