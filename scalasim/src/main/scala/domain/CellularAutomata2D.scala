@@ -16,7 +16,8 @@ object CellularAutomata2D:
         type Rules = Map[State, NeighborRule[TwoDimensionalSpace]]
         override val ruleCollection: Rules = Map()
         override val dimension: TwoDimensionalSpace = TwoDimensionalSpace()
-        override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: List[Cell[TwoDimensionalSpace]]): Cell[TwoDimensionalSpace] = ???
+        override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbor[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] = ???
+
         override def getNeighbours(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = ???
         override def getRules: Rules = ruleCollection
         override def addRule(cellState: State, neighborRule: Rule[Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]): Unit = ???
