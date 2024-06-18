@@ -4,6 +4,9 @@ import org.scalatest.matchers.should.Matchers.*
 import domain.NeighborRuleUtility.NeighborhoodLocator
 import domain.Dimensions.TwoDimensionalSpace
 import domain.Position.Position2D
+import domain.Neighbor.Neighborhood2D
+import domain.Cell.Cell2D
+import domain.CellularAutomata.State
 
 class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
     test("Neighborhoodlocator should work as expected"):
@@ -14,3 +17,17 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
       val center = Position2D(List(0, 0))
 
       nLocator.absoluteNeighborsLocations(center) shouldBe neig.toIterable
+
+    test("A two dimensional neighborhood should be mapped correctly"):
+      val c0 = Cell2D(Position2D((0, 0).toList), new State {})
+      val others = List(
+        Cell2D(Position2D((0, 1).toList), new State {}),
+        Cell2D(Position2D((1, 0).toList), new State {}),
+        Cell2D(Position2D((1, 1).toList), new State {}),
+      ).toIterable
+
+      val n = Neighborhood2D(c0, others)
+
+      n.center shouldBe c0
+      n.neighbors shouldBe others
+
