@@ -10,7 +10,6 @@ object CellularAutomata2D:
         case x: TwoDimensionalSpace => CellularAutomata2DImpl()
         case _ => throw new IllegalArgumentException("Unsupported dimension")
     
-    import CellularAutomata.*
     enum CellularState extends State:
         case ALIVE
         case DEAD
