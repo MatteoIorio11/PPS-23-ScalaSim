@@ -10,7 +10,7 @@ object CellularAutomata:
         type Rules
         def ruleCollection: Rules
         def dimension: D
-        def applyRule(cell: Cell[D], neighbours: List[Cell[D]]): Cell[D]
+        def applyRule(cell: Cell[D], neighbors: Neighbor[D]): Cell[D]
         def getNeighbours(cell: Cell[D]): List[Cell[D]]
         def getRules: Rules
         def addRule(cellState: State, rule: Rule[I, O]): Unit
