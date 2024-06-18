@@ -12,5 +12,5 @@ object CellularAutomata:
         def applyRule(cell: Cell[D], neighbours: List[Cell[D]]): Cell[D]
         def getNeighbours(cell: Cell[D]): List[Cell[D]]
         def getRules: Rules
-        def addRule(cellState: State, neighborRule: NeighborRule[D]): Unit
+        def addRule(cellState: State, neighborRule: Rule[D]): Unit
 
