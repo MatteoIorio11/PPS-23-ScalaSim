@@ -3,17 +3,17 @@ package domain
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.Dimensions.*
-import domain.CellularAutomata2D.*
+import domain.GameOfLife.*
 import domain.CellularAutomata.*
 import domain.Rule
 import domain.Cell.*
 import org.scalatest.BeforeAndAfterEach
 
 class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
-  val cellularAutomata2D = CellularAutomata2D()
+  val gameOfLife = GameOfLife()
 
   test("Cellular Automata's map rule should be empty"):
-    this.cellularAutomata2D.rules should be (Map())
+    gameOfLife.rules should be (Map())
 
   test("Add new rule for the Cellular Automata"):
     val state: State = CellularState.ALIVE
@@ -24,5 +24,5 @@ class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
         case 3 => Cell2D(caller.position, CellularState.ALIVE)
         case y if y <= 2 => Cell2D(caller.position, CellularState.DEAD)
         case x if x > 3 => Cell2D(caller.position, CellularState.DEAD)
-    this.cellularAutomata2D.addRule(state, neighborRule)
-    this.cellularAutomata2D.rules should not be (Map())
+    gameOfLife.addRule(state, neighborRule)
+    gameOfLife.rules should not be (Map())
