@@ -10,5 +10,4 @@ trait Rule[I, O]:
    def tFunc(in: I): O
    def applyTransformation(ca: I): O = tFunc(ca)
 
-abstract class NeighborRule[D <: Dimension] extends Rule[Neighbor[D], Cell[D]]:
-   def tFunc(in: Neighbor[D]): Cell[D]
+trait NeighborRule[D <: Dimension] extends Rule[Neighbor[D], Cell[D]]

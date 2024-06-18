@@ -4,8 +4,8 @@ import domain.Dimensions.*
 import domain.Cell.*
 
 trait Neighbor[D <: Dimension]:
-    opaque type Neighborhood = List[Cell[D]]
+    type Neighborhood = List[Cell[D]]
 
-    def neighborhood(ca: Cell[D]): Neighborhood
+    def neighborhood: Neighborhood
 
-    def center(n: Neighborhood): Cell[D]
+    def center: Cell[D]

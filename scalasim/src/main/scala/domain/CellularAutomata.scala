@@ -1,7 +1,8 @@
 package domain
 
 import domain.Dimensions.*
-import domain.Neighbor.*
+import domain.Neighbor
+import domain.Rule
 import domain.Cell.*
 object CellularAutomata:
     trait State
@@ -12,5 +13,6 @@ object CellularAutomata:
         def applyRule(cell: Cell[D], neighbours: List[Cell[D]]): Cell[D]
         def getNeighbours(cell: Cell[D]): List[Cell[D]]
         def getRules: Rules
-        def addRule(cellState: State, neighborRule: Rule[D]): Unit
+        // TODO CAMBIARE SOTTO
+        def addRule(cellState: State, neighborRule: NeighborRule[D]): Unit
 
