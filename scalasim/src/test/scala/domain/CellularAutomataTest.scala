@@ -7,8 +7,9 @@ import domain.CellularAutomata2D.*
 import domain.CellularAutomata.*
 import domain.Rule
 import domain.Cell.*
+import org.scalatest.BeforeAndAfterEach
 
-class CellularAutomataTest extends AnyFunSuite:
+class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
   val cellularAutomata2D = CellularAutomata2D()
 
   test("Cellular Automata's map rule should be empty"):
@@ -24,3 +25,4 @@ class CellularAutomataTest extends AnyFunSuite:
         case y if y <= 2 => Cell2D(caller.position, CellularState.DEAD)
         case x if x > 3 => Cell2D(caller.position, CellularState.DEAD)
     this.cellularAutomata2D.addRule(state, neighborRule)
+    this.cellularAutomata2D.rules should not be (Map())
