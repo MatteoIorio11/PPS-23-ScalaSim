@@ -8,6 +8,6 @@ object Cell:
         def position: Position[D]
         def state: State
     
-    class Cell2D(val position: Position2D, val state: State) extends Cell[TwoDimensionalSpace]:
+    class Cell2D(val position: Position[TwoDimensionalSpace], val state: State) extends Cell[TwoDimensionalSpace]:
         require(position != null)
         require(state != null)
