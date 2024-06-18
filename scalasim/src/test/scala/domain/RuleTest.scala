@@ -7,7 +7,7 @@ import domain.GameOfLife
 
 class RuleTest extends org.scalatest.funsuite.AnyFunSuite:
 
-  test("An identity Rule should return the same automaton"):
+  test("An identity Rule should return the same input"):
     val r: Rule[Any, Any] = x => x
     val ca = GameOfLife()
 
