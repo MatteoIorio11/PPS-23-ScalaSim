@@ -9,3 +9,10 @@ trait Neighbor[D <: Dimension]:
     def neighborhood: Neighborhood
 
     def center: Cell[D]
+
+object Neighbor:
+    case class Neighborhood2D(
+        override val center: Cell[TwoDimensionalSpace],
+        val neighbors: Iterable[Cell[TwoDimensionalSpace]]
+    ) extends Neighbor[TwoDimensionalSpace]:
+        override def neighborhood: Neighborhood = neighbors.toList
