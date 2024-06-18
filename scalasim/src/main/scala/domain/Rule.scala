@@ -15,10 +15,10 @@ trait NeighborRule[D <: Dimension] extends Rule[Neighbor[D], Cell[D]]
 
 object NeighborRuleUtility:
    trait NeighborhoodLocator[D <: Dimension]:
-      def relativeNeighborsLocations: Iterable[Cell[D]]
-      def absoluteNeighborsLocations(center: Cell[D]): Iterable[Cell[D]]
-
-   extension (l: Iterable[Int])
-      infix def elementWiseMinus(l2: Iterable[Int]): Iterable[Int] = (l zip l2) map { case (a, b) => a - b }
+      def relativeNeighborsLocations: Iterable[Position[D]]
+      def absoluteNeighborsLocations(center: Position[D]): Iterable[Position[? <: Dimension]] =
+         relativeNeighborsLocations.map(c =>
+            Position((center.coordinates zip c.coordinates) map { case (a, b) => a - b})
+         )
 
    def getNeighboursWithState[D <: Dimension](state: State, neighbours: Neighbor[D]): List[Cell[D]] = ???
