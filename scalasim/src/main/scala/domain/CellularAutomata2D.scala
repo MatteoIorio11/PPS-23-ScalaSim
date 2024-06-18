@@ -6,17 +6,17 @@ import domain.Neighbor
 import domain.Cell.*
 
 object CellularAutomata2D:
-    def apply(): CellularAutomata[TwoDimensionalSpace] = 
+    def apply(): CellularAutomata[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] = 
         CellularAutomata2DImpl()
     
     enum CellularState extends State:
         case ALIVE
         case DEAD
-    case class CellularAutomata2DImpl() extends CellularAutomata[TwoDimensionalSpace]:
+    case class CellularAutomata2DImpl() extends CellularAutomata[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
         type Rules = Map[State, NeighborRule[TwoDimensionalSpace]]
         override val ruleCollection: Rules = Map()
         override val dimension: TwoDimensionalSpace = TwoDimensionalSpace()
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: List[Cell[TwoDimensionalSpace]]): Cell[TwoDimensionalSpace] = ???
         override def getNeighbours(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = ???
         override def getRules: Rules = ruleCollection
-        override def addRule(cellState: State, neighborRule: NeighborRule[TwoDimensionalSpace]): Unit = ???
+        override def addRule(cellState: State, neighborRule: Rule[Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]): Unit = ???
