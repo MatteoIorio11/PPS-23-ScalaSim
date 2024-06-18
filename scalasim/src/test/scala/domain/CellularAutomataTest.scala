@@ -7,6 +7,7 @@ import domain.GameOfLife.*
 import domain.CellularAutomata.*
 import domain.Rule
 import domain.Cell.*
+import domain.Position.*
 import org.scalatest.BeforeAndAfterEach
 
 class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
@@ -21,8 +22,8 @@ class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
       val y = NeighborRuleUtility.getNeighboursWithState(CellularState.ALIVE, x)
       val caller = x.center
       y.length match
-        case 3 => Cell2D(caller.position, CellularState.ALIVE)
-        case y if y <= 2 => Cell2D(caller.position, CellularState.DEAD)
-        case x if x > 3 => Cell2D(caller.position, CellularState.DEAD)
+        case 3 => Cell2D(caller.position.asPosition[Position2D], CellularState.ALIVE)
+        case y if y <= 2 => Cell2D(caller.position.asPosition[Position2D], CellularState.DEAD)
+        case x if x > 3 => Cell2D(caller.position.asPosition[Position2D], CellularState.DEAD)
     gameOfLife.addRule(state, neighborRule)
     gameOfLife.rules should not be (Map())
