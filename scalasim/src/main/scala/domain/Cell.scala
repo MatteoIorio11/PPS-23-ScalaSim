@@ -16,4 +16,4 @@ trait Cell[D <: Dimension]:
 
 object Cell:
     def apply[D <: Dimension](p: Position[D], s: State): Cell[D] = new CellImpl(p, s)
-    class CellImpl[D <: Dimension](override val position: Position[D], override val state: State) extends Cell[D]
+    case class CellImpl[D <: Dimension](override val position: Position[D], override val state: State) extends Cell[D]
