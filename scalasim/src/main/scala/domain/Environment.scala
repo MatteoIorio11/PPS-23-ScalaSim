@@ -46,11 +46,14 @@ object GameOfLifeEnvironment:
 
     import Environment.*
     class GameOfLifeEnvironmentImpl(val dimension: Int, val cellularAutomata: CellularAutomata[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]) extends Environment[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
+        require(dimension > 0)
+        require(cellularAutomata != null)
         type Matrix = Array[Array[Cell[TwoDimensionalSpace]]]
         var matrix: Matrix = Array.ofDim[Array[Cell[TwoDimensionalSpace]]](dimension).initializeEmpty2D(dimension = dimension)
         
         initialise()
-        override def neighboors(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = ???
+        override def neighboors(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = 
+            cellularAutomata.neighboors(cell)
         override protected def initialise(): Unit = 
             val cells: Int = Random.nextInt(maxCellsToSpawn) + 1
             matrix.initialiseAliveCells(cells, dimension)
