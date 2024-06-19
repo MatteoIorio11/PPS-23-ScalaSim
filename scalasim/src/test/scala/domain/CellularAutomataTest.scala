@@ -27,3 +27,25 @@ class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
         case x if x > 3 => Cell(caller.position.asPosition[Position2D], CellState.DEAD)
     gameOfLife.addRule(state, neighborRule)
     gameOfLife.rules should not be (Map())
+
+  test("Given a Cell we should be able to retrieve the correct neighboors"):
+    val cell = Cell(Position2D((0, 0).toList), CellState.DEAD) 
+    val state: State = CellState.ALIVE
+    val others = List(
+        Cell(Position2D((0, 1).toList), CellState.DEAD),
+        Cell(Position2D((1, 0).toList), CellState.DEAD),
+        Cell(Position2D((1, 0).toList), CellState.DEAD),
+        Cell(Position2D((-1, 0).toList), CellState.DEAD),
+        Cell(Position2D((0, -1).toList), CellState.DEAD),
+        Cell(Position2D((1, -1).toList), CellState.DEAD),
+        Cell(Position2D((-1, 1).toList), CellState.DEAD),
+        Cell(Position2D((-1, -1).toList), CellState.DEAD),
+      ).toIterable
+    val neighbor: Neighbor[TwoDimensionalSpace] = Neighbor(cell, others)
+    val rule: NeighborRule[TwoDimensionalSpace] = (neighbor) => 
+      val y = 0
+      Cell(Position((0,0).toList), CellState.DEAD)
+    gameOfLife.addRule(state, rule)
+    gameOfLife.neighboors(Cell(Position((0,0).toList), CellState.DEAD)) should be (neighbor.neighborhood)
+
+
