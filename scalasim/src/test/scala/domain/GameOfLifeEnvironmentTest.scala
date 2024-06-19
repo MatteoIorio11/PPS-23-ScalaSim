@@ -11,5 +11,9 @@ class GameOfLifeEnvironmentTest extends AnyFunSuite with BeforeAndAfterEach:
     val env = GameOfLifeEnvironment(dimension)
 
     test("Initialize an environment should add cells into the matrix"):
-        env.start()
         env.matrix.length should not be 0
+    
+    test("Initialization should also add alive cells"):
+        print(env.matrix)
+        env.matrix.flatMap(array => array.map(cell => cell.state))
+        .filter(state => state == CellState.ALIVE).length should not be 0
