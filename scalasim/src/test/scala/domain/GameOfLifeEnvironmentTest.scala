@@ -5,15 +5,24 @@ import org.scalatest.matchers.should.Matchers.*
 import domain.GameOfLifeEnvironment.*
 import domain.GameOfLife.*
 import org.scalatest.BeforeAndAfterEach
+import domain.Dimensions.TwoDimensionalSpace
 
 class GameOfLifeEnvironmentTest extends AnyFunSuite with BeforeAndAfterEach:
     val dimension = 100
     val env = GameOfLifeEnvironment(dimension)
 
+    test("Initialise environment with dimension <= 0 should throw an error"):
+        val exception = intercept[RuntimeException](GameOfLifeEnvironment(0))
+        exception shouldBe a[IllegalArgumentException]
+
+
     test("Initialize an environment should add cells into the matrix"):
         env.matrix.length should not be 0
     
     test("Initialization should also add alive cells"):
-        print(env.matrix)
         env.matrix.flatMap(array => array.map(cell => cell.state))
-        .filter(state => state == CellState.ALIVE).length should not be 0
+            .filter(state => state == CellState.ALIVE).length should not be 0
+    
+    test("The neighboors of a cell should always exits"):
+        val cell: Cell[TwoDimensionalSpace] = Cell(Position((0,0).toList), CellState.DEAD)
+        env.neighboors(cell = cell)
