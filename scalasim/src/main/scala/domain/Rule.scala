@@ -30,7 +30,8 @@ object NeighborRuleUtility:
       
    trait NeighborhoodLocator[D <: Dimension]:
       def relativeNeighborsLocations: Iterable[Position[D]]
-      def absoluteNeighborsLocations(center: Position[D]): Iterable[Position[? <: Dimension]] =
+
+      def absoluteNeighborsLocations(center: Position[D]): Iterable[Position[D]] =
          relativeNeighborsLocations.map(c =>
             Position((center.coordinates zip c.coordinates) map { case (a, b) => a + b})
          ).filter(p => !p.coordinates.toList.contains((x: Int) => x < 0))
