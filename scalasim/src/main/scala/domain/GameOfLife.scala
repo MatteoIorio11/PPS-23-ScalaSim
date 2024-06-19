@@ -9,7 +9,7 @@ object GameOfLife:
     def apply(): CellularAutomata[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] = 
         GameOfLifeImpl()
     
-    enum CellularState extends State:
+    enum CellState extends State:
         case ALIVE
         case DEAD
     case class GameOfLifeImpl() extends CellularAutomata[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
