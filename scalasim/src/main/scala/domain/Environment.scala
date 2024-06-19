@@ -15,7 +15,7 @@ object Environment:
         def dimension: Int
         def cellularAutomata: CellularAutomata[D, I, O]
         def neighboors(cell: Cell[D]): List[Cell[D]]
-        protected def start(): Unit
+        protected def initialise(): Unit
         def nextIteration(): Unit
 
 
@@ -34,23 +34,24 @@ object GameOfLifeEnvironment:
                     array(x)(y) = Cell(Position2D((x, y).toList), CellState.DEAD)
             array
 
-        def initialiseAliveCells(nCells: Int, dimension: Int): Unit = 
-            var usedPositions = Set[Position[TwoDimensionalSpace]]()
-            for cell <- 0 until nCells
-                x = Random.nextInt(dimension)
-                y = Random.nextInt(dimension)
-                position = Position2D((x, y).toList)
-                if !usedPositions.contains(position)
-            yield
-                array(x)(y) = Cell(position, CellState.ALIVE)
-                usedPositions = usedPositions.incl(position)
+        def initialiseAliveCells(nCells: Int, dimension: Int): Unit =
+            var spawnedCells = 0
+            while (spawnedCells < nCells)
+                val x = Random.nextInt(dimension)
+                val y = Random.nextInt(dimension)
+                val position = Position2D((x, y).toList)
+                if (array(x)(y).state == CellState.DEAD)
+                    array(x)(y) = Cell(position, CellState.ALIVE)
+                    spawnedCells = spawnedCells + 1
 
     import Environment.*
     class GameOfLifeEnvironmentImpl(val dimension: Int, val cellularAutomata: CellularAutomata[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]) extends Environment[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
         type Matrix = Array[Array[Cell[TwoDimensionalSpace]]]
-        def matrix: Matrix = Array.ofDim[Array[Cell[TwoDimensionalSpace]]](dimension).initializeEmpty2D(dimension = dimension)
+        var matrix: Matrix = Array.ofDim[Array[Cell[TwoDimensionalSpace]]](dimension).initializeEmpty2D(dimension = dimension)
+        
+        initialise()
         override def neighboors(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = ???
-        override def start(): Unit = 
+        override protected def initialise(): Unit = 
             val cells: Int = Random.nextInt(maxCellsToSpawn) + 1
             matrix.initialiseAliveCells(cells, dimension)
 
