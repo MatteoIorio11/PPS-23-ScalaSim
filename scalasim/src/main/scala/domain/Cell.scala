@@ -2,13 +2,14 @@ package domain
 
 import domain.Dimensions.*
 import domain.CellularAutomata.*
-import domain.Position.{Position2D, Position3D}
+import domain.Position
+
+trait Cell[D <: Dimension]:
+    def position: Position[D]
+    def state: State
+
 object Cell:
-    trait Cell[D <: Dimension]:
-        def position: Position[D]
-        def state: State
+    def apply[D <: Dimension](p: Position[D], s: State): Cell[D] = new CellImpl(p, s)
+    class CellImpl[D <: Dimension](override val position: Position[D], override val state: State) extends Cell[D]
+
     
-    class Cell2D(val position: Position2D, val state: State) extends Cell[TwoDimensionalSpace]:
-        require(position != null) ; require(state != null)
-    class Cell3D(val position: Position3D, val state: State) extends Cell[ThreeDimensionalSpace]:
-        require(position != null) ; require(state != null)

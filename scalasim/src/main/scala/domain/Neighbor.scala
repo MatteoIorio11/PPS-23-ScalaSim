@@ -11,16 +11,7 @@ trait Neighbor[D <: Dimension]:
     def center: Cell[D]
 
 object Neighbor:
-    abstract class AbstractNeighborhood[D <: Dimension](
-        override val center: Cell[D],
-        val neighbors: Iterable[Cell[D]],
-    ) extends Neighbor[D]:
+    def apply[D <: Dimension](center: Cell[D], neighbors: Iterable[Cell[D]]): Neighbor[D] = new NeighborImpl(center, neighbors)
+    
+    class NeighborImpl[D <: Dimension](override val center: Cell[D], val neighbors: Iterable[Cell[D]]) extends Neighbor[D]:
         override def neighborhood: Neighborhood = neighbors.toList
-
-    case class Neighborhood2D(
-        override val center: Cell2D, override val neighbors: Iterable[Cell2D]
-    ) extends AbstractNeighborhood[TwoDimensionalSpace](center, neighbors)
-
-    case class Neighborhood3D(
-        override val center: Cell3D, override val neighbors: Iterable[Cell3D]
-    ) extends AbstractNeighborhood[ThreeDimensionalSpace](center, neighbors)

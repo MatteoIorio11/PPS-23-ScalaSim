@@ -3,7 +3,7 @@ package domain
 import domain.Dimensions.Dimension
 import domain.Dimensions.TwoDimensionalSpace
 import domain.Position
-import domain.Cell.Cell
+import domain.Cell
 import domain.Neighbor
 import domain.CellularAutomata.State
 
