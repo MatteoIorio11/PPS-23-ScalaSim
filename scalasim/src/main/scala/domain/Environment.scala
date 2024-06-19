@@ -7,6 +7,8 @@ import domain.Cell.*
 import scala.util.Random
 import domain.Position.Position2D
 import domain.GameOfLife.*
+import domain.NeighborRuleUtility.NeighborhoodLocator
+import domain.NeighborRuleUtility.CircleNeighborhoodLocator
 
 object Environment:
     trait Environment[D <: Dimension, I, O]:
@@ -45,7 +47,10 @@ object GameOfLifeEnvironment:
                     spawnedCells = spawnedCells + 1
 
     import Environment.*
-    class GameOfLifeEnvironmentImpl(val dimension: Int, val cellularAutomata: CellularAutomata[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]) extends Environment[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
+    class GameOfLifeEnvironmentImpl(
+        val dimension: Int,
+        val cellularAutomata: CellularAutomata[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]],
+        ) extends Environment[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
         require(dimension > 0)
         require(cellularAutomata != null)
         type Matrix = Array[Array[Cell[TwoDimensionalSpace]]]
@@ -53,7 +58,10 @@ object GameOfLifeEnvironment:
         
         initialise()
         override def neighboors(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = 
-            cellularAutomata.neighboors(cell)
+            given NeighborhoodLocator[TwoDimensionalSpace] = CircleNeighborhoodLocator()
+            cellularAutomata.neighboors(cell).map(p => p.coordinates.toList).map(c => matrix(c(0))(c(1)))
+            
+
         override protected def initialise(): Unit = 
             val cells: Int = Random.nextInt(maxCellsToSpawn) + 1
             matrix.initialiseAliveCells(cells, dimension)

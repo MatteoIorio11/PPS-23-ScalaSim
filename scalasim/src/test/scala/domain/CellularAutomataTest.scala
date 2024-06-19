@@ -9,6 +9,8 @@ import domain.Rule
 import domain.Cell.*
 import domain.Position.*
 import org.scalatest.BeforeAndAfterEach
+import domain.NeighborRuleUtility.NeighborhoodLocator
+import domain.NeighborRuleUtility.CircleNeighborhoodLocator
 
 class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
   val gameOfLife = GameOfLife()
@@ -46,6 +48,7 @@ class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
       val y = 0
       Cell(Position((0,0).toList), CellState.DEAD)
     gameOfLife.addRule(state, rule)
-    gameOfLife.neighboors(Cell(Position((0,0).toList), CellState.DEAD)) should be (neighbor.neighborhood)
+    given NeighborhoodLocator[TwoDimensionalSpace] = CircleNeighborhoodLocator()
+    gameOfLife.neighboors(Cell(Position((0,0).toList), CellState.DEAD)) shouldBe neighbor.neighborhood.map(c => c.position)
 
 
