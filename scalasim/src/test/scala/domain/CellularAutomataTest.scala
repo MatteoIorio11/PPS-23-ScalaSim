@@ -3,7 +3,7 @@ package domain
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.base.Dimensions.*
-import domain.GameOfLife.*
+import domain.simulations.gameoflife.GameOfLife.*
 import domain.automaton.CellularAutomata.*
 import domain.automaton.Rule
 import domain.automaton.Cell.*
@@ -15,6 +15,7 @@ import domain.automaton.Cell
 import domain.base.Position
 import domain.automaton.Neighbor
 import automaton.NeighborRule
+import simulations.gameoflife.GameOfLife
 
 class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
   val gameOfLife = GameOfLife()

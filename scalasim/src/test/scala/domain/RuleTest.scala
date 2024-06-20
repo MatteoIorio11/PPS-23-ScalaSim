@@ -3,7 +3,7 @@ package domain
 import org.scalatest.matchers.should.Matchers.*
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.CellularAutomata.CellularAutomata
-import domain.GameOfLife
+import domain.simulations.gameoflife.GameOfLife
 import automaton.Rule
 
 class RuleTest extends org.scalatest.funsuite.AnyFunSuite:

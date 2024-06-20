@@ -3,7 +3,7 @@ package domain
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.GameOfLifeEnvironment.*
-import domain.GameOfLife.*
+import domain.simulations.gameoflife.GameOfLife.*
 import org.scalatest.BeforeAndAfterEach
 import domain.base.Dimensions.TwoDimensionalSpace
 import automaton.Cell
