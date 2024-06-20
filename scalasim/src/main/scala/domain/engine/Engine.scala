@@ -12,6 +12,8 @@ object Engine:
         def environment: Environment[D, I, O]
         def nextIteration: Unit
         def currentState: Matrix
+        def start: Unit
+        def stop: Unit
 
 object Engine2D:
     import Engine.*
@@ -23,5 +25,6 @@ object Engine2D:
 
         override def currentState: Matrix = ???
 
+        override def stop: Unit = ???
 
-
+        override def start: Unit = ???
