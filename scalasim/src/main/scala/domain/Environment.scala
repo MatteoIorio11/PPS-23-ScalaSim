@@ -18,7 +18,6 @@ object Environment:
         def cellularAutomata: CellularAutomata[D, I, O]
         def neighboors(cell: Cell[D]): List[Cell[D]]
         protected def initialise(): Unit
-        def nextIteration(): Unit
         protected def availableCells(positions: List[Position[D]]): List[Cell[D]]
     
 
@@ -74,5 +73,3 @@ object GameOfLifeEnvironment:
         override protected def initialise(): Unit = 
             val cells: Int = Random.nextInt(maxCellsToSpawn) + 1
             matrix.initialiseAliveCells(cells, dimension)
-
-        override def nextIteration(): Unit = ???
