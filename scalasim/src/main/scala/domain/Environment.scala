@@ -2,12 +2,12 @@ package domain
 
 import scala.collection.mutable.ArrayBuffer
 import domain.base.Dimensions.*
-import domain.CellularAutomata.*
+import domain.automaton.CellularAutomata.*
 import domain.automaton.Cell.*
 import scala.util.Random
 import domain.base.Position.Position2D
 import domain.GameOfLife.*
-import domain.NeighborRuleUtility.NeighborhoodLocator
+import domain.automaton.NeighborRuleUtility.NeighborhoodLocator
 import automaton.Cell
 import base.Position
 import automaton.Neighbor
@@ -67,7 +67,7 @@ object GameOfLifeEnvironment:
         
         initialise()
         override def neighboors(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = 
-            import domain.NeighborRuleUtility.given
+            import domain.automaton.NeighborRuleUtility.given
             availableCells(circleNeighborhoodLocator.absoluteNeighborsLocations(cell.position).toList)
 
         override protected def initialise(): Unit = 

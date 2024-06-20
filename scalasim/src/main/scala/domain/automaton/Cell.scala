@@ -1,7 +1,7 @@
 package domain.automaton
 
 import domain.base.Dimensions.*
-import domain.CellularAutomata.*
+import domain.automaton.CellularAutomata.*
 import domain.base.Position
 
 /**

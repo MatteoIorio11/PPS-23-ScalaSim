@@ -1,13 +1,13 @@
 package domain
 
 import org.scalatest.matchers.should.Matchers.*
-import domain.NeighborRuleUtility.NeighborhoodLocator
+import domain.automaton.NeighborRuleUtility.NeighborhoodLocator
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position.Position2D
 import domain.automaton.Neighbor
 import domain.automaton.Cell
-import domain.CellularAutomata.State
-import domain.CellularAutomata.CellularAutomata
+import domain.automaton.CellularAutomata.State
+import domain.automaton.CellularAutomata.CellularAutomata
 import base.Position
 
 class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:

@@ -4,16 +4,17 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.base.Dimensions.*
 import domain.GameOfLife.*
-import domain.CellularAutomata.*
-import domain.Rule
+import domain.automaton.CellularAutomata.*
+import domain.automaton.Rule
 import domain.automaton.Cell.*
 import domain.base.Position.*
 import org.scalatest.BeforeAndAfterEach
-import domain.NeighborRuleUtility.NeighborhoodLocator
-import domain.NeighborRuleUtility.given
+import domain.automaton.NeighborRuleUtility.NeighborhoodLocator
+import domain.automaton.NeighborRuleUtility.given
 import domain.automaton.Cell
 import domain.base.Position
 import domain.automaton.Neighbor
+import automaton.NeighborRule
 
 class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
   val gameOfLife = GameOfLife()
@@ -24,7 +25,7 @@ class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
   test("Add new rule for the Cellular Automata"):
     val state: State = CellState.ALIVE
     val neighborRule: NeighborRule[TwoDimensionalSpace] = (x: Neighbor[TwoDimensionalSpace]) => 
-      val y = NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x)
+      val y = automaton.NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x)
       val caller = x.center
       y.length match
         case 3 => Cell(caller.position.asPosition[Position2D], CellState.ALIVE)

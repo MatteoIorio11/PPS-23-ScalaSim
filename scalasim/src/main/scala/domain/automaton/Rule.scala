@@ -1,11 +1,11 @@
-package domain
+package domain.automaton
 
 import domain.base.Dimensions.Dimension
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position
 import domain.automaton.Cell
 import domain.automaton.Neighbor
-import domain.CellularAutomata.State
+import CellularAutomata.State
 
 trait Rule[I, O]:
    def tFunc(in: I): O
