@@ -54,9 +54,7 @@ object GameOfLifeEnvironment:
             positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < dimension))
               .map(pos => pos.coordinates.toList)
               .map(cor => matrix(cor.head)(cor.last))
-
-        type Matrix = Array[Array[Cell[TwoDimensionalSpace]]]
-        var matrix: Matrix = Array.ofDim[Array[Cell[TwoDimensionalSpace]]](dimension).initializeEmpty2D(dimension = dimension)
+        override def matrix: Matrix = Array.ofDim[Array[Cell[TwoDimensionalSpace]]](dimension).initializeEmpty2D(dimension = dimension)
 
         initialise()
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
