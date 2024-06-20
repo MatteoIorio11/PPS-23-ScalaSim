@@ -19,7 +19,6 @@ object GameOfLife:
         override val dimension: TwoDimensionalSpace = TwoDimensionalSpace()
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbor[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] = ???
         override def neighboors(cell: Cell[TwoDimensionalSpace])(using locator: NeighborhoodLocator[TwoDimensionalSpace]): List[Position[TwoDimensionalSpace]] = 
-            val rule = ruleCollection.get(cell.state)
             locator.relativeNeighborsLocations.toList
         override def rules: Rules = ruleCollection
         override def addRule(cellState: State, neighborRule: NeighborRule[TwoDimensionalSpace]): Unit = 
