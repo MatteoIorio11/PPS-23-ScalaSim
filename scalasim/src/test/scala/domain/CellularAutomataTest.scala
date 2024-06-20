@@ -42,5 +42,3 @@ class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
     gameOfLife.addRule(state, rule)
     given NeighborhoodLocator[TwoDimensionalSpace] = CircleNeighborhoodLocator()
     gameOfLife.neighboors(Cell(Position((0,0).toList), CellState.DEAD)) shouldBe neighbor.neighborhood.map(c => c.position)
-
-
