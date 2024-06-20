@@ -19,7 +19,8 @@ object Environment:
         def neighboors(cell: Cell[D]): List[Cell[D]]
         protected def initialise(): Unit
         def nextIteration(): Unit
-
+        protected def availableCells(positions: List[Position[D]]): List[Cell[D]]
+    
 
 object GameOfLifeEnvironment:
     val maxCellsToSpawn = 50
@@ -53,14 +54,22 @@ object GameOfLifeEnvironment:
         ) extends Environment[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
         require(dimension > 0)
         require(cellularAutomata != null)
+
+
+        override protected def availableCells(positions: List[Position[TwoDimensionalSpace]]): List[Cell[TwoDimensionalSpace]] = 
+            positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < dimension))
+                .map(pos => pos.coordinates.toList)
+                .map(cor => matrix(cor(0))(cor(1)))
+
         type Matrix = Array[Array[Cell[TwoDimensionalSpace]]]
         var matrix: Matrix = Array.ofDim[Array[Cell[TwoDimensionalSpace]]](dimension).initializeEmpty2D(dimension = dimension)
         
         initialise()
         override def neighboors(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = 
-            given NeighborhoodLocator[TwoDimensionalSpace] = CircleNeighborhoodLocator()
-            cellularAutomata.neighboors(cell).map(p => p.coordinates.toList).map(c => matrix(c(0))(c(1)))
-            
+            val circleN = CircleNeighborhoodLocator()
+            val positions = circleN.absoluteNeighborsLocations(cell.position)
+                .toList
+            availableCells(positions)
 
         override protected def initialise(): Unit = 
             val cells: Int = Random.nextInt(maxCellsToSpawn) + 1
