@@ -10,7 +10,7 @@ import domain.Cell.*
 import domain.Position.*
 import org.scalatest.BeforeAndAfterEach
 import domain.NeighborRuleUtility.NeighborhoodLocator
-import domain.NeighborRuleUtility.CircleNeighborhoodLocator
+import domain.NeighborRuleUtility.given
 
 class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
   val gameOfLife = GameOfLife()
@@ -33,14 +33,12 @@ class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
   test("Given a Cell we should be able to retrieve the correct neighboors"):
     val cell = Cell(Position2D((0, 0).toList), CellState.DEAD) 
     val state: State = CellState.ALIVE
-    val circleN = CircleNeighborhoodLocator()
-    val others = circleN.relativeNeighborsLocations.map(pos => Cell(pos, CellState.DEAD))
+    val others = circleNeighborhoodLocator.relativeNeighborsLocations.map(pos => Cell(pos, CellState.DEAD))
     val neighbor: Neighbor[TwoDimensionalSpace] = Neighbor(cell, others)
     val rule: NeighborRule[TwoDimensionalSpace] = (neighbor) => 
       val y = 0
       Cell(Position((0,0).toList), CellState.DEAD)
     gameOfLife.addRule(state, rule)
-    given NeighborhoodLocator[TwoDimensionalSpace] = CircleNeighborhoodLocator()
     gameOfLife.neighboors(Cell(Position((0,0).toList), CellState.DEAD)) shouldBe neighbor.neighborhood.map(c => c.position)
 
   test("Apply rule on a specific cell should return the right cell"):

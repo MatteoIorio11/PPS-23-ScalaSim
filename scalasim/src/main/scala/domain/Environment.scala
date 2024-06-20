@@ -8,7 +8,6 @@ import scala.util.Random
 import domain.Position.Position2D
 import domain.GameOfLife.*
 import domain.NeighborRuleUtility.NeighborhoodLocator
-import domain.NeighborRuleUtility.CircleNeighborhoodLocator
 
 object Environment:
     trait Environment[D <: Dimension, I, O]:
@@ -65,10 +64,8 @@ object GameOfLifeEnvironment:
         
         initialise()
         override def neighboors(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] = 
-            val circleN = CircleNeighborhoodLocator()
-            val positions = circleN.absoluteNeighborsLocations(cell.position)
-                .toList
-            availableCells(positions)
+            import domain.NeighborRuleUtility.given
+            availableCells(circleNeighborhoodLocator.absoluteNeighborsLocations(cell.position).toList)
 
         override protected def initialise(): Unit = 
             val cells: Int = Random.nextInt(maxCellsToSpawn) + 1
