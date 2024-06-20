@@ -32,9 +32,19 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
       n.center shouldBe c0
       n.neighborhood shouldBe others
 
+    test("A Neighborhood Locator should behave as expected"):
+      val positions = List((0, -1), (0, 1)) map (c => Position2D(c.toList))
+      val horizontalNL = new NeighborhoodLocator[TwoDimensionalSpace]:
+        override def relativeNeighborsLocations: Iterable[Position[TwoDimensionalSpace]] = positions
+
+
+      horizontalNL.relativeNeighborsLocations shouldBe positions.toIterable
+      val expectedPositions = List((0, 0), (0, 2)) map (c => Position2D(c.toList))
+      val center = Position2D((0, 1).toList)
+      horizontalNL.absoluteNeighborsLocations(center) shouldBe expectedPositions.toIterable
+
     test("A Neighborhood Locator should map a correct neighborhood"):
       val c0 = Cell(Position2D((1, 1).toList), new State {})
-
       val c1 = Position2D((0, 0).toList)
       val c2 = Position2D((2, 2).toList)
 
