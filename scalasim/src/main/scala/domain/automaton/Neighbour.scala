@@ -13,16 +13,15 @@ import domain.automaton.Cell
  *
  * @param D the [[Dimension]] of the space.
  */
-trait Neighbor[D <: Dimension]:
-    type Neighborhood = List[Cell[D]]
+trait Neighbour[D <: Dimension]:
+    type Neighbourhood = List[Cell[D]]
 
-    def neighborhood: Neighborhood
+    def neighbourhood: Neighbourhood
 
     def center: Cell[D]
 
-object Neighbor:
-    def apply[D <: Dimension](center: Cell[D], neighbors: Iterable[Cell[D]]): Neighbor[D] =
-        new NeighborImpl(center, neighbors)
-    
-    class NeighborImpl[D <: Dimension](override val center: Cell[D], val neighbors: Iterable[Cell[D]]) extends Neighbor[D]:
-        override def neighborhood: Neighborhood = neighbors.toList
+object Neighbour:
+    def apply[D <: Dimension](center: Cell[D], neighbors: Iterable[Cell[D]]): Neighbour[D] = NeighbourImpl(center, neighbors)
+
+    private class NeighbourImpl[D <: Dimension](override val center: Cell[D], val neighbors: Iterable[Cell[D]]) extends Neighbour[D]:
+        override def neighbourhood: Neighbourhood = neighbors.toList

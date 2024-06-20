@@ -4,10 +4,10 @@ import org.scalatest.matchers.should.Matchers.*
 import domain.automaton.NeighborRuleUtility.NeighborhoodLocator
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position.Position2D
-import domain.automaton.Neighbor
+import domain.automaton.Neighbour
 import domain.automaton.Cell
-import domain.automaton.CellularAutomata.State
-import domain.automaton.CellularAutomata.CellularAutomata
+import domain.automaton.CellularAutomaton.State
+import domain.automaton.CellularAutomaton.CellularAutomata
 import base.Position
 
 class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
@@ -28,10 +28,10 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
         Cell(Position2D((1, 1).toList), new State {}),
       ).toIterable
 
-      val n = Neighbor(c0, others)
+      val n = Neighbour(c0, others)
 
       n.center shouldBe c0
-      n.neighborhood shouldBe others
+      n.neighbourhood shouldBe others
 
     test("A Neighborhood Locator should behave as expected"):
       val positions = List((0, -1), (0, 1)) map (c => Position2D(c.toList))
@@ -54,4 +54,3 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
            List((-1, -1), (1, 1)).map(c => Position2D(c.toList))
           
       diagonalNeighbourhoodLocator.absoluteNeighborsLocations(c0.position) shouldBe List(c1, c2).toIterable
-        

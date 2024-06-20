@@ -1,7 +1,7 @@
 package domain.automaton
 
 import domain.base.Dimensions.*
-import domain.automaton.CellularAutomata.*
+import domain.automaton.CellularAutomaton.*
 import domain.base.Position
 
 /**
@@ -15,5 +15,5 @@ trait Cell[D <: Dimension]:
     def state: State
 
 object Cell:
-    def apply[D <: Dimension](p: Position[D], s: State): Cell[D] = new CellImpl(p, s)
-    case class CellImpl[D <: Dimension](override val position: Position[D], override val state: State) extends Cell[D]
+    def apply[D <: Dimension](p: Position[D], s: State): Cell[D] = CellImpl(p, s)
+    private case class CellImpl[D <: Dimension](override val position: Position[D], override val state: State) extends Cell[D]

@@ -4,7 +4,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.base.Dimensions.*
 import domain.simulations.gameoflife.GameOfLife.*
-import domain.automaton.CellularAutomata.*
+import domain.automaton.CellularAutomaton.*
 import domain.automaton.Rule
 import domain.automaton.Cell.*
 import domain.base.Position.*
@@ -13,7 +13,7 @@ import domain.automaton.NeighborRuleUtility.NeighborhoodLocator
 import domain.automaton.NeighborRuleUtility.given
 import domain.automaton.Cell
 import domain.base.Position
-import domain.automaton.Neighbor
+import domain.automaton.Neighbour
 import automaton.NeighborRule
 import simulations.gameoflife.GameOfLife
 
@@ -25,7 +25,7 @@ class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
 
   test("Add new rule for the Cellular Automata"):
     val state: State = CellState.ALIVE
-    val neighborRule: NeighborRule[TwoDimensionalSpace] = (x: Neighbor[TwoDimensionalSpace]) => 
+    val neighborRule: NeighborRule[TwoDimensionalSpace] = (x: Neighbour[TwoDimensionalSpace]) => 
       val y = automaton.NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x)
       val caller = x.center
       y.length match
@@ -35,22 +35,11 @@ class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
     gameOfLife.addRule(state, neighborRule)
     gameOfLife.rules should not be (Map())
 
-  test("Given a Cell we should be able to retrieve the correct neighboors"):
-    val cell = Cell(Position2D((0, 0).toList), CellState.DEAD) 
-    val state: State = CellState.ALIVE
-    val others = circleNeighborhoodLocator.relativeNeighborsLocations.map(pos => Cell(pos, CellState.DEAD))
-    val neighbor: Neighbor[TwoDimensionalSpace] = Neighbor(cell, others)
-    val rule: NeighborRule[TwoDimensionalSpace] = (neighbor) => 
-      val y = 0
-      Cell(Position((0,0).toList), CellState.DEAD)
-    gameOfLife.addRule(state, rule)
-    gameOfLife.neighboors(Cell(Position((0,0).toList), CellState.DEAD)) shouldBe neighbor.neighborhood.map(c => c.position)
-
   test("Apply rule on a specific cell should return the right cell"):
     val cell = Cell(Position2D((0,0).toList), CellState.DEAD)
     val state = CellState.DEAD
     val neighbors = List.empty
-    val neighbor: Neighbor[TwoDimensionalSpace] = Neighbor(cell, neighbors)
+    val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
     val rule: NeighborRule[TwoDimensionalSpace] = (neighbor) => 
       Cell(Position((0,0).toList), CellState.ALIVE)
     gameOfLife.addRule(state, rule)

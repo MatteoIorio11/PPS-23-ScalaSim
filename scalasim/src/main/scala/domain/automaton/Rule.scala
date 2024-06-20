@@ -4,14 +4,14 @@ import domain.base.Dimensions.Dimension
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position
 import domain.automaton.Cell
-import domain.automaton.Neighbor
-import CellularAutomata.State
+import domain.automaton.Neighbour
+import CellularAutomaton.State
 
 trait Rule[I, O]:
    def tFunc(in: I): O
    def applyTransformation(ca: I): O = tFunc(ca)
 
-trait NeighborRule[D <: Dimension] extends Rule[Neighbor[D], Cell[D]]
+trait NeighborRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D]]
 
 object NeighborRuleUtility:
    enum RelativePositions(x: Int, y: Int):
@@ -50,4 +50,4 @@ object NeighborRuleUtility:
             BottomRight,
          ).map(p => Position(p.coordinates))
 
-   def getNeighboursWithState[D <: Dimension](state: State, neighbours: Neighbor[D]): List[Cell[D]] = ???
+   def getNeighboursWithState[D <: Dimension](state: State, neighbours: Neighbour[D]): List[Cell[D]] = ???
