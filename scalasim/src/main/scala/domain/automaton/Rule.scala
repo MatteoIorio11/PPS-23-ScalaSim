@@ -11,10 +11,10 @@ trait Rule[I, O]:
    def tFunc(in: I): O
    def applyTransformation(ca: I): O = tFunc(ca)
 
-trait NeighborRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D]]
+trait NeighbourRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D]]
 
 object NeighborRuleUtility:
-   enum RelativePositions(x: Int, y: Int):
+   private enum RelativePositions(x: Int, y: Int):
       case TopLeft      extends RelativePositions(-1, -1)
       case TopCenter    extends RelativePositions(-1, 0)
       case TopRight     extends RelativePositions(-1, 1)
@@ -28,16 +28,16 @@ object NeighborRuleUtility:
       def coordinates: List[Int] = List(x, y)
       
       
-   trait NeighborhoodLocator[D <: Dimension]:
-      def relativeNeighborsLocations: Iterable[Position[D]]
+   trait NeighbourhoodLocator[D <: Dimension]:
+      def relativeNeighboursLocations: Iterable[Position[D]]
 
-      def absoluteNeighborsLocations(center: Position[D]): Iterable[Position[D]] =
-         relativeNeighborsLocations.map(c =>
+      def absoluteNeighboursLocations(center: Position[D]): Iterable[Position[D]] =
+         relativeNeighboursLocations.map(c =>
             Position((center.coordinates zip c.coordinates) map { case (a, b) => a + b})
          ).filter(p => !p.coordinates.toList.contains((x: Int) => x < 0))
 
-   given circleNeighborhoodLocator: NeighborhoodLocator[TwoDimensionalSpace] = new NeighborhoodLocator[TwoDimensionalSpace]:
-      override def relativeNeighborsLocations: Iterable[Position[TwoDimensionalSpace]] =
+   given circleNeighbourhoodLocator: NeighbourhoodLocator[TwoDimensionalSpace] = new NeighbourhoodLocator[TwoDimensionalSpace]:
+      override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
          import RelativePositions.*
          List(
             TopLeft,

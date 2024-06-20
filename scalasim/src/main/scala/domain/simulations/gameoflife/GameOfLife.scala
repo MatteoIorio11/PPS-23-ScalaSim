@@ -5,11 +5,11 @@ import domain.Environment.Environment
 import domain.automaton.CellularAutomaton.*
 import domain.base.Dimensions.*
 import domain.automaton.Neighbour
-import domain.automaton.NeighborRuleUtility.NeighborhoodLocator
+import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
 import domain.automaton.Cell.*
 import domain.automaton.Cell
 import domain.base.Position
-import domain.automaton.{NeighborRule, Rule}
+import domain.automaton.{NeighbourRule, Rule}
 import domain.base.Position.Position2D
 import domain.simulations.gameoflife.GameOfLife.CellState
 
@@ -60,7 +60,7 @@ object GameOfLifeEnvironment:
         initialise()
         override def neighboors(cell: Cell[TwoDimensionalSpace]): List[Cell[TwoDimensionalSpace]] =
             import domain.automaton.NeighborRuleUtility.given
-            availableCells(circleNeighborhoodLocator.absoluteNeighborsLocations(cell.position).toList)
+            availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
         override protected def initialise(): Unit =
             val cells: Int = Random.nextInt(maxCellsToSpawn) + 1
@@ -68,7 +68,7 @@ object GameOfLifeEnvironment:
 
 
 object GameOfLife:
-    def apply(): CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] = 
+    def apply(): CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] =
         GameOfLifeImpl()
     
     enum CellState extends State:
@@ -82,5 +82,5 @@ object GameOfLife:
                 .map(rule => rule.applyTransformation(neighbours))
                 .getOrElse(Cell(Position((0,0).toList), CellState.DEAD))
         override def rules: Rules = ruleCollection
-        override def addRule(cellState: State, neighborRule: NeighborRule[TwoDimensionalSpace]): Unit = 
+        override def addRule(cellState: State, neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
             ruleCollection = ruleCollection + (cellState -> neighborRule)

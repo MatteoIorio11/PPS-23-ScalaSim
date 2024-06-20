@@ -7,7 +7,7 @@ import domain.automaton.Cell.*
 import scala.util.Random
 import domain.base.Position.Position2D
 import domain.simulations.gameoflife.GameOfLife.*
-import domain.automaton.NeighborRuleUtility.NeighborhoodLocator
+import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
 import automaton.Cell
 import base.Position
 import automaton.Neighbour

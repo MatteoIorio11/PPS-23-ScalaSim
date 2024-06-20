@@ -9,12 +9,12 @@ import domain.automaton.Rule
 import domain.automaton.Cell.*
 import domain.base.Position.*
 import org.scalatest.BeforeAndAfterEach
-import domain.automaton.NeighborRuleUtility.NeighborhoodLocator
+import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
 import domain.automaton.NeighborRuleUtility.given
 import domain.automaton.Cell
 import domain.base.Position
 import domain.automaton.Neighbour
-import automaton.NeighborRule
+import automaton.NeighbourRule
 import simulations.gameoflife.GameOfLife
 
 class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
@@ -25,7 +25,7 @@ class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
 
   test("Add new rule for the Cellular Automata"):
     val state: State = CellState.ALIVE
-    val neighborRule: NeighborRule[TwoDimensionalSpace] = (x: Neighbour[TwoDimensionalSpace]) => 
+    val neighborRule: NeighbourRule[TwoDimensionalSpace] = (x: Neighbour[TwoDimensionalSpace]) =>
       val y = automaton.NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x)
       val caller = x.center
       y.length match
@@ -40,7 +40,7 @@ class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
     val state = CellState.DEAD
     val neighbors = List.empty
     val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
-    val rule: NeighborRule[TwoDimensionalSpace] = (neighbor) => 
+    val rule: NeighbourRule[TwoDimensionalSpace] = (neighbor) =>
       Cell(Position((0,0).toList), CellState.ALIVE)
     gameOfLife.addRule(state, rule)
     gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position((0,0).toList), CellState.ALIVE)
