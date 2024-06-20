@@ -21,4 +21,4 @@ object GameOfLife:
         override def neighboors(cell: Cell[TwoDimensionalSpace])(using locator: NeighborhoodLocator[TwoDimensionalSpace]): List[Position[TwoDimensionalSpace]] = ???
         override def rules: Rules = ruleCollection
         override def addRule(cellState: State, neighborRule: NeighborRule[TwoDimensionalSpace]): Unit = 
-            ruleCollection = ruleCollection.+(kv=(cellState, neighborRule))
+            ruleCollection = ruleCollection + (cellState -> neighborRule)
