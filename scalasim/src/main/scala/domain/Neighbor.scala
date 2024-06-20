@@ -1,7 +1,8 @@
 package domain
 
-import domain.Dimensions.*
-import domain.Cell.*
+import domain.base.Dimensions.*
+import domain.automaton.Cell.*
+import automaton.Cell
 
 /**
  * A Neighbor represents a collection of [[Cell]]s which are

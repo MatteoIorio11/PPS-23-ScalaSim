@@ -2,15 +2,16 @@ package domain
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
-import domain.Dimensions.*
+import domain.base.Dimensions.*
 import domain.GameOfLife.*
 import domain.CellularAutomata.*
 import domain.Rule
-import domain.Cell.*
+import domain.automaton.Cell.*
 import domain.Position.*
 import org.scalatest.BeforeAndAfterEach
 import domain.NeighborRuleUtility.NeighborhoodLocator
 import domain.NeighborRuleUtility.given
+import automaton.Cell
 
 class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
   val gameOfLife = GameOfLife()

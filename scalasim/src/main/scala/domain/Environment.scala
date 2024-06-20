@@ -1,13 +1,14 @@
 package domain
 
 import scala.collection.mutable.ArrayBuffer
-import domain.Dimensions.*
+import domain.base.Dimensions.*
 import domain.CellularAutomata.*
-import domain.Cell.*
+import domain.automaton.Cell.*
 import scala.util.Random
 import domain.Position.Position2D
 import domain.GameOfLife.*
 import domain.NeighborRuleUtility.NeighborhoodLocator
+import automaton.Cell
 
 object Environment:
     trait Environment[D <: Dimension, I, O]:

@@ -1,10 +1,11 @@
 package domain
 
-import domain.Dimensions.*
+import domain.base.Dimensions.*
 import domain.Neighbor
 import domain.Rule
-import domain.Cell.*
+import domain.automaton.Cell.*
 import domain.NeighborRuleUtility.NeighborhoodLocator
+import automaton.Cell
 
 object CellularAutomata:
     trait State

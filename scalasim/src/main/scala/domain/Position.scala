@@ -1,6 +1,6 @@
 package domain
 
-import domain.Dimensions.*
+import domain.base.Dimensions.*
 
 /**
  * A generic position in space.

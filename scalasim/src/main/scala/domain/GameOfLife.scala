@@ -1,10 +1,11 @@
 package domain
 
 import domain.CellularAutomata.*
-import domain.Dimensions.*
+import domain.base.Dimensions.*
 import domain.Neighbor
 import domain.NeighborRuleUtility.NeighborhoodLocator
-import domain.Cell.*
+import domain.automaton.Cell.*
+import automaton.Cell
 
 object GameOfLife:
     def apply(): CellularAutomata[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] = 

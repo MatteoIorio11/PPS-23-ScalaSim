@@ -2,8 +2,8 @@ package domain
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
-import domain.Dimensions.*
-import domain.Cell
+import domain.base.Dimensions.*
+import domain.automaton.Cell
 import domain.CellularAutomata.*
 import domain.Position.Position2D
 

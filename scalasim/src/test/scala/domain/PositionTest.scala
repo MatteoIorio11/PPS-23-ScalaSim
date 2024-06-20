@@ -4,7 +4,7 @@ import org.scalatest.matchers.should.Matchers.*
 
 import domain.Position
 import domain.Position.*
-import domain.Dimensions.TwoDimensionalSpace
+import domain.base.Dimensions.TwoDimensionalSpace
 
 class PositionTest extends org.scalatest.funsuite.AnyFunSuite:
 

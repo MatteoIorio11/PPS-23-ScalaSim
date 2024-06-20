@@ -1,7 +1,7 @@
 package domain
 
 import org.scalatest.matchers.should.Matchers.*
-import domain.Dimensions.TwoDimensionalSpace
+import domain.base.Dimensions.TwoDimensionalSpace
 import domain.CellularAutomata.CellularAutomata
 import domain.GameOfLife
 

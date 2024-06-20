@@ -1,9 +1,9 @@
 package domain
 
-import domain.Dimensions.Dimension
-import domain.Dimensions.TwoDimensionalSpace
+import domain.base.Dimensions.Dimension
+import domain.base.Dimensions.TwoDimensionalSpace
 import domain.Position
-import domain.Cell
+import domain.automaton.Cell
 import domain.Neighbor
 import domain.CellularAutomata.State
 

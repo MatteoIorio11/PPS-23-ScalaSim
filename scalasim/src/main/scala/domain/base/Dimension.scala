@@ -1,4 +1,4 @@
-package domain
+package domain.base
 
 import domain.Position
 

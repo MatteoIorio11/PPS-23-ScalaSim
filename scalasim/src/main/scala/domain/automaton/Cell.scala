@@ -1,6 +1,6 @@
-package domain
+package domain.automaton
 
-import domain.Dimensions.*
+import domain.base.Dimensions.*
 import domain.CellularAutomata.*
 import domain.Position
 

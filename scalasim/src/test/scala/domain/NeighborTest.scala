@@ -2,10 +2,10 @@ package domain
 
 import org.scalatest.matchers.should.Matchers.*
 import domain.NeighborRuleUtility.NeighborhoodLocator
-import domain.Dimensions.TwoDimensionalSpace
+import domain.base.Dimensions.TwoDimensionalSpace
 import domain.Position.Position2D
 import domain.Neighbor
-import domain.Cell
+import domain.automaton.Cell
 import domain.CellularAutomata.State
 import domain.CellularAutomata.CellularAutomata
 

@@ -5,7 +5,8 @@ import org.scalatest.matchers.should.Matchers.*
 import domain.GameOfLifeEnvironment.*
 import domain.GameOfLife.*
 import org.scalatest.BeforeAndAfterEach
-import domain.Dimensions.TwoDimensionalSpace
+import domain.base.Dimensions.TwoDimensionalSpace
+import automaton.Cell
 
 class GameOfLifeEnvironmentTest extends AnyFunSuite with BeforeAndAfterEach:
     val dimension = 100
