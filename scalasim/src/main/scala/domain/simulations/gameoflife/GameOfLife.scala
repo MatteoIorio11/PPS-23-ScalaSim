@@ -44,7 +44,8 @@ object GameOfLifeEnvironment:
     class GameOfLifeEnvironmentImpl(
         val dimension: Int,
         val cellularAutomata: CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]],
-        ) extends Environment[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
+        ) extends Environment[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] 
+            with ArrayEnvironment2D[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
         require(dimension > 0)
         require(cellularAutomata != null)
 
