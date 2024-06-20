@@ -42,3 +42,14 @@ class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
     gameOfLife.addRule(state, rule)
     given NeighborhoodLocator[TwoDimensionalSpace] = CircleNeighborhoodLocator()
     gameOfLife.neighboors(Cell(Position((0,0).toList), CellState.DEAD)) shouldBe neighbor.neighborhood.map(c => c.position)
+
+  test("Apply rule on a specific cell should return the right cell"):
+    val cell = Cell(Position2D((0,0).toList), CellState.DEAD)
+    val state = CellState.DEAD
+    val neighbors = List.empty
+    val neighbor: Neighbor[TwoDimensionalSpace] = Neighbor(cell, neighbors)
+    val rule: NeighborRule[TwoDimensionalSpace] = (neighbor) => 
+      Cell(Position((0,0).toList), CellState.ALIVE)
+    gameOfLife.addRule(state, rule)
+    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position((0,0).toList), CellState.ALIVE)
+
