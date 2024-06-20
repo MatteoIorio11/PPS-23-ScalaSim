@@ -16,6 +16,7 @@ import simulations.gameoflife.GameOfLife
 object Environment:
     type Matrix
     trait Environment[D <: Dimension, I, O]:
+        type Matrix
         def matrix: Matrix
         def dimension: Int
         def cellularAutomata: CellularAutomata[D, I, O]
@@ -25,4 +26,5 @@ object Environment:
     
 
     trait ArrayEnvironment2D[D <: Dimension, I, O] extends Environment[D, I, O]:
-        override type Matrix <: Array[Array[Cell[D]]]
+        override type Matrix = Array[Array[Cell[D]]]
+        
