@@ -17,7 +17,11 @@ object GameOfLife:
         type Rules = Map[State, Rule[Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]]
         var ruleCollection: Rules = Map()
         override val dimension: TwoDimensionalSpace = TwoDimensionalSpace()
-        override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbor[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] = ???
+        override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbor[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] = 
+            ruleCollection.get(cell.state)
+                .map(rule => rule.applyTransformation(neighbours))
+                .getOrElse(Cell(Position((0,0).toList), CellState.DEAD))
+
         override def neighboors(cell: Cell[TwoDimensionalSpace])(using locator: NeighborhoodLocator[TwoDimensionalSpace]): List[Position[TwoDimensionalSpace]] = 
             locator.absoluteNeighborsLocations(cell.position).toList
         override def rules: Rules = ruleCollection
