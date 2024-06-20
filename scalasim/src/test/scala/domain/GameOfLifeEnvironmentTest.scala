@@ -25,4 +25,4 @@ class GameOfLifeEnvironmentTest extends AnyFunSuite with BeforeAndAfterEach:
     
     test("The neighboors of a cell should always exits"):
         val cell: Cell[TwoDimensionalSpace] = Cell(Position((0,0).toList), CellState.DEAD)
-        env.neighboors(cell = cell)
+        env.neighboors(cell = cell) shouldNot be (List.empty)
