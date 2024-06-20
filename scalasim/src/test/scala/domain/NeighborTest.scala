@@ -7,6 +7,7 @@ import domain.Position.Position2D
 import domain.Neighbor
 import domain.Cell
 import domain.CellularAutomata.State
+import domain.CellularAutomata.CellularAutomata
 
 class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
     test("Neighborhoodlocator should work as expected"):
@@ -31,3 +32,15 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
       n.center shouldBe c0
       n.neighborhood shouldBe others
 
+    test("A Neighborhood Locator should map a correct neighborhood"):
+      val c0 = Cell(Position2D((1, 1).toList), new State {})
+
+      val c1 = Position2D((0, 0).toList)
+      val c2 = Position2D((2, 2).toList)
+
+      val diagonalNeighbourhoodLocator = new NeighborhoodLocator[TwoDimensionalSpace]:
+        override def relativeNeighborsLocations: Iterable[Position[TwoDimensionalSpace]] =
+           List((-1, -1), (1, 1)).map(c => Position2D(c.toList))
+          
+      diagonalNeighbourhoodLocator.absoluteNeighborsLocations(c0.position) shouldBe List(c1, c2).toIterable
+        
