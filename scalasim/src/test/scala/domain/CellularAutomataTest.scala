@@ -7,11 +7,13 @@ import domain.GameOfLife.*
 import domain.CellularAutomata.*
 import domain.Rule
 import domain.automaton.Cell.*
-import domain.Position.*
+import domain.base.Position.*
 import org.scalatest.BeforeAndAfterEach
 import domain.NeighborRuleUtility.NeighborhoodLocator
 import domain.NeighborRuleUtility.given
-import automaton.Cell
+import domain.automaton.Cell
+import domain.base.Position
+import domain.automaton.Neighbor
 
 class CellularAutomataTest extends AnyFunSuite with BeforeAndAfterEach:
   val gameOfLife = GameOfLife()

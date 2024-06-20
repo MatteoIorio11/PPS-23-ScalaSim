@@ -2,7 +2,7 @@ package domain.automaton
 
 import domain.base.Dimensions.*
 import domain.CellularAutomata.*
-import domain.Position
+import domain.base.Position
 
 /**
  * A Cell represents a [[Position]] inside the environment,

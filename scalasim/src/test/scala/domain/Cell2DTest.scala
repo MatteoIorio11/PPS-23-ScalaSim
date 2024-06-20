@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers.*
 import domain.base.Dimensions.*
 import domain.automaton.Cell
 import domain.CellularAutomata.*
-import domain.Position.Position2D
+import domain.base.Position.Position2D
 
 class Cell2DTest extends AnyFunSuite:
     enum MyState extends State:

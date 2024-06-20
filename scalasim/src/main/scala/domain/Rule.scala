@@ -2,9 +2,9 @@ package domain
 
 import domain.base.Dimensions.Dimension
 import domain.base.Dimensions.TwoDimensionalSpace
-import domain.Position
+import domain.base.Position
 import domain.automaton.Cell
-import domain.Neighbor
+import domain.automaton.Neighbor
 import domain.CellularAutomata.State
 
 trait Rule[I, O]:

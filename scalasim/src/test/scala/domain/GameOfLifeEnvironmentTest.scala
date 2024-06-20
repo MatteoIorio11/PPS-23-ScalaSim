@@ -7,6 +7,7 @@ import domain.GameOfLife.*
 import org.scalatest.BeforeAndAfterEach
 import domain.base.Dimensions.TwoDimensionalSpace
 import automaton.Cell
+import base.Position
 
 class GameOfLifeEnvironmentTest extends AnyFunSuite with BeforeAndAfterEach:
     val dimension = 100

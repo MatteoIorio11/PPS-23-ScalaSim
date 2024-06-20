@@ -5,10 +5,12 @@ import domain.base.Dimensions.*
 import domain.CellularAutomata.*
 import domain.automaton.Cell.*
 import scala.util.Random
-import domain.Position.Position2D
+import domain.base.Position.Position2D
 import domain.GameOfLife.*
 import domain.NeighborRuleUtility.NeighborhoodLocator
 import automaton.Cell
+import base.Position
+import automaton.Neighbor
 
 object Environment:
     trait Environment[D <: Dimension, I, O]:

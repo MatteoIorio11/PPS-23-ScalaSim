@@ -2,10 +2,11 @@ package domain
 
 import domain.CellularAutomata.*
 import domain.base.Dimensions.*
-import domain.Neighbor
+import domain.automaton.Neighbor
 import domain.NeighborRuleUtility.NeighborhoodLocator
 import domain.automaton.Cell.*
 import automaton.Cell
+import base.Position
 
 object GameOfLife:
     def apply(): CellularAutomata[TwoDimensionalSpace, Neighbor[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] = 

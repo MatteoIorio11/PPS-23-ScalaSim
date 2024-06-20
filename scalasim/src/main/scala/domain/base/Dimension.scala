@@ -1,6 +1,5 @@
 package domain.base
 
-import domain.Position
 
 object Dimensions:
   /**
