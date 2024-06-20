@@ -42,9 +42,9 @@ object GameOfLifeEnvironment:
 
     import Environment.*
     class GameOfLifeEnvironmentImpl(
-                                     val dimension: Int,
-                                     val cellularAutomata: CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]],
-                                   ) extends Environment[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
+        val dimension: Int,
+        val cellularAutomata: CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]],
+        ) extends Environment[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
         require(dimension > 0)
         require(cellularAutomata != null)
 
