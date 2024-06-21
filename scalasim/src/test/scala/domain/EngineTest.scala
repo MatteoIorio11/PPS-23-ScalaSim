@@ -17,12 +17,9 @@ class EngineTest extends AnyFunSuite:
         engine.running shouldBe false
 
     test("Run the simulation should return the new state of the simulation"):
-        /*
         val currSimulation = engine.currentState
         currSimulation should not be (Iterator.empty)
         engine.startEngine
         val newState = engine.currentState
         engine.stopEngine
         newState should not be currSimulation
-        */
-        print("hello")
