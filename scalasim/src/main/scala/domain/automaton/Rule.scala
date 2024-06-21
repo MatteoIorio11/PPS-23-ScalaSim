@@ -50,4 +50,5 @@ object NeighborRuleUtility:
             BottomRight,
          ).map(p => Position(p.coordinates))
 
-   def getNeighboursWithState[D <: Dimension](state: State, neighbours: Neighbour[D]): List[Cell[D]] = ???
+   def getNeighboursWithState[D <: Dimension](state: State, neighbours: Neighbour[D]): List[Cell[D]] = 
+      neighbours.neighbourhood.filter(cell => cell.state == state)
