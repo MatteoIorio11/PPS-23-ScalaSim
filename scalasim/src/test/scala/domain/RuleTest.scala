@@ -2,7 +2,7 @@ package domain
 
 import org.scalatest.matchers.should.Matchers.*
 import domain.base.Dimensions.TwoDimensionalSpace
-import domain.automaton.CellularAutomaton.CellularAutomata
+import domain.automaton.CellularAutomaton.CellularAutomaton
 import domain.simulations.gameoflife.GameOfLife
 import automaton.Rule
 

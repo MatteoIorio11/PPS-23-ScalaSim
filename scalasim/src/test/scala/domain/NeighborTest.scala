@@ -7,7 +7,7 @@ import domain.base.Position.Position2D
 import domain.automaton.Neighbour
 import domain.automaton.Cell
 import domain.automaton.CellularAutomaton.State
-import domain.automaton.CellularAutomaton.CellularAutomata
+import domain.automaton.CellularAutomaton.CellularAutomaton
 import base.Position
 
 class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:

@@ -11,7 +11,7 @@ import domain.automaton.NeighbourRule
 
 object CellularAutomaton:
     trait State
-    trait CellularAutomata[D <: Dimension, I, O]:
+    trait CellularAutomaton[D <: Dimension, I, O]:
         type Rules
         protected def ruleCollection: Rules
         def applyRule(cell: Cell[D], neighbors: Neighbour[D]): Cell[D]

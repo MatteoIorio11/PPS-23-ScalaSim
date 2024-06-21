@@ -45,7 +45,7 @@ object GameOfLifeEnvironment:
     import Environment.*
     class GameOfLifeEnvironmentImpl(
         val dimension: Int,
-        val cellularAutomata: CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]],
+        val cellularAutomata: CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]],
         ) extends Environment[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] 
             with ArrayEnvironment2D[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
         require(dimension > 0)
@@ -68,13 +68,13 @@ object GameOfLifeEnvironment:
             matrix = matrix.initialiseAliveCells(cells, dimension)
         
 object GameOfLife:
-    def apply(): CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] =
+    def apply(): CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] =
         GameOfLifeImpl()
     
     enum CellState extends State:
         case ALIVE
         case DEAD
-    private case class GameOfLifeImpl() extends CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
+    private case class GameOfLifeImpl() extends CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
         type Rules = Map[State, Rule[Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]]
         var ruleCollection: Rules = Map()
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =

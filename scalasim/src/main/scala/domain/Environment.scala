@@ -18,7 +18,7 @@ object Environment:
         type Matrix
         def matrix: Matrix
         def dimension: Int
-        def cellularAutomata: CellularAutomata[D, I, O]
+        def cellularAutomata: CellularAutomaton[D, I, O]
         def neighbours(cell: Cell[D]): Iterable[Cell[D]]
         protected def initialise(): Unit
         protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
