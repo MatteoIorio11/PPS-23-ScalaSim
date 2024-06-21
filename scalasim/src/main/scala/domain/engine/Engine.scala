@@ -10,7 +10,8 @@ import domain.automaton.NeighborRuleUtility
 
 object Engine:
     trait Engine[D <: Dimension, I, O]:
-        def environment: Environment[D, I, O]
+        type Matrix = Environment[D, I, O]#Matrix
+        protected def running: Boolean
         def nextIteration: Unit
         def currentState: Matrix
         def start: Unit
@@ -27,11 +28,8 @@ object Engine2D:
     private case class Engine2DImpl(
         val environment: Environment[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]])
      extends Engine[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
-
+        var running = false
         override def nextIteration: Unit = ??? 
-
         override def currentState: Matrix = ???
-
         override def stop: Unit = ???
-
         override def start: Unit = ???

@@ -14,7 +14,6 @@ import automaton.Neighbour
 import simulations.gameoflife.GameOfLife
 
 object Environment:
-    type Matrix
     trait Environment[D <: Dimension, I, O]:
         type Matrix
         def matrix: Matrix
