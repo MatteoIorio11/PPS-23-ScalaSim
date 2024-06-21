@@ -59,7 +59,10 @@ object DummyAutomaton:
         case DEAD
         case ALIVE
     def apply(): CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] = 
-        DummyAutomatonImpl()
+        val dummy = DummyAutomatonImpl()
+        dummy.addRule(DummyState.ALIVE, (x) => Cell(Position((0,0).toList), DummyState.DEAD))
+        dummy.addRule(DummyState.DEAD, (x) => Cell(Position((0,0).toList), DummyState.ALIVE))
+        dummy
     private class DummyAutomatonImpl() 
         extends CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
         type Rules = Map[State, Rule[Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]]

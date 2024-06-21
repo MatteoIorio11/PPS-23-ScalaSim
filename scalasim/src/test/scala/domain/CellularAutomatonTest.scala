@@ -15,7 +15,7 @@ class CellularAutomatonTestq extends AnyFunSuite:
     val ca = DummyAutomaton()
 
     test("Cellular Automaton's map rule should be empty"):
-        ca.rules shouldBe (Map.empty)
+        ca.rules should not be (Map.empty)
     
     test("Add new rule for the cellular automaton should add it into the automaton's collection"):
         val state: State = DummyState.ALIVE
