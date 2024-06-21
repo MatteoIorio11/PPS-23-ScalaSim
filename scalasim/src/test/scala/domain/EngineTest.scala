@@ -10,9 +10,9 @@ class EngineTest extends AnyFunSuite:
 
     test("Method start should start the simulation and stop should stop it"):
         engine.running shouldBe false
-        engine.start
+        engine.startEngine
         engine.running shouldBe true
-        engine.stop
+        engine.stopEngine
         engine.running shouldBe false
 
   

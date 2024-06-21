@@ -15,8 +15,8 @@ object Engine:
         def running: Boolean
         def nextIteration: Unit
         def currentState: Matrix
-        def start: Unit
-        def stop: Unit
+        def startEngine: Unit
+        def stopEngine: Unit
 
 object Engine2D:
     import Engine.*
@@ -28,12 +28,16 @@ object Engine2D:
 
     private case class SimulationEngine2D(
         val environment: Environment[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]])
-     extends Engine[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
-        var running = false
+     extends Thread with Engine[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
+        @volatile var running = false
         override def nextIteration: Unit = ???
             
         override def currentState: Matrix = ???
-        override def stop: Unit = 
+        override def stopEngine: Unit = 
             running = false
-        override def start: Unit = 
-            running = true
+        override def startEngine: Unit = 
+            if (!running)
+                running = true
+                start()
+        override def run(): Unit = ???
+        
