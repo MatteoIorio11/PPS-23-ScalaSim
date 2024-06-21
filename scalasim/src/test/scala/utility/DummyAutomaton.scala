@@ -40,11 +40,19 @@ object DummyAutomatonEnvironment:
                     case x if x => DummyState.ALIVE
                     case _ => DummyState.DEAD
                 array(x)(y) = Cell(Position((x, y).toList), state)
+        array(0)(0) = Cell(Position((0,0).toList), DummyState.DEAD)
         matrix = array.asInstanceOf[Matrix]
 
 
-      override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]): Iterable[Cell[TwoDimensionalSpace]] = ???
-      override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] = ???
+      override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]): Iterable[Cell[TwoDimensionalSpace]] = 
+        positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < dimension))
+            .map(pos => pos.coordinates.toList)
+            .map(cor => matrix(cor.head)(cor.last))
+
+      override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] = 
+          import domain.automaton.NeighborRuleUtility.given
+          availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
+
 
 object DummyAutomaton:
     enum DummyState extends State:
