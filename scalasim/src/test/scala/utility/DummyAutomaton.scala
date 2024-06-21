@@ -13,6 +13,7 @@ import domain.automaton.NeighbourRule
 import domain.Environment.ArrayEnvironment2D
 import utility.DummyAutomaton.DummyState
 import domain.automaton.CellularAutomaton
+import java.util.Random
 
 
 object DummyAutomatonEnvironment:
@@ -34,17 +35,16 @@ object DummyAutomatonEnvironment:
         val array = Array.fill(dimension, dimension)(initialCell)
         for (y <- 0 until dimension)
             for (x <- 0 until dimension)
-                array(x)(y) = Cell(Position((x, y).toList), DummyState.DEAD)
+                val probability = Random().nextBoolean()
+                val state = probability match
+                    case x if x => DummyState.ALIVE
+                    case _ => DummyState.DEAD
+                array(x)(y) = Cell(Position((x, y).toList), state)
         matrix = array.asInstanceOf[Matrix]
 
 
       override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]): Iterable[Cell[TwoDimensionalSpace]] = ???
       override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] = ???
-
-    @main def main(): Unit = 
-        val env = DummyAutomatonEnvironment(10)
-        print(env.matrix)
-
 
 object DummyAutomaton:
     enum DummyState extends State:
