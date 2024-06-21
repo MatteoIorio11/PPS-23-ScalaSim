@@ -10,8 +10,8 @@ import domain.automaton.Rule
 import domain.automaton.NeighbourRule
 
 
-object FakeAutomaton:
-    enum FakeState extends State:
+object DummyAutomaton:
+    enum DummyState extends State:
         case DEAD
         case ALIVE
     private case class FakeAutomatonEnvironment(
@@ -29,21 +29,14 @@ object FakeAutomaton:
       override protected def initialise(): Unit = ???
 
 
-
-
-
-    class FakeAutomatonImpl() 
+    class DummyAutomatonImpl() 
         extends CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
-
         type Rules = Map[State, Rule[Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]]
         var ruleCollection: Rules = Map()
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
             ruleCollection.get(cell.state)
                 .map(rule => rule.applyTransformation(neighbours))
-                .getOrElse(Cell(Position((0,0).toList), FakeState.DEAD))
+                .getOrElse(Cell(Position((0,0).toList), DummyState.DEAD))
         override def rules: Rules = ruleCollection
         override def addRule(cellState: State, neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
             ruleCollection = ruleCollection + (cellState -> neighborRule)
-
-        
-
