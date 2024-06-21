@@ -30,7 +30,7 @@ object GameOfLifeEnvironment:
                     array(x)(y) = Cell(Position2D((x, y).toList), CellState.DEAD)
             array
 
-        def initialiseAliveCells(nCells: Int, dimension: Int): Unit =
+        def initialiseAliveCells(nCells: Int, dimension: Int): Array[Array[Cell[TwoDimensionalSpace]]] =
             var spawnedCells = 0
             while (spawnedCells < nCells)
                 val x = Random.nextInt(dimension)
@@ -39,6 +39,7 @@ object GameOfLifeEnvironment:
                 if (array(x)(y).state == CellState.DEAD)
                     array(x)(y) = Cell(position, CellState.ALIVE)
                     spawnedCells = spawnedCells + 1
+            array
 
     import Environment.*
     class GameOfLifeEnvironmentImpl(
@@ -54,7 +55,7 @@ object GameOfLifeEnvironment:
             positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < dimension))
               .map(pos => pos.coordinates.toList)
               .map(cor => matrix(cor.head)(cor.last))
-        override def matrix: Matrix = Array.ofDim[Array[Cell[TwoDimensionalSpace]]](dimension).initializeEmpty2D(dimension = dimension)
+        var matrix: Matrix = Array.ofDim[Array[Cell[TwoDimensionalSpace]]](dimension).initializeEmpty2D(dimension = dimension)
 
         initialise()
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
@@ -63,9 +64,8 @@ object GameOfLifeEnvironment:
 
         override protected def initialise(): Unit =
             val cells: Int = Random.nextInt(maxCellsToSpawn) + 1
-            matrix.initialiseAliveCells(cells, dimension)
-
-
+            matrix = matrix.initialiseAliveCells(cells, dimension)
+        
 object GameOfLife:
     def apply(): CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] =
         GameOfLifeImpl()
