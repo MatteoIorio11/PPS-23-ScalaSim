@@ -20,6 +20,10 @@ object Environment:
         def dimension: Int
         def cellularAutomata: CellularAutomaton[D, I, O]
         def neighbours(cell: Cell[D]): Iterable[Cell[D]]
+        def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
+            val neighbour = Neighbour(cell, neighbors)
+            cellularAutomata.applyRule(cell, neighbour)
+        
         protected def initialise(): Unit
         protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
     
