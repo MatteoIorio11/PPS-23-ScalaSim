@@ -14,6 +14,7 @@ import domain.Environment.ArrayEnvironment2D
 import utility.DummyAutomaton.DummyState
 import domain.automaton.CellularAutomaton
 import java.util.Random
+import scala.collection.mutable.ArrayBuffer
 
 
 object DummyAutomatonEnvironment:
@@ -27,12 +28,12 @@ object DummyAutomatonEnvironment:
     extends Environment[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] 
             with ArrayEnvironment2D[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
       require(dimension > 0)
-      var matrix: Matrix = Array.ofDim[Array[Cell[TwoDimensionalSpace]]](dimension)
+      var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
         initialise()
       override protected def initialise(): Unit = 
         print(matrix)
         val initialCell = Cell(Position((-1,-1).toList), DummyState.DEAD)
-        val array = Array.fill(dimension, dimension)(initialCell)
+        val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
         for (y <- 0 until dimension)
             for (x <- 0 until dimension)
                 val probability = Random().nextBoolean()

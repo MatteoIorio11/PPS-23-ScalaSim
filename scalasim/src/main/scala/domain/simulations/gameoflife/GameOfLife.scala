@@ -14,6 +14,7 @@ import domain.base.Position.Position2D
 import domain.simulations.gameoflife.GameOfLife.CellState
 
 import scala.util.Random
+import scala.collection.mutable.ArrayBuffer
 
 object GameOfLifeEnvironment:
     var maxCellsToSpawn = 0
@@ -23,15 +24,15 @@ object GameOfLifeEnvironment:
         maxCellsToSpawn = (dimension / 2) + 1
         GameOfLifeEnvironmentImpl(dimension, cellularAutomata = GameOfLife())
 
-    extension (array: Array[Array[Cell[TwoDimensionalSpace]]])
-        def initializeEmpty2D(dimension: Int): Array[Array[Cell[TwoDimensionalSpace]]] =
-            val array = Array.fill(dimension, dimension)(initialCell)
+    extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
+        def initializeEmpty2D(dimension: Int): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+            val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
             for (y <- 0 until dimension)
                 for (x <- 0 until dimension)
                     array(x)(y) = Cell(Position2D((x, y).toList), CellState.DEAD)
             array
 
-        def initialiseAliveCells(nCells: Int, dimension: Int): Array[Array[Cell[TwoDimensionalSpace]]] =
+        def initialiseAliveCells(nCells: Int, dimension: Int): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
             var spawnedCells = 0
             while (spawnedCells < nCells)
                 val x = Random.nextInt(dimension)
@@ -56,7 +57,7 @@ object GameOfLifeEnvironment:
             positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < dimension))
               .map(pos => pos.coordinates.toList)
               .map(cor => matrix(cor.head)(cor.last))
-        var matrix: Matrix = Array.ofDim[Array[Cell[TwoDimensionalSpace]]](dimension).initializeEmpty2D(dimension = dimension)
+        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeEmpty2D(dimension = dimension)
 
         initialise()
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =

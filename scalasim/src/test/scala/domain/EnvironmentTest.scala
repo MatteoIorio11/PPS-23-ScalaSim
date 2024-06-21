@@ -7,6 +7,7 @@ import domain.automaton.Cell
 import utility.DummyAutomaton.DummyState
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position
+import scala.collection.mutable.ArrayBuffer
 
 
 class EnvironmentTest extends AnyFunSuite:
@@ -17,10 +18,10 @@ class EnvironmentTest extends AnyFunSuite:
         exception shouldBe a[IllegalArgumentException]
     
     test("Initialize an environment should add cells into the matrix"):
-        env.matrix should not be (Array.empty[Array[Cell[TwoDimensionalSpace]]])
+        env.matrix should not be (ArrayBuffer.empty[ArrayBuffer[Cell[TwoDimensionalSpace]]])
     
     test("Initialization should also add alive cells"):
-        env.matrix.asInstanceOf[Array[Array[Cell[TwoDimensionalSpace]]]]
+        env.matrix.asInstanceOf[ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]]
             .flatMap(array => array.map(cell => cell.state))
             .filter(state => state == DummyState.ALIVE).length should not be 0
     
