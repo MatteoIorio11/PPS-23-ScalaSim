@@ -9,6 +9,7 @@ class EngineTest extends AnyFunSuite:
     val engine = Engine2D(GameOfLifeEnvironment(100))
 
     test("Method start should start the simulation and stop should stop it"):
+        engine.running shouldBe false
         engine.start
         engine.running shouldBe true
         engine.stop
