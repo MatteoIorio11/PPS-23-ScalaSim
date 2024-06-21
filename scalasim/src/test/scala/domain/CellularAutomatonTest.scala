@@ -22,4 +22,15 @@ class CellularAutomatonTestq extends AnyFunSuite:
         val neighborRule: NeighbourRule[TwoDimensionalSpace] = (x: Neighbour[TwoDimensionalSpace]) => Cell(Position((0,0).toList), DummyState.DEAD)
         ca.addRule(state, neighborRule)
         ca.rules should not be (Map.empty)
-  
+    
+    test("Apply rule on a specific cell should return the right cell"):
+        val cell: Cell[TwoDimensionalSpace] = Cell(Position((0,0).toList), DummyState.DEAD)
+        val state = DummyState.DEAD
+        val neighbors = List.empty
+        val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
+        val rule: NeighbourRule[TwoDimensionalSpace] = (neighbor) =>
+            Cell(Position((0,0).toList), DummyState.ALIVE)
+        ca.addRule(state, rule)
+        ca.applyRule(cell, neighbor) shouldBe Cell(Position((0,0).toList), DummyState.ALIVE)
+
+
