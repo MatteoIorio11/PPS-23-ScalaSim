@@ -1,3 +1,5 @@
+package utility
+
 import domain.automaton.CellularAutomaton.CellularAutomata
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Neighbour
@@ -14,6 +16,9 @@ object DummyAutomaton:
     enum DummyState extends State:
         case DEAD
         case ALIVE
+
+    def apply(): CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] = 
+        DummyAutomatonImpl()
     private case class FakeAutomatonEnvironment(
         val dimension: Int,
         val cellularAutomata: CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]
@@ -29,7 +34,7 @@ object DummyAutomaton:
       override protected def initialise(): Unit = ???
 
 
-    class DummyAutomatonImpl() 
+    private class DummyAutomatonImpl() 
         extends CellularAutomata[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
         type Rules = Map[State, Rule[Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]]
         var ruleCollection: Rules = Map()
