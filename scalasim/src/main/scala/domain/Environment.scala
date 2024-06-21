@@ -20,14 +20,20 @@ object Environment:
         def dimension: Int
         def cellularAutomata: CellularAutomaton[D, I, O]
         def neighbours(cell: Cell[D]): Iterable[Cell[D]]
+        protected def saveCell(cell: Cell[D]): Unit 
         def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
             val neighbour = Neighbour(cell, neighbors)
-            cellularAutomata.applyRule(cell, neighbour)
-        
+            val newCell = cellularAutomata.applyRule(cell, neighbour)
+            saveCell(newCell)
+            newCell
         protected def initialise(): Unit
         protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
     
 
     trait ArrayEnvironment2D[D <: Dimension, I, O] extends Environment[D, I, O]:
-        override type Matrix = Array[Array[Cell[D]]]
+        override type Matrix = ArrayBuffer[ArrayBuffer[Cell[D]]]
+        override protected def saveCell(cell: Cell[D]): Unit = 
+            val x = cell.position.coordinates.head
+            val y = cell.position.coordinates.last
+            matrix(x)(y) = cell
         
