@@ -32,7 +32,9 @@ object Engine2D:
         @volatile var running = false
         override def nextIteration: Unit = ???
             
-        override def currentState: Matrix = ???
+        override def currentState: Matrix = 
+            this.synchronized:
+                environment.matrix
         override def stopEngine: Unit = 
             running = false
         override def startEngine: Unit = 
