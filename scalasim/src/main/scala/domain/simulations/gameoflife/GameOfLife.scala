@@ -16,10 +16,11 @@ import domain.simulations.gameoflife.GameOfLife.CellState
 import scala.util.Random
 
 object GameOfLifeEnvironment:
-    val maxCellsToSpawn = 50
+    var maxCellsToSpawn = 0
     val initialCell: Cell[TwoDimensionalSpace] = Cell(Position2D((-1, -1).toList), CellState.DEAD)
 
     def apply(dimension: Int): GameOfLifeEnvironmentImpl =
+        maxCellsToSpawn = (dimension / 2) + 1
         GameOfLifeEnvironmentImpl(dimension, cellularAutomata = GameOfLife())
 
     extension (array: Array[Array[Cell[TwoDimensionalSpace]]])
