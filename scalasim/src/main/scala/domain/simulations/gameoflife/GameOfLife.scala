@@ -70,7 +70,12 @@ object GameOfLifeEnvironment:
         
 object GameOfLife:
     def apply(): CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] =
-        GameOfLifeImpl()
+        val gameOfLife = GameOfLifeImpl()
+        gameOfLife.addRule(CellState.ALIVE, (neighbours) => {
+            val aliveNeighbours = neighbours.neighbourhood.count(_.state == CellState.ALIVE)
+            Cell(neighbours.center.position, if (aliveNeighbours < 2 || aliveNeighbours > 3) CellState.DEAD else CellState.ALIVE)
+        })
+        gameOfLife
     
     enum CellState extends State:
         case ALIVE
