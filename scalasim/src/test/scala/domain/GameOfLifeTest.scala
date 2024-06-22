@@ -36,13 +36,10 @@ class GameOfLifeTest extends AnyFunSuite with BeforeAndAfterEach:
     gameOfLife.addRule(state, neighborRule)
     gameOfLife.rules should not be (Map())
 
-  test("Apply rule on a specific cell should return the right cell"):
-    val cell = Cell(Position2D((0,0).toList), CellState.DEAD)
-    val state = CellState.DEAD
-    val neighbors = List.empty
+  test("Alive cell should be Dead with less than two Alive neighbors"):
+    val cell = Cell(Position2D((0,0).toList), CellState.ALIVE)
+    val neighbors = List(
+      Cell(Position2D((1, 1).toList), CellState.ALIVE),
+    )
     val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
-    val rule: NeighbourRule[TwoDimensionalSpace] = (neighbor) =>
-      Cell(Position((0,0).toList), CellState.ALIVE)
-    gameOfLife.addRule(state, rule)
-    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position((0,0).toList), CellState.ALIVE)
-
+    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position((0,0).toList), CellState.DEAD)
