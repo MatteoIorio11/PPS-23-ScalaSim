@@ -4,12 +4,10 @@ import domain.Environment
 import domain.Environment.Environment
 import domain.automaton.CellularAutomaton.*
 import domain.base.Dimensions.*
-import domain.automaton.Neighbour
+import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule, Rule}
 import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
 import domain.automaton.Cell.*
-import domain.automaton.Cell
 import domain.base.Position
-import domain.automaton.{NeighbourRule, Rule}
 import domain.base.Position.Position2D
 import domain.simulations.gameoflife.GameOfLife.CellState
 
@@ -71,10 +69,21 @@ object GameOfLifeEnvironment:
 object GameOfLife:
     def apply(): CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] =
         val gameOfLife = GameOfLifeImpl()
-        gameOfLife.addRule(CellState.ALIVE, (neighbours) => {
-            val aliveNeighbours = neighbours.neighbourhood.count(_.state == CellState.ALIVE)
-            Cell(neighbours.center.position, if (aliveNeighbours < 2 || aliveNeighbours > 3) CellState.DEAD else CellState.ALIVE)
-        })
+        val liveRule: NeighbourRule[TwoDimensionalSpace] =  (x: Neighbour[TwoDimensionalSpace]) => {
+            NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x).length match {
+                case y if y < 2 || y > 3 => Cell(x.center.position.asPosition[Position2D], CellState.DEAD)
+                case _ => Cell(x.center.position.asPosition[Position2D], CellState.ALIVE)
+            }
+        }
+        gameOfLife.addRule(CellState.ALIVE, liveRule)
+
+        val deadRule: NeighbourRule[TwoDimensionalSpace] =  (x: Neighbour[TwoDimensionalSpace]) => {
+            NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x).length match {
+                case 3 => Cell(x.center.position.asPosition[Position2D], CellState.ALIVE)
+                case _ => Cell(x.center.position.asPosition[Position2D], CellState.DEAD)
+            }
+        }
+        gameOfLife.addRule(CellState.DEAD, deadRule)
         gameOfLife
     
     enum CellState extends State:
