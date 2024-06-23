@@ -15,6 +15,9 @@ import utility.DummyAutomaton.DummyState
 import domain.automaton.CellularAutomaton
 import java.util.Random
 import scala.collection.mutable.ArrayBuffer
+import org.scalatest.tools.AnsiColor
+import org.scalatest.tools.ColorBar
+import java.awt.Color
 
 
 object DummyAutomatonEnvironment:
@@ -59,11 +62,15 @@ object DummyAutomaton:
     enum DummyState extends State:
         case DEAD
         case ALIVE
+    var automatonColors = Map[DummyState, Color]()
     def apply(): CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] = 
         val dummy = DummyAutomatonImpl()
+        automatonColors = automatonColors + (DummyState.DEAD -> Color.RED)
+        automatonColors = automatonColors + (DummyState.ALIVE -> Color.GREEN)
         dummy.addRule(DummyState.ALIVE, (x) => Cell(Position((x.center.position.coordinates)), DummyState.DEAD))
         dummy.addRule(DummyState.DEAD, (x) => Cell(Position((x.center.position.coordinates)), DummyState.ALIVE))
         dummy
+
     private class DummyAutomatonImpl() 
         extends CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
         type Rules = Map[State, Rule[Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]]
