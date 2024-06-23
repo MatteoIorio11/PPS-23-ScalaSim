@@ -9,6 +9,10 @@ lazy val root = project
       scalaVersion := scala3Version,
       libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test,
 
+      // jcodec
+      libraryDependencies += "org.jcodec" % "jcodec" % "0.2.5",
+      libraryDependencies += "org.jcodec" % "jcodec-javase" % "0.2.5",
+
       // scalatest
       libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.18" % Test,
       libraryDependencies += "com.github.sbt" % "junit-interface" % "0.13.3" % Test,
