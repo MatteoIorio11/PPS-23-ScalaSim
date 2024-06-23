@@ -71,7 +71,7 @@ object DummyAutomaton:
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
             ruleCollection.get(cell.state)
                 .map(rule => rule.applyTransformation(neighbours))
-                .getOrElse(Cell(Position((0,0).toList), DummyState.DEAD))
+                .getOrElse(Cell(cell.position, DummyState.DEAD))
         override def rules: Rules = ruleCollection
         override def addRule(cellState: State, neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
             ruleCollection = ruleCollection + (cellState -> neighborRule)
