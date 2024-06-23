@@ -8,7 +8,7 @@ import utility.DummyAutomatonEnvironment
 import domain.simulations.gameoflife.GameOfLifeEnvironment.initialCell
 
 class EngineTest extends AnyFunSuite:
-    val engine = Engine2D(DummyAutomatonEnvironment(10))
+    val engine = Engine2D(DummyAutomatonEnvironment(10), 100)
 
     test("Method start should start the simulation and stop should stop it"):
         engine.running shouldBe false
