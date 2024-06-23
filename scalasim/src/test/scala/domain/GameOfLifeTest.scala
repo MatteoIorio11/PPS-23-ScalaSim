@@ -21,8 +21,8 @@ import domain.automaton.NeighborRuleUtility
 class GameOfLifeTest extends AnyFunSuite with BeforeAndAfterEach:
   val gameOfLife = GameOfLife()
 
-  test("Cellular Automata's map rule should be empty"):
-    gameOfLife.rules should be (Map())
+  test("GameOfLife's map rule should not be empty"):
+    gameOfLife.rules should not be (Map.empty)
 
   test("Add new rule for the Cellular Automata"):
     val state: State = CellState.ALIVE
