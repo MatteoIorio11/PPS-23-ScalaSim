@@ -30,4 +30,11 @@ class EngineTest extends AnyFunSuite:
         initialState.collect {
             case cell => (cell, newState.filter(c => c.position == cell.position).head)
         }.forall(x => x._1.state != x._2.state) shouldBe (true)
+    
+    test("After doing a simulation for a couple of time the history should not be empty"):
+        engine.history shouldBe (LazyList.empty)
+        engine.startEngine
+        Thread.sleep(1000)
+        engine.stopEngine
+        engine.history shouldNot be (LazyList.empty)
 
