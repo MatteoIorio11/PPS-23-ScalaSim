@@ -17,7 +17,8 @@ object CellularAutomaton:
     /**
      * Cellular automaton trait. It defines all the information about a general automaton.
      * A cellular automaton must define a collection of rules, where inside each rule is stored the logic
-     * to apply to a particular cell.
+     * to apply to a particular cell. The cellular automaton can be seen as a collection of rules,
+     * where each rule must be used only in a specific state. The cellular automaton manages the logic for all Its Cells.
      * @param D the [[Dimension]] of the space;
       */
     trait CellularAutomaton[D <: Dimension]:
