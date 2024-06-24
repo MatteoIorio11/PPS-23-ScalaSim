@@ -5,10 +5,15 @@ import org.scalatest.matchers.should.Matchers.*
 import domain.engine.Engine2D
 import domain.simulations.gameoflife.GameOfLifeEnvironment
 import utility.DummyAutomatonEnvironment
+import org.scalatest.BeforeAndAfterEach
 import domain.simulations.gameoflife.GameOfLifeEnvironment.initialCell
 
-class EngineTest extends AnyFunSuite:
-    val engine = Engine2D(DummyAutomatonEnvironment(10), 100)
+class EngineTest extends AnyFunSuite with BeforeAndAfterEach:
+    var engine = Engine2D(DummyAutomatonEnvironment(10), 100)
+    
+    override protected def beforeEach(): Unit = 
+        engine = Engine2D(DummyAutomatonEnvironment(10), 100)
+
 
     test("Method start should start the simulation and stop should stop it"):
         engine.running shouldBe false
@@ -37,4 +42,3 @@ class EngineTest extends AnyFunSuite:
         Thread.sleep(1000)
         engine.stopEngine
         engine.history shouldNot be (LazyList.empty)
-

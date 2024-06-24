@@ -21,15 +21,14 @@ import java.awt.Color
 
 
 object DummyAutomatonEnvironment:
-    def apply(dimension: Int): Environment[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] =
+    def apply(dimension: Int): Environment[TwoDimensionalSpace] =
         DummyAutomatonEnvironmentImpl(dimension, DummyAutomaton())
 
     private case class DummyAutomatonEnvironmentImpl(
         val dimension: Int,
-        val cellularAutomata: CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]
+        val cellularAutomata: CellularAutomaton[TwoDimensionalSpace]
     )
-    extends Environment[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] 
-            with ArrayEnvironment2D[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
+    extends Environment[TwoDimensionalSpace] with ArrayEnvironment2D[TwoDimensionalSpace]:
       require(dimension > 0)
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
         initialise()
@@ -63,7 +62,7 @@ object DummyAutomaton:
         case DEAD
         case ALIVE
     var automatonColors = Map[DummyState, Color]()
-    def apply(): CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] = 
+    def apply(): CellularAutomaton[TwoDimensionalSpace] = 
         val dummy = DummyAutomatonImpl()
         automatonColors = automatonColors + (DummyState.DEAD -> Color.RED)
         automatonColors = automatonColors + (DummyState.ALIVE -> Color.GREEN)
@@ -72,7 +71,7 @@ object DummyAutomaton:
         dummy
 
     private class DummyAutomatonImpl() 
-        extends CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
+        extends CellularAutomaton[TwoDimensionalSpace]:
         type Rules = Map[State, Rule[Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]]
         var ruleCollection: Rules = Map()
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
