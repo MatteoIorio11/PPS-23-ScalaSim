@@ -45,10 +45,13 @@ object NeighborRuleUtility:
          ).filter(p => !p.coordinates.toList.contains((x: Int) => x < 0))
 
    extension[D <: Dimension] (p: Position[D])
-      inline def +(other: Position[D]): Position[D] = Position((p.coordinates zip other.coordinates) map { case (a, b) => a + b})
+      private def elementWiseFunc(other: Position[D])(func: (Int, Int) => Int): Position[D] =
+         Position((p.coordinates zip other.coordinates) map { case (a, b) => func(a, b)})
+      def +(other: Position[D]): Position[D] = elementWiseFunc(other)(_ + _)
+      def -(other: Position[D]): Position[D] = elementWiseFunc(other)(_ - _)
 
    extension[D <: Dimension] (c: Cell[D])
-      inline def +=(rp: RelativePositions) = new Cell[D] {
+      def +=(rp: RelativePositions) = new Cell[D] {
          override def state: State = c.state
          override def position: Position[D] = c.position.+(Position(rp.coordinates))
       }

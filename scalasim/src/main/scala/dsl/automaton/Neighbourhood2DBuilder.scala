@@ -29,6 +29,14 @@ class Neighbourhood2DBuilder:
     center = Some(Position(List(i, j)))
     this
 
+  def relativePositions: List[Cell[TwoDimensionalSpace]] =
+    import domain.automaton.NeighborRuleUtility.-
+
+    center match
+      case Some(c) => cells.map: p =>
+        Cell(c - p.position, p.state)
+      case _ => throw IllegalStateException("Cannot compute relative positions if center is not defined")
+
 object Neighbourhood2DBuilder:
   export DSL.*
 
@@ -45,19 +53,3 @@ object Neighbourhood2DBuilder:
 
     extension (builder: Neighbourhood2DBuilder)
       def |(b: Neighbourhood2DBuilder): Neighbourhood2DBuilder = b
-
-class Alive extends State:
-  val name: String = "alive"
-
-class Dead extends State:
-  val name: String = "dead"
-
-@main def main(): Unit =
-  import Neighbourhood2DBuilder.*
-
-  val nrb = Neighbourhood2DBuilder.configureNeighborhood:
-    state(Alive()) | x | state(Alive()) | n |
-    x              | c | x               | n |
-    state(Dead())  | x | state(Dead())
-
-  nrb.cells.foreach(x => println(s"${x.position} ->> ${x.state}"))
