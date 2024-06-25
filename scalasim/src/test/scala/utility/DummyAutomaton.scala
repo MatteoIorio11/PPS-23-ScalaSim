@@ -24,15 +24,12 @@ object DummyAutomatonEnvironment:
     def apply(dimension: Int): Environment[TwoDimensionalSpace] =
         DummyAutomatonEnvironmentImpl(dimension, DummyAutomaton())
 
-    private case class DummyAutomatonEnvironmentImpl(
-        val dimension: Int,
-        val cellularAutomata: CellularAutomaton[TwoDimensionalSpace]
-    )
-    extends Environment[TwoDimensionalSpace] with ArrayEnvironment2D:
+    private case class DummyAutomatonEnvironmentImpl(val dimension: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
+        extends Environment[TwoDimensionalSpace] with ArrayEnvironment2D:
       require(dimension > 0)
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
         initialise()
-      override protected def initialise(): Unit = 
+      override protected def initialise() = 
         print(matrix)
         val initialCell = Cell(Position((-1,-1).toList), DummyState.DEAD)
         val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
@@ -47,12 +44,12 @@ object DummyAutomatonEnvironment:
         matrix = array.asInstanceOf[Matrix]
 
 
-      override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]): Iterable[Cell[TwoDimensionalSpace]] = 
+      override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]) = 
         positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < dimension))
             .map(pos => pos.coordinates.toList)
             .map(cor => matrix(cor.head)(cor.last))
 
-      override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] = 
+      override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
           import domain.automaton.NeighborRuleUtility.given
           availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
@@ -74,10 +71,10 @@ object DummyAutomaton:
         extends CellularAutomaton[TwoDimensionalSpace]:
         type Rules = Map[State, Rule[Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]]
         var ruleCollection: Rules = Map()
-        override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
+        override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]) =
             ruleCollection.get(cell.state)
                 .map(rule => rule.applyTransformation(neighbours))
                 .getOrElse(Cell(cell.position, DummyState.DEAD))
         override def rules: Rules = ruleCollection
-        override def addRule(cellState: State, neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
+        override def addRule(cellState: State, neighborRule: NeighbourRule[TwoDimensionalSpace]) =
             ruleCollection = ruleCollection + (cellState -> neighborRule)
