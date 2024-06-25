@@ -43,15 +43,15 @@ object Engine2D:
         val dimension = env.dimension
         var history = LazyList()
         override def nextIteration: Unit = 
-            environment().matrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
+            environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
                     .flatMap(iterable => iterable.map(cell => cell))
                     .map(cell => env.applyRule(cell, env.neighbours(cell)))
-            history = history.appended(currentMatrix)
+            history = history:+currentMatrix
         override def environment(): Environment[TwoDimensionalSpace] = 
             this.synchronized:
                 env
         override def currentMatrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]] = 
-            environment().matrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
+            environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
         override def stopEngine: Unit = 
             running = false
         override def startEngine: Unit = 
