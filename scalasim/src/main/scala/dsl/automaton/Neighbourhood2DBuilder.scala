@@ -34,7 +34,7 @@ class Neighbourhood2DBuilder:
 
     center match
       case Some(c) => cells.map: p =>
-        Cell(c - p.position, p.state)
+        Cell(p.position - c, p.state)
       case _ => throw IllegalStateException("Cannot compute relative positions if center is not defined")
 
 object Neighbourhood2DBuilder:
