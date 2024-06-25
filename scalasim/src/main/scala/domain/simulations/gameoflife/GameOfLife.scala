@@ -21,41 +21,17 @@ object GameOfLifeEnvironment:
     def apply(dimension: Int): GameOfLifeEnvironmentImpl =
         maxCellsToSpawn = (dimension / 2) + 1
         GameOfLifeEnvironmentImpl(dimension, cellularAutomata = GameOfLife())
-
-    extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-        def initializeEmpty2D(dimension: Int): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-            val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
-            for (y <- 0 until dimension)
-                for (x <- 0 until dimension)
-                    array(x)(y) = Cell(Position2D((x, y).toList), CellState.DEAD)
-            array
-
-        def initialiseAliveCells(nCells: Int, dimension: Int): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-            var spawnedCells = 0
-            while (spawnedCells < nCells)
-                val x = Random.nextInt(dimension)
-                val y = Random.nextInt(dimension)
-                val position = Position2D((x, y).toList)
-                if (array(x)(y).state == CellState.DEAD)
-                    array(x)(y) = Cell(position, CellState.ALIVE)
-                    spawnedCells = spawnedCells + 1
-            array
-
+    
     import Environment.*
     class GameOfLifeEnvironmentImpl(
         val dimension: Int,
-        val cellularAutomata: CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]],
-        ) extends Environment[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] 
-            with ArrayEnvironment2D[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
+        val cellularAutomata: CellularAutomaton[TwoDimensionalSpace],
+        ) extends Environment[TwoDimensionalSpace] 
+            with ArrayEnvironment2D:
         require(dimension > 0)
         require(cellularAutomata != null)
 
-
-        override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]): Iterable[Cell[TwoDimensionalSpace]] =
-            positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < dimension))
-              .map(pos => pos.coordinates.toList)
-              .map(cor => matrix(cor.head)(cor.last))
-        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeEmpty2D(dimension = dimension)
+        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeEmpty2D(dimension = dimension)(initialCell)
 
         initialise()
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
@@ -64,10 +40,10 @@ object GameOfLifeEnvironment:
 
         override protected def initialise(): Unit =
             val cells: Int = Random.nextInt(maxCellsToSpawn) + 1
-            matrix = matrix.initialiseAliveCells(cells, dimension)
+            matrix = matrix.initializeCells(cells, dimension)(CellState.ALIVE)
         
 object GameOfLife:
-    def apply(): CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]] =
+    def apply(): CellularAutomaton[TwoDimensionalSpace] =
         val gameOfLife = GameOfLifeImpl()
         val liveRule: NeighbourRule[TwoDimensionalSpace] =  (x: Neighbour[TwoDimensionalSpace]) => {
             NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x).length match {
@@ -89,7 +65,7 @@ object GameOfLife:
     enum CellState extends State:
         case ALIVE
         case DEAD
-    private case class GameOfLifeImpl() extends CellularAutomaton[TwoDimensionalSpace, Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]:
+    private case class GameOfLifeImpl() extends CellularAutomaton[TwoDimensionalSpace]:
         type Rules = Map[State, Rule[Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]]
         var ruleCollection: Rules = Map()
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
