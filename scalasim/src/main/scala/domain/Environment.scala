@@ -23,7 +23,7 @@ object Environment:
       */
     trait Environment[D <: Dimension]:
         type Matrix
-        def matrix: Matrix
+        def currentMatrix: Matrix
         def dimension: Int
         def cellularAutomata: CellularAutomaton[D]
         def neighbours(cell: Cell[D]): Iterable[Cell[D]]
@@ -34,6 +34,7 @@ object Environment:
             saveCell(newCell)
             newCell
         protected def initialise(): Unit
+        protected def matrix: Matrix
         protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
     
 
@@ -46,6 +47,9 @@ object Environment:
             val x = cell.position.coordinates.head
             val y = cell.position.coordinates.last
             matrix.addCell(x, y)(dimension)(cell)
+
+        override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+            matrix.clone()
         
         override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]): Iterable[Cell[TwoDimensionalSpace]] =
           positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < dimension))
