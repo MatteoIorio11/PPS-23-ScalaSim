@@ -3,6 +3,7 @@ package domain
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.engine.Engine2D
+import domain.exporter.Image.exportMatrixToImage
 import domain.simulations.gameoflife.GameOfLifeEnvironment
 import utility.DummyAutomatonEnvironment
 import org.scalatest.BeforeAndAfterEach
@@ -41,4 +42,17 @@ class EngineTest extends AnyFunSuite with BeforeAndAfterEach:
         engine.startEngine
         Thread.sleep(1000)
         engine.stopEngine
+        engine.history.foreach(x => println(x))
         engine.history shouldNot be (LazyList.empty)
+
+@main def main(): Unit =
+    val engine = Engine2D(GameOfLifeEnvironment(10), 100)
+    engine.startEngine
+    Thread.sleep(2000)
+    engine.stopEngine
+    val path = "cellular_automata"
+    engine.history.foreach(x => println(x))
+    engine.history.zipWithIndex.foreach { case (matrix, index) =>
+        val filePath = s"${path}_$index.png"
+        exportMatrixToImage(matrix, 10, filePath)
+    }
