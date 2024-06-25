@@ -28,7 +28,7 @@ object DummyAutomatonEnvironment:
         val dimension: Int,
         val cellularAutomata: CellularAutomaton[TwoDimensionalSpace]
     )
-    extends Environment[TwoDimensionalSpace] with ArrayEnvironment2D[TwoDimensionalSpace]:
+    extends Environment[TwoDimensionalSpace] with ArrayEnvironment2D:
       require(dimension > 0)
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
         initialise()
