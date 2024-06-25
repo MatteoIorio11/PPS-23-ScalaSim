@@ -39,20 +39,11 @@ class EngineTest extends AnyFunSuite with BeforeAndAfterEach:
     
     test("After doing a simulation for a couple of time the history should not be empty"):
         engine.history shouldBe (LazyList.empty)
+        val initMatrix = engine.currentMatrix
         engine.startEngine
         Thread.sleep(1000)
         engine.stopEngine
-        engine.history.foreach(x => println(x))
+        val lastMatrix = engine.currentMatrix
         engine.history shouldNot be (LazyList.empty)
-
-@main def main(): Unit =
-    val engine = Engine2D(GameOfLifeEnvironment(10), 100)
-    engine.startEngine
-    Thread.sleep(2000)
-    engine.stopEngine
-    val path = "cellular_automata"
-    engine.history.foreach(x => println(x))
-    engine.history.zipWithIndex.foreach { case (matrix, index) =>
-        val filePath = s"${path}_$index.png"
-        exportMatrixToImage(matrix, 10, filePath)
-    }
+        engine.history.head shouldBe (initMatrix)
+        engine.history.last shouldBe (lastMatrix)
