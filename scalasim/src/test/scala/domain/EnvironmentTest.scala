@@ -18,10 +18,10 @@ class EnvironmentTest extends AnyFunSuite:
         exception shouldBe a[IllegalArgumentException]
     
     test("Initialize an environment should add cells into the matrix"):
-        env.matrix should not be (ArrayBuffer.empty[ArrayBuffer[Cell[TwoDimensionalSpace]]])
+        env.currentMatrix should not be (ArrayBuffer.empty[ArrayBuffer[Cell[TwoDimensionalSpace]]])
     
     test("Initialization should also add alive cells"):
-        env.matrix.asInstanceOf[ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]]
+        env.currentMatrix.asInstanceOf[ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]]
             .flatMap(array => array.map(cell => cell.state))
             .filter(state => state == DummyState.ALIVE).length should not be 0
     
