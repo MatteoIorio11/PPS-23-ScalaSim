@@ -40,10 +40,39 @@ object Environment:
     /**
       * Environment 2D, where the matrix is defined as an ArrayBuffer.
       */
-    trait ArrayEnvironment2D[D <: Dimension] extends Environment[D]:
-        override type Matrix = ArrayBuffer[ArrayBuffer[Cell[D]]]
-        override protected def saveCell(cell: Cell[D]): Unit = 
+    trait ArrayEnvironment2D extends Environment[TwoDimensionalSpace]:
+        override type Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]
+        override protected def saveCell(cell: Cell[TwoDimensionalSpace]): Unit = 
             val x = cell.position.coordinates.head
             val y = cell.position.coordinates.last
-            matrix(x)(y) = cell
+            matrix.addCell(x, y)(dimension)(cell)
         
+        override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]): Iterable[Cell[TwoDimensionalSpace]] =
+          positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < dimension))
+            .map(pos => pos.coordinates.toList)
+            .map(cor => matrix(cor.head)(cor.last))
+        
+        extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
+          def initializeEmpty2D(dimension: Int)(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+              val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
+              for (y <- 0 until dimension)
+                  for (x <- 0 until dimension)
+                      array.addCell(x, y)(dimension)(Cell(Position2D((x, y).toList), CellState.DEAD))
+              array
+
+          def addCell(x: Int, y: Int)(dimension: Int)(cell: Cell[TwoDimensionalSpace]): Unit = 
+            (x, y) match
+              case (x, y) if x >= 0 && y >= 0 && x < dimension && y < dimension => array(x)(y) = cell
+              case _ => throw new IllegalArgumentException("Index out of bound error")
+            
+
+          def initializeCells(nCells: Int, dimension: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+              var spawnedCells = 0
+              while (spawnedCells < nCells)
+                  val x = Random.nextInt(dimension)
+                  val y = Random.nextInt(dimension)
+                  val position = Position2D((x, y).toList)
+                  if (array(x)(y).state != state)
+                      array.addCell(x, y)(dimension)(Cell(position, state))
+                      spawnedCells = spawnedCells + 1
+              array

@@ -21,7 +21,7 @@ object Engine:
         def currentMatrix: R
         def startEngine: Unit
         def stopEngine: Unit
-    trait IterableEngine2D[D <: Dimension] extends Engine[D, Iterable[Iterable[Cell[TwoDimensionalSpace]]]]:
+    trait IterableEngine2D extends Engine[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]]:
         override def history: LazyList[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
         override def currentMatrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]]
 
@@ -37,7 +37,7 @@ object Engine2D:
     private case class SimulationEngine2D(
         val env: Environment[TwoDimensionalSpace],
         private val tick: Int)
-     extends Thread with IterableEngine2D[TwoDimensionalSpace]:
+     extends Thread with IterableEngine2D:
         require(tick >= 100)
         @volatile var running = false
         val dimension = env.dimension
