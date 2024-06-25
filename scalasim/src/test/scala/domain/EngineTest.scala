@@ -3,7 +3,6 @@ package domain
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.engine.Engine2D
-import domain.exporter.Image.exportMatrixToImage
 import domain.simulations.gameoflife.GameOfLifeEnvironment
 import utility.DummyAutomatonEnvironment
 import org.scalatest.BeforeAndAfterEach
@@ -47,3 +46,4 @@ class EngineTest extends AnyFunSuite with BeforeAndAfterEach:
         engine.history shouldNot be (LazyList.empty)
         engine.history.head shouldBe (initMatrix)
         engine.history.last shouldBe (lastMatrix)
+        engine.history.head shouldNot be (engine.history(1))
