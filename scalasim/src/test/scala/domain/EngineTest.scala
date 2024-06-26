@@ -38,13 +38,13 @@ class EngineTest extends AnyFunSuite with BeforeAndAfterEach:
         }.forall(x => x._1.state != x._2.state) shouldBe (true)
     
     test("After doing a simulation for a couple of time the history should not be empty"):
-        engine.history should be (ArrayBuffer.empty)
+        engine.history should be (LazyList.empty)
         val initMatrix = engine.currentMatrix
         engine.startEngine
         Thread.sleep(1000)
         engine.stopEngine
         val lastMatrix = engine.currentMatrix
-        engine.history shouldNot be (ArrayBuffer.empty)
+        engine.history shouldNot be (LazyList.empty)
         engine.history.head shouldBe (initMatrix)
         engine.history.last shouldBe (lastMatrix)
         engine.history(0) shouldNot be (engine.history(1))
