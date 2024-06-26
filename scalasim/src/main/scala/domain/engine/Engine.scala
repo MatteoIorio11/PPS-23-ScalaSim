@@ -15,14 +15,14 @@ import scala.collection.mutable.ArrayBuffer
 object Engine:
     trait Engine[D <: Dimension, R]:
         def running: Boolean
-        def history: LazyList[R]
+        def history: ArrayBuffer[R]
         protected def environment(): Environment[D]
         protected def nextIteration: Unit
         def currentMatrix: R
         def startEngine: Unit
         def stopEngine: Unit
     trait IterableEngine2D extends Engine[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]]:
-        override def history: LazyList[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
+        override def history: ArrayBuffer[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
         override def currentMatrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]]
 
 object Engine2D:
@@ -41,7 +41,7 @@ object Engine2D:
         require(tick >= 100)
         @volatile var running = false
         val dimension = env.dimension
-        var history = LazyList()
+        var history = ArrayBuffer()
         override def nextIteration: Unit = 
             environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
                     .flatMap(iterable => iterable.map(cell => cell))
@@ -59,6 +59,7 @@ object Engine2D:
                 running = true
                 start()
         override def run(): Unit = 
+            history = history:+currentMatrix
             while (running)
                 nextIteration
                 Thread.sleep(tick)
