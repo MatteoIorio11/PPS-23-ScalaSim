@@ -105,8 +105,7 @@ class NeighbourRule2DBuilder:
     import domain.automaton.NeighborRuleUtility.-
 
     center match
-      case Some(c) => cells.map: p =>
-        Cell(p.position - c.position, p.state)
+      case Some(c) => cells.map(p => Cell(p.position - c.position, p.state))
       case _ => throw IllegalStateException("Cannot compute relative positions if center is not defined")
 
   /**
@@ -145,10 +144,13 @@ class NeighbourRule2DBuilder:
    * @return this [[NeighbourRule2DBuilder]] with the new [[NeighbourRule]] added.
    */
   def configureAnother(s: State)(config: NeighbourRule2DBuilder ?=> Unit): NeighbourRule2DBuilder =
-    resetBuild
-    config(using this)
-    buildRule(s)
+    val otherBuilder = NeighbourRule2DBuilder()
+    config(using otherBuilder)
+    otherBuilder.buildRule(s)
+    addRule(otherBuilder.rules(0))
     this
+
+  private def addRule(nr: NeighbourRule[TwoDimensionalSpace]): Unit = rules = rules :+ nr
 
   extension (t: (Int, Int))
     private def toPosition: Position[TwoDimensionalSpace] = Position(t.toList)

@@ -73,7 +73,6 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
     val expectedCell = Cell[TwoDimensionalSpace](Position((0, 1).toList), alive)
 
     val rule: NeighbourRule[TwoDimensionalSpace] = builder.rules.head
-    builder.cells.foreach(println(_))
     builder.relativePositions.foreach(println(_))
     rule.applyTransformation(neighbourhood) shouldBe expectedCell
 
@@ -81,6 +80,27 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
     val builder = NeighbourRule2DBuilder.configureRule(alive) {
       state(alive) | c(dead) | state(alive)
     }.configureAnother(dead):
-      state(dead) | c (alive) | state(dead)
+      state(dead) | n |
+      c(alive)   | n |
+      state(dead)
     
     builder.rules.size shouldBe 2
+
+    val aliveNeighbourhood = Neighbour[TwoDimensionalSpace](
+      center = Cell(Position((1, 1).toList), dead),
+      List(
+        Position[TwoDimensionalSpace]((1, 0).toList) -> alive,
+        Position[TwoDimensionalSpace]((1, 2).toList) -> alive,
+      ).map(x => Cell(x._1, x._2))
+    )
+
+    val deadNeighbourhood = Neighbour[TwoDimensionalSpace](
+      center = Cell(Position((1, 0).toList), alive),
+      List(
+        Position[TwoDimensionalSpace]((0, 0).toList) -> dead,
+        Position[TwoDimensionalSpace]((2, 0).toList) -> dead,
+      ).map(x => Cell(x._1, x._2))
+    )
+
+    builder.rules(0).applyTransformation(aliveNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position((1, 1).toList), alive)
+    builder.rules(1).applyTransformation(deadNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position((1, 0).toList), dead)
