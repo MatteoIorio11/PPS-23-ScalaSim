@@ -39,7 +39,8 @@ object Environment:
     
 
     /**
-      * Environment 2D, where the matrix is defined as an ArrayBuffer.
+      * Environment 2D, where the matrix is defined as an [[ArrayBuffer[ArrayBuffer]]]. This type of matrix can be 
+      * very efficient because it allows us to have an O(1) random time access.
       */
     trait ArrayEnvironment2D extends Environment[TwoDimensionalSpace]:
         override type Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]
