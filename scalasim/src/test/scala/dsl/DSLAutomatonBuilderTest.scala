@@ -4,10 +4,12 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.automaton.CellularAutomaton.State
 import dsl.automaton.Neighbourhood2DBuilder.*
+import dsl.automaton.Neighbourhood2DBuilder.given
 import domain.base.Position
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Cell
 import domain.automaton.Neighbour
+import domain.automaton.NeighbourRule
 
 class DSLAutomatonBuilderTest extends AnyFunSuite:
   class Alive extends State:
@@ -18,33 +20,29 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
 
   val alive = Alive()
   val dead = Dead()
-  val nrb = Neighbourhood2DBuilder.configureNeighborhood:
+  val nrb = Neighbourhood2DBuilder.configureNeighborhood(dead):
     state(alive) | x        | state(dead) | n |
     x            | c(alive) | x            | n |
     state(alive) | x        | state(dead)
 
-  test("The dsl should map a correct set of positions"):
+  test("The dsl should map a correct set of cells"):
     nrb.center.isEmpty should not be true
-    nrb.center.get shouldBe Position(List(1, 1))
+    nrb.center.get shouldBe Cell(Position(List(1, 1)), alive)
 
-    val expectedPositions = List(
-      (0, 0), (0, 2),
-      (2, 0), (2, 2),
-    ).map(x => Position(x.toList))
+    val expectedPositions: List[Cell[TwoDimensionalSpace]] = List(
+      (0, 0) -> alive,
+      (0, 2) -> dead,
+      (2, 0) -> alive,
+      (2, 2) -> dead,
+    ).map(x => Cell(Position(x._1.toList), x._2))
 
-    val actualPositions = nrb.cells.map(_.position)
-
-    actualPositions should contain theSameElementsAs expectedPositions
-
-  test("The DSL should map a correct set of cells"):
-    val expectedStates = (alive, dead, alive, dead).toList
-    nrb.cells.map(_.state) should contain theSameElementsInOrderAs expectedStates
+    nrb.cells should contain theSameElementsAs expectedPositions
 
   test("Relative neighbours positions cannot be retrieved if center is not set"):
     val exc = intercept[IllegalStateException]:
-      Neighbourhood2DBuilder.configureNeighborhood {
+      Neighbourhood2DBuilder.configureNeighborhood(alive) {
         state(alive) | state(dead) | state(alive)
-      }.relativePositions 
+      }.relativePositions
     assert(!exc.getMessage().isBlank())
 
   private val expectedCells: List[Cell[TwoDimensionalSpace]] = List(
@@ -58,6 +56,34 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
     val rpos: List[Cell[TwoDimensionalSpace]] = nrb.relativePositions
     rpos should contain theSameElementsInOrderAs expectedCells
 
-  test("The DSL should be able to produce a proper Neighbour instance"):
-    val expectedNeighbourhood = Neighbour[TwoDimensionalSpace](nrb.center.get, nrb.cells)
-    expectedNeighbourhood shouldBe nrb.neighbourhood
+  test("The DSL should be able to produce a proper relative Neighbour instance"):
+    val expectedNeighbourhood = Neighbour[TwoDimensionalSpace](
+      Cell(Position((0, 0).toList), nrb.center.get.state), nrb.relativePositions
+    )
+    nrb.relativeNeighbourhood shouldBe expectedNeighbourhood
+
+  test("Rule specified in DSL should work as expected"):
+    val builder = Neighbourhood2DBuilder.configureNeighborhood(alive):
+      state(alive) | c(dead) | state(alive)
+
+    val center = Cell[TwoDimensionalSpace](Position((0, 1).toList), dead)
+    val cells = List(
+      (0, 0) -> alive,
+      (0, 2) -> alive,
+    ).map(x => Cell[TwoDimensionalSpace](Position(x._1.toList), x._2))
+
+    val neighbourhood = Neighbour[TwoDimensionalSpace](center, cells)
+    val expectedCell = Cell[TwoDimensionalSpace](Position((0, 1).toList), alive)
+
+    val rule: NeighbourRule[TwoDimensionalSpace] = builder.rules.head
+    builder.cells.foreach(println(_))
+    builder.relativePositions.foreach(println(_))
+    rule.applyTransformation(neighbourhood) shouldBe expectedCell
+
+  test("Rule composition should be made available through `configureAnother`"):
+    val builder = Neighbourhood2DBuilder.configureNeighborhood(alive) {
+      state(alive) | c(dead) | state(alive)
+    }.configureAnother(dead):
+      state(dead) | c (alive) | state(dead)
+    
+    builder.rules.size shouldBe 2

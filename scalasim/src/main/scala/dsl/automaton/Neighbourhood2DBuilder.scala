@@ -6,6 +6,7 @@ import domain.automaton.Cell
 import domain.base.Position
 import domain.automaton.CellularAutomaton.State
 import domain.automaton.Neighbour
+import domain.automaton.NeighbourRule
 
 class Neighbourhood2DBuilder:
 
@@ -13,6 +14,7 @@ class Neighbourhood2DBuilder:
   var j: Int = 0
   var center: Option[Cell[TwoDimensionalSpace]] = Option.empty
   var cells: List[Cell[TwoDimensionalSpace]] = List.empty
+  var rules: List[NeighbourRule[TwoDimensionalSpace]] = List.empty
 
   def nextRow: this.type =
     i += 1
@@ -21,18 +23,25 @@ class Neighbourhood2DBuilder:
 
   def addCell(s: Option[State]): this.type =
     s match
-      case Some(state) => cells = cells :+ Cell(Position(List(i, j)), state)
+      case Some(state) => cells = cells :+ Cell((i, j).toPosition, state)
       case _ =>
     j += 1
     this
 
   def setCenter(s: State): this.type =
-    center = Some(Cell(Position(List(i, j)), s))
-    this 
+    center = Some(Cell((i, j).toPosition, s))
+    j += 1
+    this
+    
+  private def buildRule(s: State): Unit =
+    import domain.automaton.NeighborRuleUtility.*
 
-  def neighbourhood: Neighbour[TwoDimensionalSpace] = center match
-      case Some(c) => Neighbour(c, cells)
-      case _ => throw IllegalStateException("Cannot get neighbourhood because center is not defined")
+    rules = rules :+ ((n: Neighbour[TwoDimensionalSpace]) =>
+        val currentRuleToAdjustedPositions = toAbsolutePosition(n.center)
+        if n == currentRuleToAdjustedPositions
+          then Cell(n.center.position, s)
+          else n.center
+        )
 
   def relativePositions: List[Cell[TwoDimensionalSpace]] =
     import domain.automaton.NeighborRuleUtility.-
@@ -41,13 +50,39 @@ class Neighbourhood2DBuilder:
       case Some(c) => cells.map: p =>
         Cell(p.position - c.position, p.state)
       case _ => throw IllegalStateException("Cannot compute relative positions if center is not defined")
+  
+  def relativeNeighbourhood: Neighbour[TwoDimensionalSpace] =
+    Neighbour(Cell((0, 0).toPosition, center.get.state), relativePositions)
+
+  private def toAbsolutePosition(cntr: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
+    import domain.automaton.NeighborRuleUtility.{+, -}
+    Neighbour(
+      cntr,
+      relativePositions.map(c => Cell(c.position + cntr.position, c.state))
+    )
+
+  private def resetBuild: Unit =
+    i = 0
+    j = 0
+    center = Option.empty
+    cells = List.empty
+
+  def configureAnother(s: State)(config: Neighbourhood2DBuilder ?=> Unit): Neighbourhood2DBuilder =
+    resetBuild
+    config(using this)
+    buildRule(s)
+    this
+
+  extension (t: (Int, Int))
+    def toPosition: Position[TwoDimensionalSpace] = Position(t.toList)
 
 object Neighbourhood2DBuilder:
   export DSL.*
 
-  def configureNeighborhood(config: Neighbourhood2DBuilder ?=> Unit): Neighbourhood2DBuilder =
+  def configureNeighborhood(s: State)(config: Neighbourhood2DBuilder ?=> Unit): Neighbourhood2DBuilder =
     given builder: Neighbourhood2DBuilder = Neighbourhood2DBuilder()
     config
+    builder.buildRule(s)
     builder
 
   object DSL:
