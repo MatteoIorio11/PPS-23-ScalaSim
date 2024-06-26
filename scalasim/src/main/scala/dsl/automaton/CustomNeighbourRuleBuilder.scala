@@ -9,7 +9,7 @@ import domain.automaton.Neighbour
 import domain.automaton.NeighbourRule
 import scala.annotation.targetName
 
-class CustomNeighbourhoodRuleBuilder extends NeighbourRule2DBuilder:
+class CustomNeighbourRuleBuilder extends ExplicitNeighbourRuleBuilder:
 
   private var i: Int = 0
   private var j: Int = 0
@@ -75,8 +75,8 @@ class CustomNeighbourhoodRuleBuilder extends NeighbourRule2DBuilder:
     center = Option.empty
     cells = List.empty
 
-  override def configureAnother(s: State)(config: NeighbourRule2DBuilder ?=> Unit): NeighbourRule2DBuilder =
-    val otherBuilder = CustomNeighbourhoodRuleBuilder()
+  override def configureAnother(s: State)(config: ExplicitNeighbourRuleBuilder ?=> Unit): ExplicitNeighbourRuleBuilder =
+    val otherBuilder = CustomNeighbourRuleBuilder()
     config(using otherBuilder)
     otherBuilder.buildRule(s)
     addRule(otherBuilder.rules(0))

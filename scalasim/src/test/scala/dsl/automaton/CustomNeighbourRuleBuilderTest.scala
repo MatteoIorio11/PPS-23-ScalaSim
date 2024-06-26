@@ -4,7 +4,7 @@ import domain.automaton.CellularAutomaton.State
 import domain.automaton.{Cell, Neighbour, NeighbourRule}
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position
-import dsl.automaton.NeighbourRule2DBuilder.{*, given}
+import dsl.automaton.ExplicitNeighbourRuleBuilder.{*, given}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 
@@ -17,7 +17,7 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
 
   private val alive = Alive()
   private val dead = Dead()
-  private val nrb = NeighbourRule2DBuilder.configureRule(dead):
+  private val nrb = ExplicitNeighbourRuleBuilder.configureRule(dead):
     state(alive) | x        | state(dead) | n |
     x            | c(alive) | x            | n |
     state(alive) | x        | state(dead)
@@ -37,7 +37,7 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
 
   test("Relative neighbours positions cannot be retrieved if center is not set"):
     val exc = intercept[IllegalStateException]:
-      NeighbourRule2DBuilder.configureRule(alive) {
+      ExplicitNeighbourRuleBuilder.configureRule(alive) {
         state(alive) | state(dead) | state(alive)
       }.relativePositions
     assert(!exc.getMessage.isBlank)
@@ -60,7 +60,7 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
     nrb.relativeNeighbourhood shouldBe expectedNeighbourhood
 
   test("Rule specified in DSL should work as expected"):
-    val builder = NeighbourRule2DBuilder.configureRule(alive):
+    val builder = ExplicitNeighbourRuleBuilder.configureRule(alive):
       state(alive) | c(dead) | state(alive)
 
     val center = Cell[TwoDimensionalSpace](Position((0, 1).toList), dead)
@@ -77,7 +77,7 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
     rule.applyTransformation(neighbourhood) shouldBe expectedCell
 
   test("Rule composition should be made available through `configureAnother`"):
-    val builder = NeighbourRule2DBuilder.configureRule(alive) {
+    val builder = ExplicitNeighbourRuleBuilder.configureRule(alive) {
       state(alive) | c(dead) | state(alive)
     }.configureAnother(dead):
       state(dead) | n |
