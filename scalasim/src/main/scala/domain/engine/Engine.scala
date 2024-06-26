@@ -43,13 +43,15 @@ object Engine2D:
         val dimension = env.dimension
         var history = ArrayBuffer()
         override def nextIteration: Unit = 
-            environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
+            environment().matrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
                     .flatMap(iterable => iterable.map(cell => cell))
                     .map(cell => env.applyRule(cell, env.neighbours(cell)))
-            history = history:+currentMatrix
+            saveInHistory
         override def environment(): Environment[TwoDimensionalSpace] = 
             this.synchronized:
                 env
+        private def saveInHistory: Unit = 
+            history = history.append(currentMatrix)
         override def currentMatrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]] = 
             environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
         override def stopEngine: Unit = 
@@ -59,7 +61,7 @@ object Engine2D:
                 running = true
                 start()
         override def run(): Unit = 
-            history = history:+currentMatrix
+            saveInHistory
             while (running)
                 nextIteration
                 Thread.sleep(tick)

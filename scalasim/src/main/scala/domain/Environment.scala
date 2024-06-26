@@ -26,6 +26,7 @@ object Environment:
         def currentMatrix: Matrix
         def dimension: Int
         def cellularAutomata: CellularAutomaton[D]
+        def matrix: Matrix
         def neighbours(cell: Cell[D]): Iterable[Cell[D]]
         protected def saveCell(cell: Cell[D]): Unit 
         def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
@@ -34,7 +35,6 @@ object Environment:
             saveCell(newCell)
             newCell
         protected def initialise(): Unit
-        protected def matrix: Matrix
         protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
     
 
@@ -46,10 +46,10 @@ object Environment:
         override protected def saveCell(cell: Cell[TwoDimensionalSpace]): Unit = 
             val x = cell.position.coordinates.head
             val y = cell.position.coordinates.last
-            matrix.addCell(x, y)(dimension)(cell)
+            matrix(x)(y) = cell
 
-        override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-            matrix.clone()
+        override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            matrix.deepCopy
         
         override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]): Iterable[Cell[TwoDimensionalSpace]] =
           positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < dimension))
@@ -61,14 +61,8 @@ object Environment:
               val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
               for (y <- 0 until dimension)
                   for (x <- 0 until dimension)
-                      array.addCell(x, y)(dimension)(Cell(Position2D((x, y).toList), CellState.DEAD))
+                      array(x)(y) = (Cell(Position2D((x, y).toList), CellState.DEAD))
               array
-
-          def addCell(x: Int, y: Int)(dimension: Int)(cell: Cell[TwoDimensionalSpace]): Unit = 
-            (x, y) match
-              case (x, y) if x >= 0 && y >= 0 && x < dimension && y < dimension => array(x)(y) = cell
-              case _ => throw new IllegalArgumentException("Index out of bound error")
-            
 
           def initializeCells(nCells: Int, dimension: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
               var spawnedCells = 0
@@ -77,6 +71,8 @@ object Environment:
                   val y = Random.nextInt(dimension)
                   val position = Position2D((x, y).toList)
                   if (array(x)(y).state != state)
-                      array.addCell(x, y)(dimension)(Cell(position, state))
+                      array(x)(y) = (Cell(position, state))
                       spawnedCells = spawnedCells + 1
               array
+          def deepCopy: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            matrix.map(row => row.map(cell => Cell(Position(cell.position.coordinates), cell.state)))

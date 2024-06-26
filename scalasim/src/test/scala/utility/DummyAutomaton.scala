@@ -28,9 +28,8 @@ object DummyAutomatonEnvironment:
         extends Environment[TwoDimensionalSpace] with ArrayEnvironment2D:
       require(dimension > 0)
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
-        initialise()
+      initialise()
       override protected def initialise() = 
-        print(matrix)
         val initialCell = Cell(Position((-1,-1).toList), DummyState.DEAD)
         val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
         for (y <- 0 until dimension)
@@ -42,12 +41,6 @@ object DummyAutomatonEnvironment:
                 array(x)(y) = Cell(Position((x, y).toList), state)
         array(0)(0) = Cell(Position((0,0).toList), DummyState.DEAD)
         matrix = array.asInstanceOf[Matrix]
-
-
-      override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]) = 
-        positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < dimension))
-            .map(pos => pos.coordinates.toList)
-            .map(cor => matrix(cor.head)(cor.last))
 
       override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
           import domain.automaton.NeighborRuleUtility.given
