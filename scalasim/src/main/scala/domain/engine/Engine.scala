@@ -13,16 +13,20 @@ import domain.base.Position
 import scala.collection.mutable.ArrayBuffer
 
 object Engine:
+    /**
+      * Engine of the simulation, this trait is responsible for the Environment. The engine is defined in 
+      * [[Dimension]] that must be equal to the Environment's dimension. The engine has also a 
+      */
     trait Engine[D <: Dimension, R]:
         def running: Boolean
-        def history: ArrayBuffer[R]
+        def history: LazyList[R]
         protected def environment(): Environment[D]
         protected def nextIteration: Unit
         def currentMatrix: R
         def startEngine: Unit
         def stopEngine: Unit
     trait IterableEngine2D extends Engine[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]]:
-        override def history: ArrayBuffer[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
+        override def history: LazyList[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
         override def currentMatrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]]
 
 object Engine2D:
@@ -41,7 +45,7 @@ object Engine2D:
         require(tick >= 100)
         @volatile var running = false
         val dimension = env.dimension
-        var history = ArrayBuffer()
+        var history = LazyList()
         override def nextIteration: Unit = 
             environment().matrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
                     .flatMap(iterable => iterable.map(cell => cell))
@@ -51,7 +55,7 @@ object Engine2D:
             this.synchronized:
                 env
         private def saveInHistory: Unit = 
-            history = history.append(currentMatrix)
+            history = history:+(currentMatrix)
         override def currentMatrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]] = 
             environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
         override def stopEngine: Unit = 
