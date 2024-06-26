@@ -7,6 +7,7 @@ import dsl.automaton.Neighbourhood2DBuilder.*
 import domain.base.Position
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Cell
+import domain.automaton.Neighbour
 
 class DSLAutomatonBuilderTest extends AnyFunSuite:
   class Alive extends State:
@@ -18,9 +19,9 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
   val alive = Alive()
   val dead = Dead()
   val nrb = Neighbourhood2DBuilder.configureNeighborhood:
-    state(alive) | x | state(dead) | n |
-    x            | c | x            | n |
-    state(alive) | x | state(dead)
+    state(alive) | x        | state(dead) | n |
+    x            | c(alive) | x            | n |
+    state(alive) | x        | state(dead)
 
   test("The dsl should map a correct set of positions"):
     nrb.center.isEmpty should not be true
@@ -46,14 +47,17 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
       }.relativePositions 
     assert(!exc.getMessage().isBlank())
 
+  private val expectedCells: List[Cell[TwoDimensionalSpace]] = List(
+    alive -> (-1, -1),
+    dead -> (-1, 1),
+    alive -> (1, -1),
+    dead -> (1, 1),
+  ).map (e => Cell(Position(e._2.toList), e._1))
+
   test("Relative neighbours cells can be retrieved if center is set"):
     val rpos: List[Cell[TwoDimensionalSpace]] = nrb.relativePositions
-    val expectedPositions: List[Cell[TwoDimensionalSpace]] = List(
-      alive -> (-1, -1),
-      dead -> (-1, 1),
-      alive -> (1, -1),
-      dead -> (1, 1),
-    ).map (e => Cell(Position(e._2.toList), e._1))
+    rpos should contain theSameElementsInOrderAs expectedCells
 
-    // rpos.map(_.position) should contain theSameElementsAs expectedPositions.map(_.position)
-    rpos should contain theSameElementsAs expectedPositions
+  test("The DSL should be able to produce a proper Neighbour instance"):
+    val expectedNeighbourhood = Neighbour[TwoDimensionalSpace](nrb.center.get, nrb.cells)
+    expectedNeighbourhood shouldBe nrb.neighbourhood

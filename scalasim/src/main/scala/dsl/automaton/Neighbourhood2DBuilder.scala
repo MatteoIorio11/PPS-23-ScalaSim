@@ -5,12 +5,13 @@ import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Cell
 import domain.base.Position
 import domain.automaton.CellularAutomaton.State
+import domain.automaton.Neighbour
 
 class Neighbourhood2DBuilder:
 
   var i: Int = 0
   var j: Int = 0
-  var center: Option[Position[TwoDimensionalSpace]] = Option.empty
+  var center: Option[Cell[TwoDimensionalSpace]] = Option.empty
   var cells: List[Cell[TwoDimensionalSpace]] = List.empty
 
   def nextRow: this.type =
@@ -25,16 +26,20 @@ class Neighbourhood2DBuilder:
     j += 1
     this
 
-  def setCenter: this.type =
-    center = Some(Position(List(i, j)))
-    this
+  def setCenter(s: State): this.type =
+    center = Some(Cell(Position(List(i, j)), s))
+    this 
+
+  def neighbourhood: Neighbour[TwoDimensionalSpace] = center match
+      case Some(c) => Neighbour(c, cells)
+      case _ => throw IllegalStateException("Cannot get neighbourhood because center is not defined")
 
   def relativePositions: List[Cell[TwoDimensionalSpace]] =
     import domain.automaton.NeighborRuleUtility.-
 
     center match
       case Some(c) => cells.map: p =>
-        Cell(p.position - c, p.state)
+        Cell(p.position - c.position, p.state)
       case _ => throw IllegalStateException("Cannot compute relative positions if center is not defined")
 
 object Neighbourhood2DBuilder:
@@ -48,7 +53,7 @@ object Neighbourhood2DBuilder:
   object DSL:
     def x(using builder: Neighbourhood2DBuilder): Neighbourhood2DBuilder = builder.addCell(None)
     def n(using builder: Neighbourhood2DBuilder):Neighbourhood2DBuilder = builder.nextRow
-    def c(using builder: Neighbourhood2DBuilder): Neighbourhood2DBuilder = builder.setCenter
+    def c(s: State)(using builder: Neighbourhood2DBuilder): Neighbourhood2DBuilder = builder.setCenter(s)
     def state(s: State)(using builder: Neighbourhood2DBuilder): Neighbourhood2DBuilder = builder.addCell(Some(s))
 
     extension (builder: Neighbourhood2DBuilder)
