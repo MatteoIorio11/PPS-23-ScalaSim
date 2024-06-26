@@ -22,15 +22,15 @@ trait NeighbourRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D]]
 
 object NeighborRuleUtility:
    enum RelativePositions(x: Int, y: Int):
-      case TopLeft      extends RelativePositions(-1, -1)
-      case TopCenter    extends RelativePositions(-1, 0)
-      case TopRight     extends RelativePositions(-1, 1)
-      case CenterLeft   extends RelativePositions(0, -1)
-      case Center       extends RelativePositions(0, 0)
-      case CenterRight  extends RelativePositions(0, 1)
-      case BottomLeft   extends RelativePositions(1, -1)
-      case BottomCenter extends RelativePositions(1, 0)
-      case BottomRight  extends RelativePositions(1, 1)
+      case TopLeft(n: Int = 0)      extends RelativePositions(n * -1, n * -1)
+      case TopCenter(n: Int = 0)    extends RelativePositions(n * -1, n * 0)
+      case TopRight(n: Int = 0)     extends RelativePositions(n * -1, n * 1)
+      case CenterLeft(n: Int = 0)   extends RelativePositions(n * 0, n * -1)
+      case Center(n: Int = 0)       extends RelativePositions(n * 0, n * 0)
+      case CenterRight(n: Int = 0)  extends RelativePositions(n * 0, n * 1)
+      case BottomLeft(n: Int = 0)   extends RelativePositions(n * 1, n * -1)
+      case BottomCenter(n: Int = 0) extends RelativePositions(n * 1, n * 0)
+      case BottomRight(n: Int = 0)  extends RelativePositions(n * 1, n * 1)
 
       def coordinates: List[Int] = List(x, y)
 
@@ -60,15 +60,15 @@ object NeighborRuleUtility:
       override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
          import RelativePositions.*
          List(
-            TopLeft,
-            TopCenter,
-            TopRight,
-            CenterLeft,
-            CenterRight,
-            BottomLeft,
-            BottomCenter,
-            BottomRight,
-         ).map(p => Position(p.coordinates))
+            TopLeft(),
+            TopCenter(),
+            TopRight(),
+            CenterLeft(),
+            CenterRight(),
+            BottomLeft(),
+            BottomCenter(),
+            BottomRight(),
+            ).map(p => Position(p.coordinates))
 
    def getNeighboursWithState[D <: Dimension](state: State, neighbours: Neighbour[D]): List[Cell[D]] = 
       neighbours.neighbourhood.filter(cell => cell.state == state)
