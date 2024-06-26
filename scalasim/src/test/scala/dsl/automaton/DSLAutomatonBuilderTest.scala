@@ -1,15 +1,12 @@
 package dsl.automaton
 
+import domain.automaton.CellularAutomaton.State
+import domain.automaton.{Cell, Neighbour, NeighbourRule}
+import domain.base.Dimensions.TwoDimensionalSpace
+import domain.base.Position
+import dsl.automaton.NeighbourRule2DBuilder.{*, given}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
-import domain.automaton.CellularAutomaton.State
-import dsl.automaton.Neighbourhood2DBuilder.*
-import dsl.automaton.Neighbourhood2DBuilder.given
-import domain.base.Position
-import domain.base.Dimensions.TwoDimensionalSpace
-import domain.automaton.Cell
-import domain.automaton.Neighbour
-import domain.automaton.NeighbourRule
 
 class DSLAutomatonBuilderTest extends AnyFunSuite:
   class Alive extends State:
@@ -18,9 +15,9 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
   class Dead extends State:
     val name: String = "dead"
 
-  val alive = Alive()
-  val dead = Dead()
-  val nrb = Neighbourhood2DBuilder.configureNeighborhood(dead):
+  private val alive = Alive()
+  private val dead = Dead()
+  private val nrb = NeighbourRule2DBuilder.configureNeighborhood(dead):
     state(alive) | x        | state(dead) | n |
     x            | c(alive) | x            | n |
     state(alive) | x        | state(dead)
@@ -40,10 +37,10 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
 
   test("Relative neighbours positions cannot be retrieved if center is not set"):
     val exc = intercept[IllegalStateException]:
-      Neighbourhood2DBuilder.configureNeighborhood(alive) {
+      NeighbourRule2DBuilder.configureNeighborhood(alive) {
         state(alive) | state(dead) | state(alive)
       }.relativePositions
-    assert(!exc.getMessage().isBlank())
+    assert(!exc.getMessage.isBlank)
 
   private val expectedCells: List[Cell[TwoDimensionalSpace]] = List(
     alive -> (-1, -1),
@@ -63,7 +60,7 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
     nrb.relativeNeighbourhood shouldBe expectedNeighbourhood
 
   test("Rule specified in DSL should work as expected"):
-    val builder = Neighbourhood2DBuilder.configureNeighborhood(alive):
+    val builder = NeighbourRule2DBuilder.configureNeighborhood(alive):
       state(alive) | c(dead) | state(alive)
 
     val center = Cell[TwoDimensionalSpace](Position((0, 1).toList), dead)
@@ -81,7 +78,7 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
     rule.applyTransformation(neighbourhood) shouldBe expectedCell
 
   test("Rule composition should be made available through `configureAnother`"):
-    val builder = Neighbourhood2DBuilder.configureNeighborhood(alive) {
+    val builder = NeighbourRule2DBuilder.configureNeighborhood(alive) {
       state(alive) | c(dead) | state(alive)
     }.configureAnother(dead):
       state(dead) | c (alive) | state(dead)
