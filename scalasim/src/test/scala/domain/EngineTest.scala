@@ -47,4 +47,4 @@ class EngineTest extends AnyFunSuite with BeforeAndAfterEach:
         engine.history shouldNot be (ArrayBuffer.empty)
         engine.history.head shouldBe (initMatrix)
         engine.history.last shouldBe (lastMatrix)
-        engine.history.head shouldNot be (engine.history(1))
+        engine.history(0) shouldNot be (engine.history(1))
