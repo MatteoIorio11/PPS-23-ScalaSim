@@ -8,7 +8,7 @@ import dsl.automaton.NeighbourRule2DBuilder.{*, given}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 
-class DSLAutomatonBuilderTest extends AnyFunSuite:
+class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
   class Alive extends State:
     val name: String = "alive"
 

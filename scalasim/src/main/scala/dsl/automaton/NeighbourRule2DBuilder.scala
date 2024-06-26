@@ -28,10 +28,23 @@ import scala.annotation.targetName
  * if the neighbourhood configuration matches with the rule.
  * For more information about the syntax, visit [[NeighbourRule2DBuilder.DSL]].
  */
-class NeighbourRule2DBuilder:
+trait NeighbourRule2DBuilder:
+    def center: Option[Cell[TwoDimensionalSpace]]
+    def cells: List[Cell[TwoDimensionalSpace]]
+    def rules: List[NeighbourRule[TwoDimensionalSpace]]
+    def nextRow: NeighbourRule2DBuilder
+    def addCell(s: Option[State]): NeighbourRule2DBuilder
+    def setCenter(s: State): NeighbourRule2DBuilder
+    def relativePositions: List[Cell[TwoDimensionalSpace]]
+    def relativeNeighbourhood: Neighbour[TwoDimensionalSpace]
+    def buildRule(s: State): Unit
+    def configureAnother(s: State)(config: NeighbourRule2DBuilder ?=> Unit): NeighbourRule2DBuilder
+
+class CustomNeighbourhoodRuleBuilder extends NeighbourRule2DBuilder:
 
   private var i: Int = 0
   private var j: Int = 0
+  //
   // TODO: change access modifiers in order to let tests pass
   var center: Option[Cell[TwoDimensionalSpace]] = Option.empty
   var cells: List[Cell[TwoDimensionalSpace]] = List.empty
@@ -42,7 +55,7 @@ class NeighbourRule2DBuilder:
    *
    * @return this [[NeighbourRule2DBuilder]]
    */
-  def nextRow: this.type =
+  override def nextRow: this.type =
     i += 1
     j = 0
     this
@@ -53,7 +66,7 @@ class NeighbourRule2DBuilder:
    * @param s an [[Option]] representing the state of the cell.
    * @return this [[NeighbourRule2DBuilder]]
    */
-  def addCell(s: Option[State]): this.type =
+  override def addCell(s: Option[State]): this.type =
     s match
       case Some(state) => cells = cells :+ Cell((i, j).toPosition, state)
       case _ =>
@@ -66,7 +79,7 @@ class NeighbourRule2DBuilder:
    * @param s the [[State]] of the center cell.
    * @return this [[NeighbourRule2DBuilder]]
    */
-  def setCenter(s: State): this.type =
+  override def setCenter(s: State): this.type =
     center = Some(Cell((i, j).toPosition, s))
     j += 1
     this
@@ -78,7 +91,7 @@ class NeighbourRule2DBuilder:
    * @param s the [[State]] of the center cell if the transformation function can be applied
    *          (i.e. if a neighbourhood matches this rule's neighbourhood).
    */
-  private def buildRule(s: State): Unit =
+  override def buildRule(s: State): Unit =
     import domain.automaton.NeighborRuleUtility.*
 
     rules = rules :+ ((n: Neighbour[TwoDimensionalSpace]) =>
@@ -101,7 +114,7 @@ class NeighbourRule2DBuilder:
    *
    * @return a list of cells with positions relative to the center cell.
    */
-  def relativePositions: List[Cell[TwoDimensionalSpace]] =
+  override def relativePositions: List[Cell[TwoDimensionalSpace]] =
     import domain.automaton.NeighborRuleUtility.-
 
     center match
@@ -113,7 +126,7 @@ class NeighbourRule2DBuilder:
    *
    * @return a [[Neighbour]] with relative positions.
    */
-  def relativeNeighbourhood: Neighbour[TwoDimensionalSpace] =
+  override def relativeNeighbourhood: Neighbour[TwoDimensionalSpace] =
     Neighbour(Cell((0, 0).toPosition, center.get.state), relativePositions)
 
   /**
@@ -143,8 +156,8 @@ class NeighbourRule2DBuilder:
    * @param config the configuration block that makes use of the DSL.
    * @return this [[NeighbourRule2DBuilder]] with the new [[NeighbourRule]] added.
    */
-  def configureAnother(s: State)(config: NeighbourRule2DBuilder ?=> Unit): NeighbourRule2DBuilder =
-    val otherBuilder = NeighbourRule2DBuilder()
+  override def configureAnother(s: State)(config: NeighbourRule2DBuilder ?=> Unit): NeighbourRule2DBuilder =
+    val otherBuilder = CustomNeighbourhoodRuleBuilder()
     config(using otherBuilder)
     otherBuilder.buildRule(s)
     addRule(otherBuilder.rules(0))
@@ -159,7 +172,7 @@ object NeighbourRule2DBuilder:
   export DSL.*
 
   def configureRule(s: State)(config: NeighbourRule2DBuilder ?=> Unit): NeighbourRule2DBuilder =
-    given builder: NeighbourRule2DBuilder = NeighbourRule2DBuilder()
+    given builder: CustomNeighbourhoodRuleBuilder = CustomNeighbourhoodRuleBuilder()
     config
     builder.buildRule(s)
     builder
