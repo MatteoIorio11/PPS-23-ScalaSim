@@ -31,7 +31,7 @@ object GameOfLifeEnvironment:
         require(dimension > 0)
         require(cellularAutomata != null)
 
-        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeEmpty2D(dimension = dimension)(initialCell)
+        protected var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeEmpty2D(dimension = dimension)(initialCell)
 
         initialise()
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =

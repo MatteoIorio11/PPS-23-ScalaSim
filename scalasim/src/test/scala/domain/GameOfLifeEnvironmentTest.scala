@@ -19,10 +19,10 @@ class GameOfLifeEnvironmentTest extends AnyFunSuite with BeforeAndAfterEach:
 
 
     test("Initialize an environment should add cells into the matrix"):
-        env.matrix.length should not be 0
+        env.currentMatrix.length should not be 0
     
     test("Initialization should also add alive cells"):
-        env.matrix.flatMap(array => array.map(cell => cell.state))
+        env.currentMatrix.flatMap(array => array.map(cell => cell.state))
             .filter(state => state == CellState.ALIVE).length should not be 0
     
     test("The neighboors of a cell should always exits"):
