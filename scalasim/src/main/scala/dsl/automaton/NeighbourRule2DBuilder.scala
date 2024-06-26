@@ -32,40 +32,84 @@ trait NeighbourRule2DBuilder:
     def center: Option[Cell[TwoDimensionalSpace]]
     def cells: List[Cell[TwoDimensionalSpace]]
     def rules: List[NeighbourRule[TwoDimensionalSpace]]
+
+    /**
+     * Make the builder consider the next row of the two dimensional grid.
+     *
+     * @return this [[NeighbourRule2DBuilder]]
+     */
     def nextRow: NeighbourRule2DBuilder
+
+    /**
+     * Adds a cell to the current set of cells, associating the cell with current row and column indexes.
+     *
+     * @param s an [[Option]] representing the state of the cell.
+     * @return this [[NeighbourRule2DBuilder]]
+     */
     def addCell(s: Option[State]): NeighbourRule2DBuilder
+
+    /**
+     * Sets the center of this neighbourhood, i.e. the cell to which the transformation function is applied.
+     *
+     * @param s the [[State]] of the center cell.
+     * @return this [[NeighbourRule2DBuilder]]
+     */
     def setCenter(s: State): NeighbourRule2DBuilder
+
+    /**
+     * Compute DSL-specified cells positions relative to the center position, i.e. where a given position
+     * is placed, if the center is considered to be the origin of the coordinates (0, 0).
+     *
+     * @example
+     * {{{
+     *   cellsPositions => ((0, 0), (0, 2))
+     *   center => (0, 1)
+     *   relativePositions(center) => ((0, -1), (0, 1))
+     * }}}
+     *
+     * @return a list of cells with positions relative to the center cell.
+     */
     def relativePositions: List[Cell[TwoDimensionalSpace]]
+
+    /**
+     * Same as [[NeighbourRule2DBuilder.relativePositions]], but builds a [[Neighbour]] object.
+     *
+     * @return a [[Neighbour]] with relative positions.
+     */
     def relativeNeighbourhood: Neighbour[TwoDimensionalSpace]
+
+    /**
+     * Converts the given positions and center into a [[NeighbourRule]] representing
+     * the desired behaviour, and adds to the set of rules built with this builder.
+     *
+     * @param s the [[State]] of the center cell if the transformation function can be applied
+     *          (i.e. if a neighbourhood matches this rule's neighbourhood).
+     */
     def buildRule(s: State): Unit
+
+    /**
+     * Builds and adds another [[NeighbourRule]] through the DSL of this current [[NeighbourRule2DBuilder]].
+     *
+     * @param s the state that will be assigned to the center if the rule matches.
+     * @param config the configuration block that makes use of the DSL.
+     * @return this [[NeighbourRule2DBuilder]] with the new [[NeighbourRule]] added.
+     */
     def configureAnother(s: State)(config: NeighbourRule2DBuilder ?=> Unit): NeighbourRule2DBuilder
 
 class CustomNeighbourhoodRuleBuilder extends NeighbourRule2DBuilder:
 
   private var i: Int = 0
   private var j: Int = 0
-  //
   // TODO: change access modifiers in order to let tests pass
   var center: Option[Cell[TwoDimensionalSpace]] = Option.empty
   var cells: List[Cell[TwoDimensionalSpace]] = List.empty
   var rules: List[NeighbourRule[TwoDimensionalSpace]] = List.empty
 
-  /**
-   * Make the builder consider the next row of the two dimensional grid.
-   *
-   * @return this [[NeighbourRule2DBuilder]]
-   */
   override def nextRow: this.type =
     i += 1
     j = 0
     this
 
-  /**
-   * Adds a cell to the current set of cells, associating the cell with current row and column indexes.
-   *
-   * @param s an [[Option]] representing the state of the cell.
-   * @return this [[NeighbourRule2DBuilder]]
-   */
   override def addCell(s: Option[State]): this.type =
     s match
       case Some(state) => cells = cells :+ Cell((i, j).toPosition, state)
@@ -73,24 +117,11 @@ class CustomNeighbourhoodRuleBuilder extends NeighbourRule2DBuilder:
     j += 1
     this
 
-  /**
-   * Sets the center of this neighbourhood, i.e. the cell to which the transformation function is applied.
-   *
-   * @param s the [[State]] of the center cell.
-   * @return this [[NeighbourRule2DBuilder]]
-   */
   override def setCenter(s: State): this.type =
     center = Some(Cell((i, j).toPosition, s))
     j += 1
     this
 
-  /**
-   * Converts the given positions and center into a [[NeighbourRule]] representing
-   * the desired behaviour, and adds to the set of rules built with this builder.
-   *
-   * @param s the [[State]] of the center cell if the transformation function can be applied
-   *          (i.e. if a neighbourhood matches this rule's neighbourhood).
-   */
   override def buildRule(s: State): Unit =
     import domain.automaton.NeighborRuleUtility.*
 
@@ -101,19 +132,6 @@ class CustomNeighbourhoodRuleBuilder extends NeighbourRule2DBuilder:
           else n.center
         )
 
-  /**
-   * Compute DSL-specified cells positions relative to the center position, i.e. where a given position
-   * is placed, if the center is considered to be the origin of the coordinates (0, 0).
-   *
-   * @example
-   * {{{
-   *   cellsPositions => ((0, 0), (0, 2))
-   *   center => (0, 1)
-   *   relativePositions(center) => ((0, -1), (0, 1))
-   * }}}
-   *
-   * @return a list of cells with positions relative to the center cell.
-   */
   override def relativePositions: List[Cell[TwoDimensionalSpace]] =
     import domain.automaton.NeighborRuleUtility.-
 
@@ -121,11 +139,6 @@ class CustomNeighbourhoodRuleBuilder extends NeighbourRule2DBuilder:
       case Some(c) => cells.map(p => Cell(p.position - c.position, p.state))
       case _ => throw IllegalStateException("Cannot compute relative positions if center is not defined")
 
-  /**
-   * Same as [[NeighbourRule2DBuilder.relativePositions]], but builds a [[Neighbour]] object.
-   *
-   * @return a [[Neighbour]] with relative positions.
-   */
   override def relativeNeighbourhood: Neighbour[TwoDimensionalSpace] =
     Neighbour(Cell((0, 0).toPosition, center.get.state), relativePositions)
 
@@ -149,13 +162,6 @@ class CustomNeighbourhoodRuleBuilder extends NeighbourRule2DBuilder:
     center = Option.empty
     cells = List.empty
 
-  /**
-   * Builds and adds another [[NeighbourRule]] through the DSL of this current [[NeighbourRule2DBuilder]].
-   *
-   * @param s the state that will be assigned to the center if the rule matches.
-   * @param config the configuration block that makes use of the DSL.
-   * @return this [[NeighbourRule2DBuilder]] with the new [[NeighbourRule]] added.
-   */
   override def configureAnother(s: State)(config: NeighbourRule2DBuilder ?=> Unit): NeighbourRule2DBuilder =
     val otherBuilder = CustomNeighbourhoodRuleBuilder()
     config(using otherBuilder)
