@@ -156,7 +156,7 @@ class NeighbourRule2DBuilder:
 object NeighbourRule2DBuilder:
   export DSL.*
 
-  def configureNeighborhood(s: State)(config: NeighbourRule2DBuilder ?=> Unit): NeighbourRule2DBuilder =
+  def configureRule(s: State)(config: NeighbourRule2DBuilder ?=> Unit): NeighbourRule2DBuilder =
     given builder: NeighbourRule2DBuilder = NeighbourRule2DBuilder()
     config
     builder.buildRule(s)
@@ -215,7 +215,7 @@ object NeighbourRule2DBuilder:
      * @param builder the [[NeighbourRule2DBuilder]] representing the current configuration.
      * @return the input [[NeighbourRule2DBuilder]] with the number of lines incremented by one.
      */
-    def n(using builder: NeighbourRule2DBuilder):NeighbourRule2DBuilder = builder.nextRowS
+    def n(using builder: NeighbourRule2DBuilder):NeighbourRule2DBuilder = builder.nextRow
 
     extension (builder: NeighbourRule2DBuilder)
       @targetName("separator") def |(b: NeighbourRule2DBuilder): NeighbourRule2DBuilder = b

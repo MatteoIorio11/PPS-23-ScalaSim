@@ -17,7 +17,7 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
 
   private val alive = Alive()
   private val dead = Dead()
-  private val nrb = NeighbourRule2DBuilder.configureNeighborhood(dead):
+  private val nrb = NeighbourRule2DBuilder.configureRule(dead):
     state(alive) | x        | state(dead) | n |
     x            | c(alive) | x            | n |
     state(alive) | x        | state(dead)
@@ -37,7 +37,7 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
 
   test("Relative neighbours positions cannot be retrieved if center is not set"):
     val exc = intercept[IllegalStateException]:
-      NeighbourRule2DBuilder.configureNeighborhood(alive) {
+      NeighbourRule2DBuilder.configureRule(alive) {
         state(alive) | state(dead) | state(alive)
       }.relativePositions
     assert(!exc.getMessage.isBlank)
@@ -60,7 +60,7 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
     nrb.relativeNeighbourhood shouldBe expectedNeighbourhood
 
   test("Rule specified in DSL should work as expected"):
-    val builder = NeighbourRule2DBuilder.configureNeighborhood(alive):
+    val builder = NeighbourRule2DBuilder.configureRule(alive):
       state(alive) | c(dead) | state(alive)
 
     val center = Cell[TwoDimensionalSpace](Position((0, 1).toList), dead)
@@ -78,7 +78,7 @@ class DSLAutomatonBuilderTest extends AnyFunSuite:
     rule.applyTransformation(neighbourhood) shouldBe expectedCell
 
   test("Rule composition should be made available through `configureAnother`"):
-    val builder = NeighbourRule2DBuilder.configureNeighborhood(alive) {
+    val builder = NeighbourRule2DBuilder.configureRule(alive) {
       state(alive) | c(dead) | state(alive)
     }.configureAnother(dead):
       state(dead) | c (alive) | state(dead)
