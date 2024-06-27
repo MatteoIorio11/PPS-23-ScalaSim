@@ -52,7 +52,7 @@ object Environment:
         def width: Int
         def heigth: Int
     /**
-      * This trait represent a Toroid Environment 2D.
+      * This trait represent a Toroid Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
     trait ToroidEnviroenment extends RectangularEnvironment with ArrayEnvironment2D:
         override protected def saveCell(cell: Cell[TwoDimensionalSpace]) =  
@@ -86,7 +86,7 @@ object Environment:
                         spawnedCells = spawnedCells + 1
                 array 
     /**
-      * Environment 2D, where the matrix is defined as an [[ArrayBuffer[ArrayBuffer]]]. This type of matrix can be 
+      * Environment 2D, where the matrix is defined as an [[ArrayBuffer(ArrayBuffer)]]. This type of matrix can be 
       * very efficient because it allows us to have an O(1) random time access.
     */
     trait ArrayEnvironment2D extends Environment[TwoDimensionalSpace]:
@@ -98,19 +98,22 @@ object Environment:
         override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
             matrix.deepCopy
         /**
-          * 
+          * Extension method for the deep copy of the matrix.
           */
         extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
             def deepCopy: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
                 matrix.map(row => row.map(cell => Cell(Position(cell.position.coordinates), cell.state)))
     /**
-      * 
+      * Square Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
     trait SquareArrayEnvironment2D extends SquareEnvironment with ArrayEnvironment2D:
         override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]): Iterable[Cell[TwoDimensionalSpace]] =
           positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < side))
             .map(pos => pos.coordinates.toList)
             .map(cor => matrix(cor.head)(cor.last))
+        /**
+          * Utilities methods.
+          */
         extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
             def initializeEmpty2D(dimension: Int)(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
                 val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
@@ -129,7 +132,7 @@ object Environment:
                         spawnedCells = spawnedCells + 1
                 array
     /**
-      * 
+      * Rectangula Environment2D where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
     trait RectangularArrayEnvironment2D extends RectangularEnvironment with ArrayEnvironment2D:
         override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]) = 
