@@ -25,16 +25,16 @@ object DummyAutomatonEnvironment:
     def apply(dimension: Int): Environment[TwoDimensionalSpace] =
         DummyAutomatonEnvironmentImpl(dimension, DummyAutomaton())
 
-    private case class DummyAutomatonEnvironmentImpl(val dimension: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
+    private case class DummyAutomatonEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
         extends Environment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
-      require(dimension > 0)
+      require(side > 0)
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
       initialise()
       override protected def initialise() = 
         val initialCell = Cell(Position((-1,-1).toList), DummyState.DEAD)
-        val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
-        for (y <- 0 until dimension)
-            for (x <- 0 until dimension)
+        val array = ArrayBuffer.fill(side, side)(initialCell)
+        for (y <- 0 until side)
+            for (x <- 0 until side)
                 val probability = Random().nextBoolean()
                 val state = probability match
                     case x if x => DummyState.ALIVE

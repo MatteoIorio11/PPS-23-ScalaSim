@@ -24,14 +24,14 @@ object GameOfLifeEnvironment:
 
     import Environment.*
     class GameOfLifeEnvironmentImpl(
-                                     val dimension: Int,
+                                     val side: Int,
                                      val cellularAutomata: CellularAutomaton[TwoDimensionalSpace],
                                    ) extends Environment[TwoDimensionalSpace]
       with SquareArrayEnvironment2D:
-        require(dimension > 0)
+        require(side > 0)
         require(cellularAutomata != null)
 
-        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeEmpty2D(dimension = dimension)(initialCell)
+        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeEmpty2D(side)(initialCell)
 
         initialise()
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
@@ -40,9 +40,9 @@ object GameOfLifeEnvironment:
 
         override protected def initialise(): Unit =
             val initialCell = Cell(Position((-1, -1).toList), CellState.DEAD)
-            val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
-            for (y <- 0 until dimension)
-                for (x <- 0 until dimension)
+            val array = ArrayBuffer.fill(side, side)(initialCell)
+            for (y <- 0 until side)
+                for (x <- 0 until side)
                     val probability = Random().nextBoolean()
                     val state = probability match
                         case x if x => CellState.ALIVE
