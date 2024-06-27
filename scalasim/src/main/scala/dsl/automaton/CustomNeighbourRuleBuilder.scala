@@ -16,7 +16,7 @@ class CustomNeighbourRuleBuilder extends ExplicitNeighbourRuleBuilder:
   // TODO: change access modifiers in order to let tests pass
   var center: Option[Cell[TwoDimensionalSpace]] = Option.empty
   var cells: List[Cell[TwoDimensionalSpace]] = List.empty
-  var rules: List[NeighbourRule[TwoDimensionalSpace]] = List.empty
+  var rules: Set[NeighbourRule[TwoDimensionalSpace]] = Set.empty
 
   override def nextRow: this.type =
     i += 1
@@ -38,7 +38,7 @@ class CustomNeighbourRuleBuilder extends ExplicitNeighbourRuleBuilder:
   override def buildRule(s: State): Unit =
     import domain.automaton.NeighborRuleUtility.*
 
-    rules = rules :+ ((n: Neighbour[TwoDimensionalSpace]) =>
+    rules = rules + ((n: Neighbour[TwoDimensionalSpace]) =>
         val currentRuleToAdjustedPositions = toAbsolutePosition(n.center)
         if n == currentRuleToAdjustedPositions
           then Cell(n.center.position, s)
@@ -79,10 +79,10 @@ class CustomNeighbourRuleBuilder extends ExplicitNeighbourRuleBuilder:
     val otherBuilder = CustomNeighbourRuleBuilder()
     config(using otherBuilder)
     otherBuilder.buildRule(s)
-    addRule(otherBuilder.rules(0))
+    addRule(otherBuilder.rules.head)
     this
 
-  private def addRule(nr: NeighbourRule[TwoDimensionalSpace]): Unit = rules = rules :+ nr
+  override def addRule(nr: NeighbourRule[TwoDimensionalSpace]): Unit = rules = rules + nr
 
   extension (t: (Int, Int))
     private def toPosition: Position[TwoDimensionalSpace] = Position(t.toList)

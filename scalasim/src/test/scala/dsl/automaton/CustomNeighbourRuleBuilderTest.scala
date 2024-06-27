@@ -102,5 +102,5 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
       ).map(x => Cell(x._1, x._2))
     )
 
-    builder.rules(0).applyTransformation(aliveNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position((1, 1).toList), alive)
-    builder.rules(1).applyTransformation(deadNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position((1, 0).toList), dead)
+    builder.rules.toList(0).applyTransformation(aliveNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position((1, 1).toList), alive)
+    builder.rules.toList(1).applyTransformation(deadNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position((1, 0).toList), dead)

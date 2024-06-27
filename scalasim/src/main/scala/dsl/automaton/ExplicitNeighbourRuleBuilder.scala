@@ -9,6 +9,11 @@ import domain.automaton.Neighbour
 import domain.automaton.NeighbourRule
 
 import scala.annotation.targetName
+import domain.base.Dimensions.Dimension
+
+trait NeighbourRuleBuilder[D <: Dimension]:
+  def rules: Set[NeighbourRule[D]]
+  def addRule(nr: NeighbourRule[D]): Unit
 
 /**
  * An object for creating a [[NeighbourRule]] in a two dimensional space.
@@ -29,10 +34,9 @@ import scala.annotation.targetName
  * if the neighbourhood configuration matches with the rule.
  * For more information about the syntax, visit [[ExplicitNeighbourRuleBuilder.DSL]].
  */
-trait ExplicitNeighbourRuleBuilder:
+trait ExplicitNeighbourRuleBuilder extends NeighbourRuleBuilder[TwoDimensionalSpace]:
     def center: Option[Cell[TwoDimensionalSpace]]
     def cells: List[Cell[TwoDimensionalSpace]]
-    def rules: List[NeighbourRule[TwoDimensionalSpace]]
 
     /**
      * Make the builder consider the next row of the two dimensional grid.
