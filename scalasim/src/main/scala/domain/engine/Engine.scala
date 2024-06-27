@@ -14,6 +14,9 @@ import scala.collection.mutable.ArrayBuffer
 import domain.engine.Engine.IterableThreadEngine2D
 import domain.engine.Engine.IterableTimerEngine2D
 import domain.engine.Engine.IterableEngine2D
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 object Engine:
     /**
@@ -36,7 +39,7 @@ object Engine:
         def stopEngine: Unit
     /**
       * This trait represent a specific type of 2D engine where the matrix type is in the form:
-      * [[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]].
+      * [[Iterable(Iterable(Cell(TwoDimensionalSpace)))]].
       */
     trait IterableEngine2D extends Engine[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]]:
         var history: LazyList[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
@@ -54,6 +57,7 @@ object Engine:
         override protected def environment(): Environment[TwoDimensionalSpace] = 
             this.synchronized:
                 env
+        override def stopEngine = running = false
         override def startEngine: Unit =
             if (!running)
                 running = true
@@ -73,7 +77,49 @@ object Engine:
                 currentTimer = currentTimer + 1
                 Thread.sleep(ONE_SECOND)
             stopEngine
-
+    /**
+      * This trait represent an optimzed way to execute the step for each cuellular automaton's cell. This implementation will use an 
+      * Iterable Engine 2D. This trait uses an Executor Service, where each row of the matrix will be assigned to a specific Agent, which is 
+      * charge to do every step for It's cells.
+      */
+    trait IterableFastEngine2D extends IterableEngine2D:
+        private case class Agent(var rows: List[Cell[TwoDimensionalSpace]]):
+            def execute: Unit = 
+                rows.map(cell => environment().applyRule(cell, environment().neighbours(cell)))
+        private val nAgents = Math.min(Runtime.getRuntime().availableProcessors(), currentMatrix.size)
+        private var agents = List[Agent]()
+        /**
+          * Initialize the agents, by assigning to them a collection of rows.
+          */
+        protected def initialize(): Unit = 
+            val rows = currentMatrix.head.size
+            var map = Map[Int, List[Cell[TwoDimensionalSpace]]]()
+            for (i <- 0 until nAgents)
+                val rowsPerAgent = rows / nAgents
+                val startIndex = i * rowsPerAgent
+                val endIndex = Math.min((i + 1) * rowsPerAgent, rows)
+                val agentRows = currentMatrix.slice(startIndex, endIndex).head
+                map = map + (i -> agentRows.toList)
+            // handle possible left overs
+            if (rows % nAgents != 0)
+                val leftovers = rows % nAgents
+                var i = 0
+                while (i < leftovers)
+                    for (j <- 0 until nAgents)
+                        map(j).appendedAll(currentMatrix.toList(rows - i - 1))
+                        i = i + 1
+                    i = i + 1
+            agents = map.values.map(list => Agent(list)).toList
+        /**
+          * Fast implementation of the cellular automaton iteration.
+          */
+        def fastIteration: Unit =
+            val executor: ExecutorService = Executors.newFixedThreadPool(nAgents + 1)
+            agents.foreach(agent => executor.execute(() => agent.execute))
+            executor.shutdown()
+/**
+  * Basic Engine 2D for Cellular Automaton Environment execution.
+  */
 object Engine2D:
     import Engine.*
     def apply(environment: Environment[TwoDimensionalSpace],
@@ -85,13 +131,14 @@ object Engine2D:
         require(tick >= 100)
         @volatile var running = false
         var history = LazyList()
-        override def stopEngine: Unit = 
-            running = false
         override def run(): Unit = 
             saveInHistory
             while (running)
                 nextIteration
                 Thread.sleep(tick)
+/**
+  * Timer Engine 2D for Cellular Automaton Environment execution. It must be necessary to specify a timer for the execution
+  */
 object TimerEngine2D:
     import Engine.*
     def apply(env: Environment[TwoDimensionalSpace], timer: Int): Engine[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]] =
@@ -100,8 +147,19 @@ object TimerEngine2D:
     extends IterableThreadEngine2D with IterableTimerEngine2D:
       require(timer >= 0)
       var running = false
-      var history: LazyList[Iterable[Iterable[Cell[TwoDimensionalSpace]]]] = LazyList()
-      override def stopEngine: Unit = 
-        running = false
-      override def run(): Unit = 
-        startTimer
+      var history = LazyList()
+      override def run(): Unit = startTimer
+/**
+  * Fast Engine 2D for Cellular Automaton Environment execution. Inside this Fast Engine It is used the Timer Engine.
+  */
+object FastEngine2D:
+    import Engine.* 
+    def apply(env: Environment[TwoDimensionalSpace], timer: Int): Engine[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]] =
+         FastEngine2D(env, timer) 
+    private case class FastEngine2D(val env: Environment[TwoDimensionalSpace], val timer: Int) 
+        extends IterableThreadEngine2D with IterableTimerEngine2D with IterableFastEngine2D:
+      initialize()
+      var running = false
+      var history = LazyList()
+      override def nextIteration = fastIteration
+      override def run() = startTimer
