@@ -36,18 +36,23 @@ object Environment:
         protected def initialise(): Unit
         protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
     /**
-      * 
+      * This trait represent a Square Environment 2D.
       */
-    trait SquareEnvironment[D <: Dimension] extends Environment[D]:
-        def dimension: Int
+    trait SquareEnvironment extends Environment[TwoDimensionalSpace]:
+        def side: Int
     /**
-      * 
+      * This trait represent a Cubic Environment 3D. 
+      */
+    trait CubicEnvironment extends Environment[ThreeDimensionalSpace]:
+        def edge: Int
+    /**
+      * This trait represent a Rectangular Environment 2D.
       */
     trait RectangularEnvironment extends Environment[TwoDimensionalSpace]:
         def width: Int
         def heigth: Int
     /**
-      * 
+      * This trait represent a Toroid Environment 2D.
       */
     trait ToroidEnviroenment extends RectangularEnvironment with ArrayEnvironment2D:
         override protected def saveCell(cell: Cell[TwoDimensionalSpace]) =  
@@ -61,7 +66,7 @@ object Environment:
                     case e => e
                 }).map(cor => matrix(cor.head)(cor.last))
         /**
-          * Utilities
+          * Extension methods for initialize the Space.
           */
         extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
             def initializeSpace(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
@@ -96,33 +101,33 @@ object Environment:
           * 
           */
         extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-          def initializeEmpty2D(dimension: Int)(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-              val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
-              for (y <- 0 until dimension)
-                  for (x <- 0 until dimension)
-                      array(x)(y) = (Cell(Position2D((x, y).toList), initialCell.state))
-              array
-
-          def initializeCells(nCells: Int, dimension: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-              var spawnedCells = 0
-              while (spawnedCells < nCells)
-                  val x = Random.nextInt(dimension)
-                  val y = Random.nextInt(dimension)
-                  val position = Position2D((x, y).toList)
-                  if (array(x)(y).state != state)
-                      array(x)(y) = (Cell(position, state))
-                      spawnedCells = spawnedCells + 1
-              array
-          def deepCopy: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            matrix.map(row => row.map(cell => Cell(Position(cell.position.coordinates), cell.state)))
+            def deepCopy: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+                matrix.map(row => row.map(cell => Cell(Position(cell.position.coordinates), cell.state)))
     /**
       * 
       */
-    trait SquareArrayEnvironment2D extends SquareEnvironment[TwoDimensionalSpace] with ArrayEnvironment2D:
+    trait SquareArrayEnvironment2D extends SquareEnvironment with ArrayEnvironment2D:
         override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]): Iterable[Cell[TwoDimensionalSpace]] =
-          positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < dimension))
+          positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < side))
             .map(pos => pos.coordinates.toList)
             .map(cor => matrix(cor.head)(cor.last))
+        extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
+            def initializeEmpty2D(dimension: Int)(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+                val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
+                    for (y <- 0 until dimension)
+                    for (x <- 0 until dimension)
+                        array(x)(y) = (Cell(Position2D((x, y).toList), initialCell.state))
+                array
+            def initializeCells(nCells: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+                var spawnedCells = 0
+                while (spawnedCells < nCells)
+                    val x = Random.nextInt(side)
+                    val y = Random.nextInt(side)
+                    val position = Position2D((x, y).toList)
+                    if (array(x)(y).state != state)
+                        array(x)(y) = (Cell(position, state))
+                        spawnedCells = spawnedCells + 1
+                array
     /**
       * 
       */
