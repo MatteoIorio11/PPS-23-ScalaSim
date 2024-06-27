@@ -27,7 +27,7 @@ object GameOfLifeEnvironment:
                                      val dimension: Int,
                                      val cellularAutomata: CellularAutomaton[TwoDimensionalSpace],
                                    ) extends Environment[TwoDimensionalSpace]
-      with ArrayEnvironment2D:
+      with SquareArrayEnvironment2D:
         require(dimension > 0)
         require(cellularAutomata != null)
 

@@ -18,6 +18,7 @@ import scala.collection.mutable.ArrayBuffer
 import org.scalatest.tools.AnsiColor
 import org.scalatest.tools.ColorBar
 import java.awt.Color
+import domain.Environment.SquareArrayEnvironment2D
 
 
 object DummyAutomatonEnvironment:
@@ -25,7 +26,7 @@ object DummyAutomatonEnvironment:
         DummyAutomatonEnvironmentImpl(dimension, DummyAutomaton())
 
     private case class DummyAutomatonEnvironmentImpl(val dimension: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
-        extends Environment[TwoDimensionalSpace] with ArrayEnvironment2D:
+        extends Environment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
       require(dimension > 0)
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
       initialise()
