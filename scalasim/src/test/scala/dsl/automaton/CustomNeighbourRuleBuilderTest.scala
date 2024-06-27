@@ -73,7 +73,6 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
     val expectedCell = Cell[TwoDimensionalSpace](Position((0, 1).toList), alive)
 
     val rule: NeighbourRule[TwoDimensionalSpace] = builder.rules.head
-    builder.relativePositions.foreach(println(_))
     rule.applyTransformation(neighbourhood) shouldBe expectedCell
 
   test("Rule composition should be made available through `configureAnother`"):
@@ -104,3 +103,7 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
 
     builder.rules.toList(0).applyTransformation(aliveNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position((1, 1).toList), alive)
     builder.rules.toList(1).applyTransformation(deadNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position((1, 0).toList), dead)
+
+
+  extension (t: (Int, Int))
+    def toPostion: Position[TwoDimensionalSpace] = Position(t.toList)
