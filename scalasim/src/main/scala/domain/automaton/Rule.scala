@@ -43,7 +43,7 @@ object NeighborRuleUtility:
       def absoluteNeighboursLocations(center: Position[D]): Iterable[Position[D]] =
          relativeNeighboursLocations.map(c =>
             center + c
-         ).filter(p => !p.coordinates.toList.contains((x: Int) => x < 0))
+         ).filter(p => p.coordinates forall (_ >= 0))
 
    object PositionArithmeticOperations:
       extension[D <: Dimension] (p: Position[D])
