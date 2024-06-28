@@ -78,7 +78,7 @@ object Environment:
                     for (x <- 0 until heigth)
                         array(x)(y) = (Cell(Position2D((x, y).toList), initialCell.state))
                 array 
-            def initializeCells(nCells: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            def spawnCells(nCells: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
                 var spawnedCells = 0
                 while (spawnedCells < nCells)
                     val x = Random.nextInt(heigth)
@@ -118,13 +118,13 @@ object Environment:
           * Utilities methods.
           */
         extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-            def initializeEmpty2D(dimension: Int)(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+            def initializeSpace(dimension: Int)(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
                 val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
                     for (y <- 0 until dimension)
                     for (x <- 0 until dimension)
                         array(x)(y) = (Cell(Position2D((x, y).toList), initialCell.state))
                 array
-            def initializeCells(nCells: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+            def spawnCells(nCells: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
                 var spawnedCells = 0
                 while (spawnedCells < nCells)
                     val x = Random.nextInt(side)
