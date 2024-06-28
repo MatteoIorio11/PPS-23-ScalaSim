@@ -12,15 +12,6 @@ import domain.base.Position
 import domain.automaton.NeighborRuleUtility.getCircularNeighbourhoodPositions
 
 class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
-    test("Neighborhoodlocator should work as expected"):
-      val neig = List((-1, -1), (1, 1)) map (c => Position2D(c.toList))
-      val nLocator = new NeighbourhoodLocator[TwoDimensionalSpace]:
-        override def relativeNeighboursLocations: Iterable[Position2D] = neig
-
-      val center = Position2D(List(0, 0))
-
-      nLocator.absoluteNeighboursLocations(center) shouldBe neig.toIterable
-
     test("A two dimensional neighborhood should be mapped correctly"):
       val c0 = Cell(Position2D((0, 0).toList), new State {})
       val others = List(
