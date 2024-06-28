@@ -89,6 +89,7 @@ object Engine:
                 rows.map(cell => environment().applyRule(cell, environment().neighbours(cell)))
         private val nAgents = Math.min(Runtime.getRuntime().availableProcessors() + 1, currentMatrix.size)
         private var agents = List[Agent]()
+        private var executor: ExecutorService = Executors.newVirtualThreadPerTaskExecutor()
         initialize // Initialize the Engine
         /**
           * Initialize the agents, by assigning to them a collection of rows.
@@ -113,11 +114,15 @@ object Engine:
                         i = i + 1
                     i = i + 1
             agents = map.values.map(list => Agent(list)).toList
+        protected def killEngine: Unit = executor.shutdown()
+        override def stopEngine = 
+          running = false
+          killEngine
         /**
           * Fast implementation of the cellular automaton iteration.
           */
         def fastIteration: Unit =
-            val executor: ExecutorService = Executors.newVirtualThreadPerTaskExecutor()
+            executor = Executors.newVirtualThreadPerTaskExecutor()
             agents.foreach(agent => executor.execute(() => agent.execute))
             executor.close()
 /**
