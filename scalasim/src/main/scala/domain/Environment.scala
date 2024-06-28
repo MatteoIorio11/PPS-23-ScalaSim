@@ -78,15 +78,29 @@ object Environment:
         override protected def saveCell(cell: Cell[TwoDimensionalSpace]) =  
             val x = cell.position.coordinates.head
             val y = cell.position.coordinates.last
-            matrix(x % heigth)(y % width) = cell
+            matrix(x /%/ heigth)(y /%/ width) = cell
         override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]) = 
             positions.map(pos => {
                 pos.coordinates match
-                    case head :: next :: tail => List(head % heigth, next % width)
+                    case head :: next :: tail => List(head /%/ heigth, next /%/ width)
                     case Nil => List()
                 })
                 .filter(pos => pos.size == MAX_SIZE)
                 .map(cor => matrix(cor.head)(cor.last))
+        /**
+          * Extension method for create a new custom mod operation.
+          */
+        extension (dividend: Int)
+          /**
+            * Mod operation that is able to manage negative numbers.
+            * @param divisor: Number to which the dividend is divided. (a mod b) b is the divisor.
+            * @return the mod of the operation (dividend mod divisor)
+            */
+          implicit def /%/(divisor: Int): Int = 
+            val result = dividend % divisor
+            result match
+              case value if value < 0 => result + divisor
+              case _ => result
         /**
           * Extension methods for initialize the Space.
           */

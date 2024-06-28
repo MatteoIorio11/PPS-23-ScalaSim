@@ -162,8 +162,7 @@ object FastEngine2D:
     import Engine.* 
     def apply(env: Environment[TwoDimensionalSpace], timer: Int): Engine[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]] =
          FastEngine2D(env, timer) 
-    private case class FastEngine2D(val env: Environment[TwoDimensionalSpace], 
-    val timer: Int) 
+    private case class FastEngine2D(val env: Environment[TwoDimensionalSpace], val timer: Int) 
         extends IterableThreadEngine2D with IterableTimerEngine2D with IterableFastEngine2D:
       var history = LazyList()
       override def nextIteration = fastIteration
