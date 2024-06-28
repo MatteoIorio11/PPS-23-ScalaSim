@@ -4,6 +4,10 @@ import domain.base.Dimensions.Dimension
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.NeighbourRule
 
+/**
+ * A generic [[NeighbourRule]] for [[D]] dimensional spaces.
+ * @tparam D the dimensionality of the rules space.
+ */
 trait NeighbourRuleBuilder[D <: Dimension]:
   def rules: Set[NeighbourRule[D]]
   def addRule(nr: NeighbourRule[D]): Unit
