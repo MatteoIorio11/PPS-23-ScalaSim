@@ -102,18 +102,15 @@ object ExpressionRuleBuilder:
     override def finalState: Option[State] = currentConfig.map(_.finalState).getOrElse(None)
 
     override def setInitialState(s: State): this.type =
-      println("Setting initial state")
       currentConfig = currentConfig.map(_.copy(initialState = s))
       this
 
     override def setFinalState(s: State): this.type =
-      println("Setting final state")
       _finalState = Some(s)
       currentConfig =  currentConfig.map(_.copy(finalState = _finalState))
       this
 
     override def setNumNeighbours(count: Int => Boolean): this.type =
-      println("Setting numNeighbours")
       currentConfig match
         case Some(config) => neighbourRulesConfigs = neighbourRulesConfigs :+ config
         case None =>
@@ -121,17 +118,14 @@ object ExpressionRuleBuilder:
       this 
 
     override def setNeighbourState(s: State): this.type =
-      println("Setting neighbours state")
       currentConfig = currentConfig.map(_.copy(neighboursState = Some(s)))
       this 
 
     override def setNeighboursRadius(radius: Int): this.type =
-      println("Setting neighbours radius")
       currentConfig = currentConfig.map(_.copy(neighbourRadius = radius))
       this 
 
     override def build(): Iterable[NeighbourRule[TwoDimensionalSpace]] =
-      println("Building rulez")
       currentConfig foreach (c => neighbourRulesConfigs = neighbourRulesConfigs :+ c)
       configureRules
       rules
