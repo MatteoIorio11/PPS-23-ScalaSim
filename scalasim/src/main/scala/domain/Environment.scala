@@ -72,17 +72,29 @@ object Environment:
           * Extension methods for initialize the Space.
           */
         extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
+            /**
+              * This extension method initialize the toroid space using the input initial cell, the initial cell
+              * will be used only for the input state, all the coordinates will be fixed automatically.
+              * @param initialCell: initial cell to use for initialize the space.
+              * @return a new Matrix initialized with the input initial cell.
+              */
             def initializeSpace(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
                 val array = ArrayBuffer.fill(width, heigth)(initialCell)
                 for (y <- 0 until width)
                     for (x <- 0 until heigth)
                         array(x)(y) = (Cell(Position2D((x, y).toList), initialCell.state))
-                array 
+                array
+            /**
+              * This extension method returns a new Matrix in which there a #nCells cells with the input state.
+              * @param nCells: number of cells to spawn 
+              * @param state: input state to use inside the spawned cells.
+              * @return a new Matrix where there are #nCells with the input state.
+              */
             def spawnCells(nCells: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
                 var spawnedCells = 0
                 while (spawnedCells < nCells)
-                    val x = Random.nextInt(heigth)
-                    val y = Random.nextInt(width)
+                    val x = Random.nextInt(heigth) % width
+                    val y = Random.nextInt(width) % heigth
                     val position = Position2D((x, y).toList)
                     if (array(x)(y).state != state)
                         array(x)(y) = (Cell(position, state))
@@ -104,6 +116,10 @@ object Environment:
           * Extension method for the deep copy of the matrix.
           */
         extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
+            /**
+              * This extension method creates a deep copy of the current matrix.
+              * @return a copy of the caller.
+              */
             def deepCopy: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
                 matrix.map(row => row.map(cell => Cell(Position(cell.position.coordinates), cell.state)))
     /**
@@ -118,12 +134,25 @@ object Environment:
           * Utilities methods.
           */
         extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-            def initializeSpace(dimension: Int)(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-                val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
-                    for (y <- 0 until dimension)
-                    for (x <- 0 until dimension)
+            /**
+              * This extension method can be used for initialize the entire matrix with an initial type of cell,
+              * every cell will be placed inside the right coordinates and every cell will have the correct position.
+              * @param initialCell: prototype of the cell.
+              * @return a new Matrix filled with cells.
+              */
+            def initializeSpace(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+                val array = ArrayBuffer.fill(side, side)(initialCell)
+                    for (y <- 0 until side)
+                    for (x <- 0 until side)
                         array(x)(y) = (Cell(Position2D((x, y).toList), initialCell.state))
                 array
+            /**
+              * This extension method can be used for spawn a fixed number of cell inside the Matrix with the input
+              * state.
+              * @param nCells: number of cells to spawn inside the matrix.
+              * @param state: state that will be used inside the spawned cells.
+              * @return a new Matrix where there are #nCells with the input state.
+              */
             def spawnCells(nCells: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
                 var spawnedCells = 0
                 while (spawnedCells < nCells)
