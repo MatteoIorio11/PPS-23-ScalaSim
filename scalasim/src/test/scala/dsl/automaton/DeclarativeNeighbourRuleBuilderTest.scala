@@ -4,6 +4,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.automaton.CellularAutomaton.State
 import dsl.automaton.ExpressionRuleBuilder.*
+import dsl.automaton.ExpressionRuleBuilder.DSLExtensions.*
 import dsl.automaton.ExplicitNeighbourRuleBuilder.*
 import domain.automaton.Cell
 import domain.base.Dimensions.TwoDimensionalSpace
@@ -61,6 +62,32 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
     val expected = Cell((1, 0).toPostion, dead)
     rule.applyTransformation(n) shouldBe expected
 
+  private object RulesTestUtils:
+      val aliveNeighbourhood = Neighbour[TwoDimensionalSpace](
+          Cell((1, 0).toPostion, dead),
+          List(
+            Cell((0, 0).toPostion, alive),
+            Cell((2, 0).toPostion, alive),
+          ),
+      )
+
+      val deadNeighbourhood = Neighbour[TwoDimensionalSpace](
+          Cell((1, 1).toPostion, alive),
+          List(
+            (0, 0) -> dead,
+            (2, 2) -> dead,
+            (0, 2) -> dead,
+            (2, 0) -> dead,
+            (0, 1) -> alive,
+            (1, 0) -> alive,
+            (1, 2) -> alive,
+            (2, 1) -> alive,
+          ).map(x => Cell(x._1.toPostion, x._2))
+      )
+
+      val aliveCell = Cell((1, 0).toPostion, alive)
+      val deadCell = Cell((1, 1).toPostion, dead)
+
   test("It should be possible to configure multiple rules in one configuration block"):
     val builder = ExpressionRuleBuilder.configureRules:
       alive when atLeastSurroundedBy(2) withState(alive) whenCenterIs(dead)
@@ -69,33 +96,19 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
     builder.build()
     
     builder.rules.size shouldBe 2
-    
-    val aliveNeighbourhood = Neighbour[TwoDimensionalSpace](
-        Cell((1, 0).toPostion, dead),
-        List(
-          Cell((0, 0).toPostion, alive),
-          Cell((2, 0).toPostion, alive),
-        ),
-    )
-
-    val deadNeighbourhood = Neighbour[TwoDimensionalSpace](
-        Cell((1, 1).toPostion, alive),
-        List(
-          (0, 0) -> dead,
-          (2, 2) -> dead,
-          (0, 2) -> dead,
-          (2, 0) -> dead,
-          (0, 1) -> alive,
-          (1, 0) -> alive,
-          (1, 2) -> alive,
-          (2, 1) -> alive,
-        ).map(x => Cell(x._1.toPostion, x._2))
-    )
 
     val aliveRule = builder.rules.head
-    val aliveCell = Cell((1, 0).toPostion, alive)
     val deadRule = builder.rules.last
-    val deadCell = Cell((1, 1).toPostion, dead)
+    
+    aliveRule.applyTransformation(RulesTestUtils.aliveNeighbourhood) shouldBe RulesTestUtils.aliveCell
+    deadRule.applyTransformation(RulesTestUtils.deadNeighbourhood) shouldBe RulesTestUtils.deadCell
+    
+  test("It should be possible to specify an exact neighbour configuration as a rule"):
+    val builder = ExpressionRuleBuilder.configureRules:
+        dead whenNeighbourhoodIsExactlyLike:
+          state(dead) | x        | state(dead) | n |
+          x           | c(alive) | x           | n |
+          state(dead) | x        | state(dead)
 
-    aliveRule.applyTransformation(aliveNeighbourhood) shouldBe aliveCell
-    deadRule.applyTransformation(deadNeighbourhood) shouldBe deadCell
+    val deadRule = builder.build().head
+    deadRule.applyTransformation(RulesTestUtils.deadNeighbourhood) shouldBe RulesTestUtils.deadCell

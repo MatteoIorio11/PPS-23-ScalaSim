@@ -14,7 +14,6 @@ trait DeclarativeNeighbourRuleBuilder extends NeighbourRuleBuilder[TwoDimensiona
 trait ExpressionRuleBuilder extends DeclarativeNeighbourRuleBuilder:
   def setInitialState(s: State): this.type
   def setFinalState(s: State): this.type
-  def finalState: Option[State]
   def setNumNeighbours(count: Int => Boolean): this.type
   def setNeighbourState(s: State): this.type
   def setNeighboursRadius(s: Int): this.type
@@ -22,7 +21,6 @@ trait ExpressionRuleBuilder extends DeclarativeNeighbourRuleBuilder:
 
 object ExpressionRuleBuilder:
   export ExpressionRuleDSL.*
-  export DSLExtensions.*
 
   def apply(): ExpressionRuleBuilder = ExpressionRuleBuilderImpl()
 
@@ -39,13 +37,6 @@ object ExpressionRuleBuilder:
 
     def atLeastSurroundedBy(n: Int)(using builder: ExpressionRuleBuilder): ExpressionRuleBuilder =
       builder.setNumNeighbours(_ >= n)
-
-    def exactlySurroundedBy(neighPlacement: ExplicitNeighbourRuleBuilder ?=> ExplicitNeighbourRuleBuilder)(using builder: ExpressionRuleBuilder): ExpressionRuleBuilder =
-      given b: CustomNeighbourRuleBuilder = CustomNeighbourRuleBuilder()
-      neighPlacement(using b)
-      neighPlacement.buildRule(builder.finalState.get)
-      builder.addRule(neighPlacement.rules.head)
-      builder
 
     enum EndClause:
       case Radius
@@ -70,6 +61,13 @@ object ExpressionRuleBuilder:
     extension (s: State)
       infix def when(builder: => ExpressionRuleBuilder): ExpressionRuleBuilder =
         builder.setFinalState(s)
+
+      infix def whenNeighbourhoodIsExactlyLike(neighPlacement: ExplicitNeighbourRuleBuilder ?=> ExplicitNeighbourRuleBuilder)(using builder: ExpressionRuleBuilder): ExpressionRuleBuilder =
+        builder.addRule(
+          ExplicitNeighbourRuleBuilder.configureRule(s)(neighPlacement).rules.head
+        )
+        builder
+
   
   private case class NeighbourRuleConfig(
       var initialState: State = AnyState,
@@ -89,8 +87,6 @@ object ExpressionRuleBuilder:
 
     private var _rules: Set[NeighbourRule[TwoDimensionalSpace]] = Set.empty
 
-    private var _finalState: Option[State] = None
-
     private var currentConfig: Option[NeighbourRuleConfig] = None
 
     private var neighbourRulesConfigs: List[NeighbourRuleConfig] = List.empty
@@ -99,15 +95,12 @@ object ExpressionRuleBuilder:
 
     override def addRule(nr: NeighbourRule[TwoDimensionalSpace]): Unit = _rules = _rules + nr
 
-    override def finalState: Option[State] = currentConfig.map(_.finalState).getOrElse(None)
-
     override def setInitialState(s: State): this.type =
       currentConfig = currentConfig.map(_.copy(initialState = s))
       this
 
     override def setFinalState(s: State): this.type =
-      _finalState = Some(s)
-      currentConfig =  currentConfig.map(_.copy(finalState = _finalState))
+      currentConfig =  currentConfig.map(_.copy(finalState = Some(s)))
       this
 
     override def setNumNeighbours(count: Int => Boolean): this.type =
