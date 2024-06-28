@@ -96,7 +96,7 @@ object Environment:
             * @param divisor: Number to which the dividend is divided. (a mod b) b is the divisor.
             * @return the mod of the operation (dividend mod divisor)
             */
-          implicit def /%/(divisor: Int): Int = 
+          infix def /%/(divisor: Int): Int = 
             val result = dividend % divisor
             result match
               case value if value < 0 => result + divisor
