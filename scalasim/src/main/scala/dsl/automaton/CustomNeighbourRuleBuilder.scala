@@ -39,8 +39,9 @@ class CustomNeighbourRuleBuilder extends ExplicitNeighbourRuleBuilder:
     import domain.automaton.NeighborRuleUtility.*
 
     rules = rules + ((n: Neighbour[TwoDimensionalSpace]) =>
-        toAbsolutePosition(n.center) match
-          case `n` => Cell(n.center.position, s)
+        val neigbours = toAbsolutePosition(n.center).neighbourhood
+        neigbours forall (n.neighbourhood.contains(_)) match
+          case true => Cell(n.center.position, s)
           case _ => n.center
     )
 
