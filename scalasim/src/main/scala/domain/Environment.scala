@@ -49,6 +49,28 @@ object Environment:
         def width: Int
         def heigth: Int
     /**
+      * Environment 2D, where the matrix is defined as an [[ArrayBuffer(ArrayBuffer)]]. This type of matrix can be 
+      * very efficient because it allows us to have an O(1) random time access.
+    */
+    trait ArrayEnvironment2D extends Environment[TwoDimensionalSpace]:
+        override type Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]
+        override protected def saveCell(cell: Cell[TwoDimensionalSpace]): Unit = 
+            val x = cell.position.coordinates.head
+            val y = cell.position.coordinates.last
+            matrix(x)(y) = cell
+        override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            matrix.deepCopy
+        /**
+          * Extension method for the deep copy of the matrix.
+          */
+        extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
+            /**
+              * This extension method creates a deep copy of the current matrix.
+              * @return a copy of the caller.
+              */
+            def deepCopy: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+                matrix.map(row => row.map(cell => Cell(Position(cell.position.coordinates), cell.state)))
+    /**
       * This trait represent a Toroid Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
     trait ToroidEnviroenment extends RectangularEnvironment with ArrayEnvironment2D:
@@ -116,28 +138,7 @@ object Environment:
                     array(x)(y) = Cell(Position((x, y).toList), state)
               array(0)(0) = Cell(Position((0, 0).toList), inputState)
               array
-    /**
-      * Environment 2D, where the matrix is defined as an [[ArrayBuffer(ArrayBuffer)]]. This type of matrix can be 
-      * very efficient because it allows us to have an O(1) random time access.
-    */
-    trait ArrayEnvironment2D extends Environment[TwoDimensionalSpace]:
-        override type Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]
-        override protected def saveCell(cell: Cell[TwoDimensionalSpace]): Unit = 
-            val x = cell.position.coordinates.head
-            val y = cell.position.coordinates.last
-            matrix(x)(y) = cell
-        override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            matrix.deepCopy
-        /**
-          * Extension method for the deep copy of the matrix.
-          */
-        extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-            /**
-              * This extension method creates a deep copy of the current matrix.
-              * @return a copy of the caller.
-              */
-            def deepCopy: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-                matrix.map(row => row.map(cell => Cell(Position(cell.position.coordinates), cell.state)))
+
     /**
       * Square Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
@@ -201,6 +202,8 @@ object Environment:
       */
     trait RectangularArrayEnvironment2D extends RectangularEnvironment with ArrayEnvironment2D:
         override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]) = 
-            positions.filter(pos => pos.coordinates.head >= 0 && pos.coordinates.last < heigth &&
-             pos.coordinates.last >= 0 && pos.coordinates.last < width)
-            .map(pos => matrix(pos.coordinates.head)(pos.coordinates.last))
+            positions
+              .filter(pos => pos.coordinates.size == 2)
+              .filter(pos => pos.coordinates.head >= 0 && pos.coordinates.last < heigth &&
+                             pos.coordinates.last >= 0 && pos.coordinates.last < width)
+              .map(pos => matrix(pos.coordinates.head)(pos.coordinates.last))
