@@ -3,8 +3,8 @@ package dsl.automaton
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.automaton.CellularAutomaton.State
-import dsl.automaton.ExpressionRuleBuilder.*
-import dsl.automaton.ExpressionRuleBuilder.DSLExtensions.*
+import dsl.automaton.DeclarativeRuleBuilder.*
+import dsl.automaton.DeclarativeRuleBuilder.DSLExtensions.*
 import dsl.automaton.ExplicitNeighbourRuleBuilder.*
 import domain.automaton.Cell
 import domain.base.Dimensions.TwoDimensionalSpace
@@ -15,19 +15,19 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
   val alive = Alive()
 
   test("DSL syntax should work as expected"):
-    ExpressionRuleBuilder.configureRules:
+    DeclarativeRuleBuilder.configureRules:
       alive when atLeastSurroundedBy(2) withState(alive) withRadius(1) whenCenterIs(AnyState)
       alive when atLeastSurroundedBy(2) withState(alive)
 
   test("The builder should be capable of bulding a rule through the DSL"):
-    val builder = ExpressionRuleBuilder.configureRules:
+    val builder = DeclarativeRuleBuilder.configureRules:
       alive when atLeastSurroundedBy(2) withState(alive) withRadius(1) whenCenterIs(AnyState)
 
     builder.build
     builder.rules.size shouldBe 1
 
   test("The DSL should map a correct rule"):
-    val builder = ExpressionRuleBuilder.configureRules:
+    val builder = DeclarativeRuleBuilder.configureRules:
       alive when atLeastSurroundedBy(2) withState(alive) withRadius(1) whenCenterIs(AnyState)
 
     builder.build
@@ -45,7 +45,7 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
     aliveRule.applyTransformation(aliveNeighbourhood) shouldBe aliveCell
 
   test("The DSL shoudl map a correct rule even without optional parameters"):
-    val builder = ExpressionRuleBuilder.configureRules:
+    val builder = DeclarativeRuleBuilder.configureRules:
       dead when atLeastSurroundedBy(1) withState(dead)
 
     builder.build
@@ -89,7 +89,7 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
       val deadCell = Cell((1, 1).toPostion, dead)
 
   test("It should be possible to configure multiple rules in one configuration block"):
-    val builder = ExpressionRuleBuilder.configureRules:
+    val builder = DeclarativeRuleBuilder.configureRules:
       alive when atLeastSurroundedBy(2) withState(alive) whenCenterIs(dead)
       dead when surroundedBy(4) withState(dead)
 
@@ -104,7 +104,7 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
     deadRule.applyTransformation(RulesTestUtils.deadNeighbourhood) shouldBe RulesTestUtils.deadCell
     
   test("It should be possible to specify an exact neighbour configuration as a rule"):
-    val builder = ExpressionRuleBuilder.configureRules:
+    val builder = DeclarativeRuleBuilder.configureRules:
         dead whenNeighbourhoodIsExactlyLike:
           state(dead) | x        | state(dead) | n |
           x           | c(alive) | x           | n |
@@ -114,7 +114,7 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
     deadRule.applyTransformation(RulesTestUtils.deadNeighbourhood) shouldBe RulesTestUtils.deadCell
 
   test("Explicit and Declartive rules should be concatened"):
-    val builder = ExpressionRuleBuilder.configureRules:
+    val builder = DeclarativeRuleBuilder.configureRules:
       alive when atLeastSurroundedBy(2) withState(alive) whenCenterIs(dead)
       dead whenNeighbourhoodIsExactlyLike:
           state(dead) | x        | state(dead) | n |
