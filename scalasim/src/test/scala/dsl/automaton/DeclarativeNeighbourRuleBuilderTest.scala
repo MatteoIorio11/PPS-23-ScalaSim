@@ -18,9 +18,17 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
       alive when atLeastSurroundedBy(2) withState(alive) withRadius(1) whenCenterIs(AnyState)
       alive when atLeastSurroundedBy(2) withState(alive)
 
-  test("The DSL should map a correct set of rules"):
+  test("The builder should be capable of bulding rules through the DSL"):
     val builder = ExpressionRuleBuilder.configureRules:
-      alive when atLeastSurroundedBy(2) withState(alive)
+      alive when atLeastSurroundedBy(2) withState(alive) withRadius(1) whenCenterIs(AnyState)
+
+    builder.build()
+    builder.rules.size shouldBe 1
+
+  test("The DSL should map a correct rule"):
+    val builder = ExpressionRuleBuilder.configureRules:
+      alive when atLeastSurroundedBy(2) withState(alive) withRadius(1) whenCenterIs(AnyState)
+      // alive when atLeastSurroundedBy(2) withState(alive) <----- problems
 
     val rule = builder.build().head
 
