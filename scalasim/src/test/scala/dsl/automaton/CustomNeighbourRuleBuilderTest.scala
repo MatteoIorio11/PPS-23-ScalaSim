@@ -104,6 +104,27 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
     builder.rules.toList(0).applyTransformation(aliveNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position((1, 1).toList), alive)
     builder.rules.toList(1).applyTransformation(deadNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position((1, 0).toList), dead)
 
+  test("Complex rule should hold"):
+    val builder = ExplicitNeighbourRuleBuilder.configureRule(dead):
+      state(dead) | x        | state(dead) | n |
+      x           | c(alive) | x           | n |
+      state(dead) | x        | state(dead)
+    
+    val deadNeighbourhood = Neighbour[TwoDimensionalSpace](
+        Cell((1, 1).toPostion, alive),
+        List(
+          (0, 0) -> dead,
+          (2, 2) -> dead,
+          (0, 2) -> dead,
+          (2, 0) -> dead,
+          (0, 1) -> alive,
+          (1, 0) -> alive,
+          (1, 2) -> alive,
+          (2, 1) -> alive,
+        ).map(x => Cell(x._1.toPostion, x._2))
+    )
+
+    builder.rules.head.applyTransformation(deadNeighbourhood) shouldBe Cell((1, 1).toPostion, dead)
 
   extension (t: (Int, Int))
     def toPostion: Position[TwoDimensionalSpace] = Position(t.toList)
