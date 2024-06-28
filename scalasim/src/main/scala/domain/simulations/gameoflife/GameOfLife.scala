@@ -23,11 +23,8 @@ object GameOfLifeEnvironment:
         GameOfLifeEnvironmentImpl(dimension, cellularAutomata = GameOfLife())
 
     import Environment.*
-    class GameOfLifeEnvironmentImpl(
-                                     val side: Int,
-                                     val cellularAutomata: CellularAutomaton[TwoDimensionalSpace],
-                                   ) extends Environment[TwoDimensionalSpace]
-      with SquareArrayEnvironment2D:
+    class GameOfLifeEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
+        extends Environment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
         require(side > 0)
         require(cellularAutomata != null)
 

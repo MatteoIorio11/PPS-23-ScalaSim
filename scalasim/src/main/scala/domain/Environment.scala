@@ -55,6 +55,7 @@ object Environment:
       * This trait represent a Toroid Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
     trait ToroidEnviroenment extends RectangularEnvironment with ArrayEnvironment2D:
+        val MAX_SIZE = 2 // width and height
         override protected def saveCell(cell: Cell[TwoDimensionalSpace]) =  
             val x = cell.position.coordinates.head
             val y = cell.position.coordinates.last
@@ -62,9 +63,11 @@ object Environment:
         override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]) = 
             positions.map(pos => {
                 pos.coordinates match
-                    case x::y => List(x % heigth, y.last % width)
-                    case e => e
-                }).map(cor => matrix(cor.head)(cor.last))
+                    case head :: next :: tail => List(head % heigth, next % width)
+                    case Nil => List()
+                })
+                .filter(pos => pos.size == MAX_SIZE)
+                .map(cor => matrix(cor.head)(cor.last))
         /**
           * Extension methods for initialize the Space.
           */
