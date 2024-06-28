@@ -39,11 +39,10 @@ class CustomNeighbourRuleBuilder extends ExplicitNeighbourRuleBuilder:
     import domain.automaton.NeighborRuleUtility.*
 
     rules = rules + ((n: Neighbour[TwoDimensionalSpace]) =>
-        val currentRuleToAdjustedPositions = toAbsolutePosition(n.center)
-        if n == currentRuleToAdjustedPositions
-          then Cell(n.center.position, s)
-          else n.center
-        )
+        toAbsolutePosition(n.center) match
+          case `n` => Cell(n.center.position, s)
+          case _ => n.center
+    )
 
   override def relativePositions: List[Cell[TwoDimensionalSpace]] =
     import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
