@@ -8,7 +8,8 @@ import domain.automaton.Neighbour
 import domain.automaton.Cell
 import domain.automaton.CellularAutomaton.State
 import domain.automaton.CellularAutomaton.CellularAutomaton
-import base.Position
+import domain.base.Position
+import domain.automaton.NeighborRuleUtility.getCircularNeighbourhoodPositions
 
 class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
     test("Neighborhoodlocator should work as expected"):
@@ -54,3 +55,22 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
            List((-1, -1), (1, 1)).map(c => Position2D(c.toList))
           
       diagonalNeighbourhoodLocator.absoluteNeighboursLocations(c0.position) shouldBe List(c1, c2).toIterable
+
+    test("Neighbourhood locator with circular neighbourhood positions should work as expected"):
+      val center: Position[TwoDimensionalSpace] = Position(List(1, 1))
+
+      val absNeighbourhood: List[Position[TwoDimensionalSpace]] = List(
+        (0, 0), (0, 1), (0, 2),
+        (1, 0),         (1, 2),
+        (2, 0), (2, 1), (2, 2)
+      ).map(x => Position(x.toList))
+
+      val relativeNeighbourhood: List[Position[TwoDimensionalSpace]] = List(
+        (-1, -1), (-1, 0), (-1, 1),
+        (0, -1),         (0, 1),
+        (1, -1), (1, 0), (1, 1)
+      ).map(x => Position(x.toList))
+
+      val locator = getCircularNeighbourhoodPositions(radius = 1)
+      locator.relativeNeighboursLocations.toList should contain theSameElementsAs relativeNeighbourhood
+      locator.absoluteNeighboursLocations(center) should contain theSameElementsAs absNeighbourhood

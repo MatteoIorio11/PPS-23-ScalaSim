@@ -46,7 +46,7 @@ class CustomNeighbourRuleBuilder extends ExplicitNeighbourRuleBuilder:
         )
 
   override def relativePositions: List[Cell[TwoDimensionalSpace]] =
-    import domain.automaton.NeighborRuleUtility.-
+    import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
 
     center match
       case Some(c) => cells.map(p => Cell(p.position - c.position, p.state))
@@ -63,7 +63,7 @@ class CustomNeighbourRuleBuilder extends ExplicitNeighbourRuleBuilder:
    * @return a [[Neighbour]] with absolute coordinates based on [[cntr]] as center.
    */
   private def toAbsolutePosition(cntr: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
-    import domain.automaton.NeighborRuleUtility.{+, -}
+    import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
     Neighbour(cntr, relativePositions.map(c => Cell(c.position + cntr.position, c.state)))
 
   /**

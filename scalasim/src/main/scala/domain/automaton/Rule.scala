@@ -6,6 +6,7 @@ import domain.base.Position
 import domain.automaton.Cell
 import domain.automaton.Neighbour
 import CellularAutomaton.State
+import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
 
 trait Rule[I, O]:
    def tFunc(in: I): O
@@ -44,17 +45,13 @@ object NeighborRuleUtility:
             center + c
          ).filter(p => !p.coordinates.toList.contains((x: Int) => x < 0))
 
-   extension[D <: Dimension] (p: Position[D])
-      private def elementWiseFunc(other: Position[D])(func: (Int, Int) => Int): Position[D] =
-         Position((p.coordinates zip other.coordinates) map { case (a, b) => func(a, b)})
-      def +(other: Position[D]): Position[D] = elementWiseFunc(other)(_ + _)
-      def -(other: Position[D]): Position[D] = elementWiseFunc(other)(_ - _)
-
-   extension[D <: Dimension] (c: Cell[D])
-      def +=(rp: RelativePositions) = new Cell[D] {
-         override def state: State = c.state
-         override def position: Position[D] = c.position.+(Position(rp.coordinates))
-      }
+   object PositionArithmeticOperations:
+      extension[D <: Dimension] (p: Position[D])
+         private def elementWiseFunc(other: Position[D])(func: (Int, Int) => Int): Position[D] =
+            Position((p.coordinates zip other.coordinates) map { case (a, b) => func(a, b)})
+         def +(other: Position[D]): Position[D] = elementWiseFunc(other)(_ + _)
+         def -(other: Position[D]): Position[D] = elementWiseFunc(other)(_ - _)
+         def -(n: Int): Position[D] = Position(p.coordinates.map(_ - n))
 
    given circleNeighbourhoodLocator: NeighbourhoodLocator[TwoDimensionalSpace] = new NeighbourhoodLocator[TwoDimensionalSpace]:
       override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
@@ -69,6 +66,17 @@ object NeighborRuleUtility:
             BottomCenter(),
             BottomRight(),
             ).map(p => Position(p.coordinates))
+
+   def getCircularNeighbourhoodPositions(radius: Int = 1): NeighbourhoodLocator[TwoDimensionalSpace] =
+      val center = Position(List(radius, radius))
+      var neighbours: List[Position[TwoDimensionalSpace]] = List.empty
+      for
+         i <- (0 to radius + 1)
+         j <- (0 to radius + 1)
+      do neighbours = neighbours :+ Position(List(i, j))
+      new NeighbourhoodLocator[TwoDimensionalSpace]:
+         override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
+            neighbours.filter(_ != center) map (_ - radius)
 
    def getNeighboursWithState[D <: Dimension](state: State, neighbours: Neighbour[D]): List[Cell[D]] = 
       neighbours.neighbourhood.filter(cell => cell.state == state)

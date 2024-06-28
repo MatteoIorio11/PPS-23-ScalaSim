@@ -30,3 +30,9 @@ class PositionTest extends org.scalatest.funsuite.AnyFunSuite:
     val p1: Position2D = Position((1, 2).toList).asPosition[Position2D]
     val p2: Position3D = Position((1, 2, 3).toList).asPosition[Position3D]
 
+  test("Position arithmetic operators shoudl work as expected"):
+    import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
+
+    Position(List(10, 20)) - 10 shouldBe Position(List(0, 10))
+    Position(List(10, 20)) - Position(List(10, 20)) shouldBe Position(List(0, 0))
+    Position(List(10, 20)) + Position(List(-1, -1)) shouldBe Position(List(9, 19))
