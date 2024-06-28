@@ -60,3 +60,42 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
 
     val expected = Cell((1, 0).toPostion, dead)
     rule.applyTransformation(n) shouldBe expected
+
+  test("It should be possible to configure multiple rules in one configuration block"):
+    val builder = ExpressionRuleBuilder.configureRules:
+      alive when atLeastSurroundedBy(2) withState(alive) whenCenterIs(dead)
+      dead when surroundedBy(4) withState(dead)
+
+    builder.build()
+    
+    builder.rules.size shouldBe 2
+    
+    val aliveNeighbourhood = Neighbour[TwoDimensionalSpace](
+        Cell((1, 0).toPostion, dead),
+        List(
+          Cell((0, 0).toPostion, alive),
+          Cell((2, 0).toPostion, alive),
+        ),
+    )
+
+    val deadNeighbourhood = Neighbour[TwoDimensionalSpace](
+        Cell((1, 1).toPostion, alive),
+        List(
+          (0, 0) -> dead,
+          (2, 2) -> dead,
+          (0, 2) -> dead,
+          (2, 0) -> dead,
+          (0, 1) -> alive,
+          (1, 0) -> alive,
+          (1, 2) -> alive,
+          (2, 1) -> alive,
+        ).map(x => Cell(x._1.toPostion, x._2))
+    )
+
+    val aliveRule = builder.rules.head
+    val aliveCell = Cell((1, 0).toPostion, alive)
+    val deadRule = builder.rules.last
+    val deadCell = Cell((1, 1).toPostion, dead)
+
+    aliveRule.applyTransformation(aliveNeighbourhood) shouldBe aliveCell
+    deadRule.applyTransformation(deadNeighbourhood) shouldBe deadCell

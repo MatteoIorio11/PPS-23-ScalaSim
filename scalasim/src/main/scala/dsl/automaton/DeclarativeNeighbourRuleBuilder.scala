@@ -18,8 +18,6 @@ trait ExpressionRuleBuilder extends DeclarativeNeighbourRuleBuilder:
   def setNumNeighbours(count: Int => Boolean): this.type
   def setNeighbourState(s: State): this.type
   def setNeighboursRadius(s: Int): this.type
-  def isBuilding: Boolean
-  def buildNextRule: Unit
   def build(): Iterable[NeighbourRule[TwoDimensionalSpace]] // TODO: Move to [[NeighbourRuleBuilder]]
 
 object ExpressionRuleBuilder:
@@ -74,11 +72,11 @@ object ExpressionRuleBuilder:
         builder.setFinalState(s)
   
   private case class NeighbourRuleConfig(
-      val initialState: State = AnyState,
-      val finalState: Option[State] = Option.empty,
-      val numNeighbours: Option[Int => Boolean] = Option.empty,
-      val neighboursState: Option[State] = Option.empty,
-      val neighbourRadius: Int = 1,
+      var initialState: State = AnyState,
+      var finalState: Option[State] = Option.empty,
+      var numNeighbours: Option[Int => Boolean] = Option.empty,
+      var neighboursState: Option[State] = Option.empty,
+      var neighbourRadius: Int = 1,
   ):
     def checkParameters: Unit = 
       assert(
@@ -88,18 +86,12 @@ object ExpressionRuleBuilder:
       assert(neighbourRadius >= 1 & neighbourRadius < Int.MaxValue, s"Neighbour radius must be from 1 to ${Int.MaxValue}")
 
   private class ExpressionRuleBuilderImpl extends ExpressionRuleBuilder:
-    import scala.compiletime.uninitialized
 
     private var _rules: Set[NeighbourRule[TwoDimensionalSpace]] = Set.empty
-    private var initialState: State = AnyState
-    private var _finalState: Option[State] = Option.empty
-    private var numNeighbours: Option[Int => Boolean] = Option.empty
-    private var neighboursState: Option[State] = Option.empty
-    private var neighbourRadius: Int = 1
 
-    private var _isBuilding: Boolean = false
-    def isBuilding_= (value: Boolean) = _isBuilding = value
-    override def isBuilding: Boolean = _isBuilding
+    private var _finalState: Option[State] = None
+
+    private var currentConfig: Option[NeighbourRuleConfig] = None
 
     private var neighbourRulesConfigs: List[NeighbourRuleConfig] = List.empty
 
@@ -107,44 +99,42 @@ object ExpressionRuleBuilder:
 
     override def addRule(nr: NeighbourRule[TwoDimensionalSpace]): Unit = _rules = _rules + nr
 
-    override def setInitialState(s: State): this.type = { initialState = s; this }
+    override def finalState: Option[State] = currentConfig.map(_.finalState).getOrElse(None)
 
-    override def finalState: Option[State] = _finalState
+    override def setInitialState(s: State): this.type =
+      println("Setting initial state")
+      currentConfig = currentConfig.map(_.copy(initialState = s))
+      this
 
     override def setFinalState(s: State): this.type =
-      if isBuilding then
-        buildNextRule
-      else isBuilding = true
-      _finalState = Option(s); this
+      println("Setting final state")
+      _finalState = Some(s)
+      currentConfig =  currentConfig.map(_.copy(finalState = _finalState))
+      this
 
-    override def setNumNeighbours(count: Int => Boolean): this.type = { numNeighbours = Option(count) ; this }
+    override def setNumNeighbours(count: Int => Boolean): this.type =
+      println("Setting numNeighbours")
+      currentConfig match
+        case Some(config) => neighbourRulesConfigs = neighbourRulesConfigs :+ config
+        case None =>
+      currentConfig = Some(NeighbourRuleConfig(numNeighbours = Some(count)))
+      this 
 
-    override def setNeighbourState(s: State): this.type = { neighboursState = Option(s) ; this }
+    override def setNeighbourState(s: State): this.type =
+      println("Setting neighbours state")
+      currentConfig = currentConfig.map(_.copy(neighboursState = Some(s)))
+      this 
 
-    override def setNeighboursRadius(radius: Int): this.type = { neighbourRadius = radius; this }
-
+    override def setNeighboursRadius(radius: Int): this.type =
+      println("Setting neighbours radius")
+      currentConfig = currentConfig.map(_.copy(neighbourRadius = radius))
+      this 
 
     override def build(): Iterable[NeighbourRule[TwoDimensionalSpace]] =
-      buildNextRule
+      println("Building rulez")
+      currentConfig foreach (c => neighbourRulesConfigs = neighbourRulesConfigs :+ c)
       configureRules
-      isBuilding = false
       rules
-
-    /**
-      * Make this builder prepares itself in order to accept a new rule configuration.
-      */
-    override def buildNextRule: Unit =
-      val config = NeighbourRuleConfig(
-        initialState,
-        finalState,
-        numNeighbours,
-        neighboursState,
-        neighbourRadius,
-      )
-
-      config.checkParameters
-      neighbourRulesConfigs = neighbourRulesConfigs :+ config
-      resetParameters
 
     private def configureRules: Unit =
       import domain.automaton.NeighborRuleUtility
@@ -164,11 +154,3 @@ object ExpressionRuleBuilder:
                   else in.center
                 case _ => in.center
           )
-
-    private def resetParameters: Unit =
-      initialState = AnyState
-      _finalState = Option.empty
-      numNeighbours = Option.empty
-      neighboursState = Option.empty
-      neighbourRadius = 1
-
