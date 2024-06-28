@@ -54,6 +54,7 @@ object Engine:
       * This trait represent a specific type of 2D engine that runs on a Virtual Thread.
       */
     trait IterableThreadEngine2D extends Thread with IterableEngine2D:
+        @volatile var running = false
         override protected def environment(): Environment[TwoDimensionalSpace] = 
             this.synchronized:
                 env
@@ -86,19 +87,21 @@ object Engine:
         private case class Agent(var rows: List[Cell[TwoDimensionalSpace]]):
             def execute: Unit = 
                 rows.map(cell => environment().applyRule(cell, environment().neighbours(cell)))
-        private val nAgents = Math.min(Runtime.getRuntime().availableProcessors(), currentMatrix.size)
+        private val nAgents = Math.min(Runtime.getRuntime().availableProcessors() + 1, currentMatrix.size)
         private var agents = List[Agent]()
+        initialize // Initialize the Engine
         /**
           * Initialize the agents, by assigning to them a collection of rows.
           */
-        protected def initialize(): Unit = 
+        private def initialize: Unit = 
             val rows = currentMatrix.head.size
             var map = Map[Int, List[Cell[TwoDimensionalSpace]]]()
+            val matrix = environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
+            val rowsPerAgent = rows / nAgents
             for (i <- 0 until nAgents)
-                val rowsPerAgent = rows / nAgents
                 val startIndex = i * rowsPerAgent
                 val endIndex = Math.min((i + 1) * rowsPerAgent, rows)
-                val agentRows = currentMatrix.slice(startIndex, endIndex).head
+                val agentRows = matrix.slice(startIndex, endIndex).head
                 map = map + (i -> agentRows.toList)
             // handle possible left overs
             if (rows % nAgents != 0)
@@ -106,7 +109,7 @@ object Engine:
                 var i = 0
                 while (i < leftovers)
                     for (j <- 0 until nAgents)
-                        map(j).appendedAll(currentMatrix.toList(rows - i - 1))
+                        map(j).appendedAll(matrix.toList(rows - i - 1))
                         i = i + 1
                     i = i + 1
             agents = map.values.map(list => Agent(list)).toList
@@ -114,9 +117,9 @@ object Engine:
           * Fast implementation of the cellular automaton iteration.
           */
         def fastIteration: Unit =
-            val executor: ExecutorService = Executors.newFixedThreadPool(nAgents + 1)
+            val executor: ExecutorService = Executors.newVirtualThreadPerTaskExecutor()
             agents.foreach(agent => executor.execute(() => agent.execute))
-            executor.shutdown()
+            executor.close()
 /**
   * Basic Engine 2D for Cellular Automaton Environment execution.
   */
@@ -129,9 +132,8 @@ object Engine2D:
 
     private case class SimulationEngine2D(val env: Environment[TwoDimensionalSpace], private val tick: Int) extends IterableThreadEngine2D:
         require(tick >= 100)
-        @volatile var running = false
         var history = LazyList()
-        override def run(): Unit = 
+        override def run() = 
             saveInHistory
             while (running)
                 nextIteration
@@ -146,9 +148,8 @@ object TimerEngine2D:
     private case class TimerEngine2D(val env: Environment[TwoDimensionalSpace], val timer: Int) 
     extends IterableThreadEngine2D with IterableTimerEngine2D:
       require(timer >= 0)
-      var running = false
       var history = LazyList()
-      override def run(): Unit = startTimer
+      override def run() = startTimer
 /**
   * Fast Engine 2D for Cellular Automaton Environment execution. Inside this Fast Engine It is used the Timer Engine.
   */
@@ -156,10 +157,9 @@ object FastEngine2D:
     import Engine.* 
     def apply(env: Environment[TwoDimensionalSpace], timer: Int): Engine[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]] =
          FastEngine2D(env, timer) 
-    private case class FastEngine2D(val env: Environment[TwoDimensionalSpace], val timer: Int) 
+    private case class FastEngine2D(val env: Environment[TwoDimensionalSpace], 
+    val timer: Int) 
         extends IterableThreadEngine2D with IterableTimerEngine2D with IterableFastEngine2D:
-      initialize()
-      var running = false
       var history = LazyList()
       override def nextIteration = fastIteration
       override def run() = startTimer
