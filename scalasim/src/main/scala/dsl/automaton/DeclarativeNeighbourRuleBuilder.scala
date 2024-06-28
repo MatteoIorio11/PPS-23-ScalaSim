@@ -14,6 +14,7 @@ trait DeclarativeNeighbourRuleBuilder extends NeighbourRuleBuilder[TwoDimensiona
 trait ExpressionRuleBuilder extends DeclarativeNeighbourRuleBuilder:
   def setInitialState(s: State): this.type
   def setFinalState(s: State): this.type
+  def finalState: Option[State]
   def setNumNeighbours(count: Int => Boolean): this.type
   def setNeighbourState(s: State): this.type
   def setNeighboursRadius(s: Int): this.type
@@ -44,6 +45,7 @@ object ExpressionRuleBuilder:
     def exactlySurroundedBy(neighPlacement: ExplicitNeighbourRuleBuilder ?=> ExplicitNeighbourRuleBuilder)(using builder: ExpressionRuleBuilder): ExpressionRuleBuilder =
       given b: CustomNeighbourRuleBuilder = CustomNeighbourRuleBuilder()
       neighPlacement(using b)
+      neighPlacement.buildRule(builder.finalState.get)
       builder.addRule(neighPlacement.rules.head)
       builder
 
@@ -90,7 +92,7 @@ object ExpressionRuleBuilder:
 
     private var _rules: Set[NeighbourRule[TwoDimensionalSpace]] = Set.empty
     private var initialState: State = AnyState
-    private var finalState: Option[State] = Option.empty
+    private var _finalState: Option[State] = Option.empty
     private var numNeighbours: Option[Int => Boolean] = Option.empty
     private var neighboursState: Option[State] = Option.empty
     private var neighbourRadius: Int = 1
@@ -107,11 +109,13 @@ object ExpressionRuleBuilder:
 
     override def setInitialState(s: State): this.type = { initialState = s; this }
 
+    override def finalState: Option[State] = _finalState
+
     override def setFinalState(s: State): this.type =
       if isBuilding then
         buildNextRule
       else isBuilding = true
-      finalState = Option(s); this
+      _finalState = Option(s); this
 
     override def setNumNeighbours(count: Int => Boolean): this.type = { numNeighbours = Option(count) ; this }
 
@@ -163,7 +167,7 @@ object ExpressionRuleBuilder:
 
     private def resetParameters: Unit =
       initialState = AnyState
-      finalState = Option.empty
+      _finalState = Option.empty
       numNeighbours = Option.empty
       neighboursState = Option.empty
       neighbourRadius = 1
