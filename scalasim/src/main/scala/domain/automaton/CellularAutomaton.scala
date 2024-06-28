@@ -27,3 +27,5 @@ object CellularAutomaton:
         def applyRule(cell: Cell[D], neighbors: Neighbour[D]): Cell[D]
         def rules: Rules
         def addRule(cellState: State, rule: NeighbourRule[D]): Unit
+    trait MapRules2D extends CellularAutomaton[TwoDimensionalSpace]:
+      override type Rules = Map[State, Rule[Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]]

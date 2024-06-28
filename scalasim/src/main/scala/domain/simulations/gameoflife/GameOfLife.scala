@@ -71,8 +71,7 @@ object GameOfLife:
     enum CellState extends State:
         case ALIVE
         case DEAD
-    private case class GameOfLifeImpl() extends CellularAutomaton[TwoDimensionalSpace]:
-        type Rules = Map[State, Rule[Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]]
+    private case class GameOfLifeImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapRules2D:
         var ruleCollection: Rules = Map()
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
             ruleCollection.get(cell.state)

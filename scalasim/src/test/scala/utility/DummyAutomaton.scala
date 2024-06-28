@@ -20,24 +20,27 @@ import org.scalatest.tools.ColorBar
 import java.awt.Color
 import domain.Environment.SquareArrayEnvironment2D
 
-
+/**
+  * 
+  */
 object DummyAutomatonEnvironment:
     def apply(dimension: Int): Environment[TwoDimensionalSpace] =
         DummyAutomatonEnvironmentImpl(dimension, DummyAutomaton())
 
-    private case class DummyAutomatonEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
+    private case class DummyAutomatonEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace]) 
         extends Environment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
       require(side > 0)
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
       initialise()
       override protected def initialise() = 
         matrix = matrix.spawnCell(DummyState.ALIVE)
-
       override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
           import domain.automaton.NeighborRuleUtility.given
           availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
-
+/**
+  * 
+  */
 object DummyAutomaton:
     enum DummyState extends State:
         case DEAD
@@ -51,9 +54,7 @@ object DummyAutomaton:
         dummy.addRule(DummyState.DEAD, (x) => Cell(Position((x.center.position.coordinates)), DummyState.ALIVE))
         dummy
 
-    private class DummyAutomatonImpl() 
-        extends CellularAutomaton[TwoDimensionalSpace]:
-        type Rules = Map[State, Rule[Neighbour[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]]
+    private class DummyAutomatonImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapRules2D:
         var ruleCollection: Rules = Map()
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]) =
             ruleCollection.get(cell.state)
