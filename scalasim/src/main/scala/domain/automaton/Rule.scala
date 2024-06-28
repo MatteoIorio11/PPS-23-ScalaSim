@@ -34,7 +34,7 @@ object NeighborRuleUtility:
       def absoluteNeighboursLocations(center: Position[D]): Iterable[Position[D]] =
          relativeNeighboursLocations.map(c =>
             Position((center.coordinates zip c.coordinates) map { case (a, b) => a + b})
-         ).filter(p => !p.coordinates.toList.contains((x: Int) => x < 0))
+         )
 
    given circleNeighbourhoodLocator: NeighbourhoodLocator[TwoDimensionalSpace] = new NeighbourhoodLocator[TwoDimensionalSpace]:
       override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
