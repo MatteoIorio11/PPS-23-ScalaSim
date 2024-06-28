@@ -31,17 +31,7 @@ object DummyAutomatonEnvironment:
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
       initialise()
       override protected def initialise() = 
-        val initialCell = Cell(Position((-1,-1).toList), DummyState.DEAD)
-        val array = ArrayBuffer.fill(side, side)(initialCell)
-        for (y <- 0 until side)
-            for (x <- 0 until side)
-                val probability = Random().nextBoolean()
-                val state = probability match
-                    case x if x => DummyState.ALIVE
-                    case _ => DummyState.DEAD
-                array(x)(y) = Cell(Position((x, y).toList), state)
-        array(0)(0) = Cell(Position((0,0).toList), DummyState.DEAD)
-        matrix = array.asInstanceOf[Matrix]
+        matrix = matrix.spawnCell(DummyState.ALIVE)
 
       override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
           import domain.automaton.NeighborRuleUtility.given

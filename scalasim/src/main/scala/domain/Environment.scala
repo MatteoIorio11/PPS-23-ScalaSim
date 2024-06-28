@@ -6,12 +6,9 @@ import domain.automaton.CellularAutomaton.*
 import domain.automaton.Cell.*
 import scala.util.Random
 import domain.base.Position.Position2D
-import domain.simulations.gameoflife.GameOfLife.*
-import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
 import automaton.Cell
 import base.Position
 import automaton.Neighbour
-import simulations.gameoflife.GameOfLife
 
 object Environment:
     /**
@@ -99,7 +96,26 @@ object Environment:
                     if (array(x)(y).state != state)
                         array(x)(y) = (Cell(position, state))
                         spawnedCells = spawnedCells + 1
-                array 
+                array
+            /**
+              * This extension method returns a new Matrix in which there can be X cells with the inputState
+              * otherwise the cell has It's initial state. The selected state is choosen by using a random value
+              * where if the random value is True then It is selected the inputState otherwise the original state.
+              * @param inputState: Input state to use If the probability returned from the random value is True
+              * @return a new Matrix in which there can be spawned a number of cell with the input state.
+              */
+            def spawnCell(inputState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+              val initialCell: Cell[TwoDimensionalSpace] = Cell(Position((-1, -1).toList), inputState)
+              val array = ArrayBuffer.fill(width, heigth)(initialCell)
+              for (y <- 0 until heigth)
+                for (x <- 0 until width)
+                    val probability = Random().nextBoolean()
+                    val state = probability match
+                        case x if x => inputState
+                        case _ => array(x)(y).state
+                    array(x)(y) = Cell(Position((x, y).toList), state)
+              array(0)(0) = Cell(Position((0, 0).toList), inputState)
+              array
     /**
       * Environment 2D, where the matrix is defined as an [[ArrayBuffer(ArrayBuffer)]]. This type of matrix can be 
       * very efficient because it allows us to have an O(1) random time access.
@@ -142,9 +158,9 @@ object Environment:
               */
             def initializeSpace(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
                 val array = ArrayBuffer.fill(side, side)(initialCell)
-                    for (y <- 0 until side)
+                  for (y <- 0 until side)
                     for (x <- 0 until side)
-                        array(x)(y) = (Cell(Position2D((x, y).toList), initialCell.state))
+                      array(x)(y) = (Cell(Position2D((x, y).toList), initialCell.state))
                 array
             /**
               * This extension method can be used for spawn a fixed number of cell inside the Matrix with the input
@@ -163,6 +179,23 @@ object Environment:
                         array(x)(y) = (Cell(position, state))
                         spawnedCells = spawnedCells + 1
                 array
+            /**
+              * This extension method can be used for spawn a random number of cell inside the Matrix with the input state.
+              * @param inputState: state that will be used iniside the spawned cells.
+              * @return a new Matrix where there are a number of random cells with the input state.
+              */
+            def spawnCell(inputState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+              val initialCell: Cell[TwoDimensionalSpace] = Cell(Position((-1, -1).toList), inputState)
+              val array = ArrayBuffer.fill(side, side)(initialCell)
+              for (y <- 0 until side)
+                for (x <- 0 until side)
+                    val probability = Random().nextBoolean()
+                    val state = probability match
+                        case x if x => inputState
+                        case _ => array(x)(y).state
+                    array(x)(y) = Cell(Position((x, y).toList), state)
+              array(0)(0) = Cell(Position((0, 0).toList), inputState)
+              array
     /**
       * Rectangula Environment2D where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
