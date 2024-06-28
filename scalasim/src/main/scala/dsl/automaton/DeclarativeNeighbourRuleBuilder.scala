@@ -17,7 +17,6 @@ trait ExpressionRuleBuilder extends DeclarativeNeighbourRuleBuilder:
   def setNumNeighbours(count: Int => Boolean): this.type
   def setNeighbourState(s: State): this.type
   def setNeighboursRadius(s: Int): this.type
-  def build(): Iterable[NeighbourRule[TwoDimensionalSpace]] // TODO: Move to [[NeighbourRuleBuilder]]
 
 object ExpressionRuleBuilder:
   export ExpressionRuleDSL.*
@@ -67,7 +66,6 @@ object ExpressionRuleBuilder:
           ExplicitNeighbourRuleBuilder.configureRule(s)(neighPlacement).rules.head
         )
         builder
-
   
   private case class NeighbourRuleConfig(
       var initialState: State = AnyState,
@@ -118,7 +116,7 @@ object ExpressionRuleBuilder:
       currentConfig = currentConfig.map(_.copy(neighbourRadius = radius))
       this 
 
-    override def build(): Iterable[NeighbourRule[TwoDimensionalSpace]] =
+    override def build: Iterable[NeighbourRule[TwoDimensionalSpace]] =
       currentConfig foreach (c => neighbourRulesConfigs = neighbourRulesConfigs :+ c)
       configureRules
       rules

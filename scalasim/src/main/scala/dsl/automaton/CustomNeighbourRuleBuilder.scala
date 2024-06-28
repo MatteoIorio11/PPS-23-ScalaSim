@@ -35,6 +35,8 @@ class CustomNeighbourRuleBuilder extends ExplicitNeighbourRuleBuilder:
     j += 1
     this
 
+  override def build: Iterable[NeighbourRule[TwoDimensionalSpace]] = rules
+
   override def buildRule(s: State): Unit =
     import domain.automaton.NeighborRuleUtility.*
 

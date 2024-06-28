@@ -9,11 +9,6 @@ import domain.automaton.Neighbour
 import domain.automaton.NeighbourRule
 
 import scala.annotation.targetName
-import domain.base.Dimensions.Dimension
-
-trait NeighbourRuleBuilder[D <: Dimension]:
-  def rules: Set[NeighbourRule[D]]
-  def addRule(nr: NeighbourRule[D]): Unit
 
 /**
  * An object for creating a [[NeighbourRule]] in a two dimensional space.

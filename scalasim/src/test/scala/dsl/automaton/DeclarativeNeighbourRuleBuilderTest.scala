@@ -23,14 +23,14 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
     val builder = ExpressionRuleBuilder.configureRules:
       alive when atLeastSurroundedBy(2) withState(alive) withRadius(1) whenCenterIs(AnyState)
 
-    builder.build()
+    builder.build
     builder.rules.size shouldBe 1
 
   test("The DSL should map a correct rule"):
     val builder = ExpressionRuleBuilder.configureRules:
       alive when atLeastSurroundedBy(2) withState(alive) withRadius(1) whenCenterIs(AnyState)
 
-    builder.build()
+    builder.build
     val aliveRule = builder.rules.head
 
     val aliveNeighbourhood = Neighbour[TwoDimensionalSpace](
@@ -48,7 +48,7 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
     val builder = ExpressionRuleBuilder.configureRules:
       dead when atLeastSurroundedBy(1) withState(dead)
 
-    builder.build()
+    builder.build
     val rule = builder.rules.head
 
     val n = Neighbour[TwoDimensionalSpace](
@@ -93,7 +93,7 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
       alive when atLeastSurroundedBy(2) withState(alive) whenCenterIs(dead)
       dead when surroundedBy(4) withState(dead)
 
-    builder.build()
+    builder.build
     
     builder.rules.size shouldBe 2
 
@@ -110,5 +110,20 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
           x           | c(alive) | x           | n |
           state(dead) | x        | state(dead)
 
-    val deadRule = builder.build().head
+    val deadRule = builder.build.head
+    deadRule.applyTransformation(RulesTestUtils.deadNeighbourhood) shouldBe RulesTestUtils.deadCell
+
+  test("Explicit and Declartive rules should be concatened"):
+    val builder = ExpressionRuleBuilder.configureRules:
+      alive when atLeastSurroundedBy(2) withState(alive) whenCenterIs(dead)
+      dead whenNeighbourhoodIsExactlyLike:
+          state(dead) | x        | state(dead) | n |
+          x           | c(alive) | x           | n |
+          state(dead) | x        | state(dead)
+
+    builder.build
+
+    val aliveRule = builder.rules.last
+    val deadRule = builder.rules.head
+    aliveRule.applyTransformation(RulesTestUtils.aliveNeighbourhood) shouldBe RulesTestUtils.aliveCell
     deadRule.applyTransformation(RulesTestUtils.deadNeighbourhood) shouldBe RulesTestUtils.deadCell
