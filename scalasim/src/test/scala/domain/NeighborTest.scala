@@ -17,7 +17,7 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
         Cell(Position(0, 1), new State {}),
         Cell(Position(1, 0), new State {}),
         Cell(Position(1, 1), new State {}),
-      ).toIterable
+      )
 
       val n = Neighbour(c0, others)
 
@@ -30,10 +30,10 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
         override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] = positions
 
 
-      horizontalNL.relativeNeighboursLocations shouldBe positions.toIterable
+      horizontalNL.relativeNeighboursLocations shouldBe positions
       val expectedPositions: List[Position[TwoDimensionalSpace]] = List(Position(0, 0), Position(0, 2))
       val center: Position[TwoDimensionalSpace] = Position(0, 1)
-      horizontalNL.absoluteNeighboursLocations(center) should contain theSameElementsAs expectedPositions.toIterable
+      horizontalNL.absoluteNeighboursLocations(center) should contain theSameElementsAs expectedPositions
 
     test("A Neighborhood Locator should map a correct neighborhood"):
       val c0: Cell[TwoDimensionalSpace] = Cell[TwoDimensionalSpace](Position(1, 1), new State {})
@@ -44,7 +44,7 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
         override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
            List(Position(-1, -1), Position(1, 1))
           
-      diagonalNeighbourhoodLocator.absoluteNeighboursLocations(c0.position) shouldBe List(c1, c2).toIterable
+      diagonalNeighbourhoodLocator.absoluteNeighboursLocations(c0.position) shouldBe List(c1, c2)
 
     test("Neighbourhood locator with circular neighbourhood positions should work as expected"):
       val center: Position[TwoDimensionalSpace] = Position(1, 1)

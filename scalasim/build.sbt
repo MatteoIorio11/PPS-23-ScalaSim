@@ -16,5 +16,7 @@ lazy val root = project
       // scalatest
       libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.18" % Test,
       libraryDependencies += "com.github.sbt" % "junit-interface" % "0.13.3" % Test,
+
+      scalacOptions ++= Seq("-deprecation")
   )
 
