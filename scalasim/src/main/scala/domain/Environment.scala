@@ -76,4 +76,4 @@ object Environment:
                       spawnedCells = spawnedCells + 1
               array
           def deepCopy: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            matrix.map(row => row.map(cell => Cell(Position(cell.position.coordinates), cell.state)))
+            matrix.map(row => row.map(cell => Cell(Position(cell.position.coordinates.toArray*), cell.state)))

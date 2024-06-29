@@ -30,7 +30,7 @@ object DummyAutomatonEnvironment:
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
       initialise()
       override protected def initialise() = 
-        val initialCell = Cell(Position((-1,-1).toList), DummyState.DEAD)
+        val initialCell = Cell(Position(-1,-1), DummyState.DEAD)
         val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
         for (y <- 0 until dimension)
             for (x <- 0 until dimension)
@@ -38,8 +38,8 @@ object DummyAutomatonEnvironment:
                 val state = probability match
                     case x if x => DummyState.ALIVE
                     case _ => DummyState.DEAD
-                array(x)(y) = Cell(Position((x, y).toList), state)
-        array(0)(0) = Cell(Position((0,0).toList), DummyState.DEAD)
+                array(x)(y) = Cell(Position(x, y), state)
+        array(0)(0) = Cell(Position(0, 0), DummyState.DEAD)
         matrix = array.asInstanceOf[Matrix]
 
       override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
@@ -56,8 +56,8 @@ object DummyAutomaton:
         val dummy = DummyAutomatonImpl()
         automatonColors = automatonColors + (DummyState.DEAD -> Color.RED)
         automatonColors = automatonColors + (DummyState.ALIVE -> Color.GREEN)
-        dummy.addRule(DummyState.ALIVE, (x) => Cell(Position((x.center.position.coordinates)), DummyState.DEAD))
-        dummy.addRule(DummyState.DEAD, (x) => Cell(Position((x.center.position.coordinates)), DummyState.ALIVE))
+        dummy.addRule(DummyState.ALIVE, (x) => Cell(x.center.position, DummyState.DEAD))
+        dummy.addRule(DummyState.DEAD, (x) => Cell(x.center.position, DummyState.ALIVE))
         dummy
 
     private class DummyAutomatonImpl() 

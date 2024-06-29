@@ -35,7 +35,7 @@ object NeighborRuleUtility:
 
       def coordinates: List[Int] = List(x, y)
 
-      def toPosition = Position(coordinates)
+      def toPosition = Position(coordinates.toArray*)
 
    trait NeighbourhoodLocator[D <: Dimension]:
       def relativeNeighboursLocations: Iterable[Position[D]]
@@ -48,10 +48,11 @@ object NeighborRuleUtility:
    object PositionArithmeticOperations:
       extension[D <: Dimension] (p: Position[D])
          private def elementWiseFunc(other: Position[D])(func: (Int, Int) => Int): Position[D] =
-            Position((p.coordinates zip other.coordinates) map { case (a, b) => func(a, b)})
+            Position(((p.coordinates zip other.coordinates) map { case (a, b) => func(a, b)}).toArray*)
+
          def +(other: Position[D]): Position[D] = elementWiseFunc(other)(_ + _)
          def -(other: Position[D]): Position[D] = elementWiseFunc(other)(_ - _)
-         def -(n: Int): Position[D] = Position(p.coordinates.map(_ - n))
+         def -(n: Int): Position[D] = Position(p.coordinates.map(_ - n).toArray*)
 
    given circleNeighbourhoodLocator: NeighbourhoodLocator[TwoDimensionalSpace] = new NeighbourhoodLocator[TwoDimensionalSpace]:
       override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
@@ -65,15 +66,15 @@ object NeighborRuleUtility:
             BottomLeft(),
             BottomCenter(),
             BottomRight(),
-            ).map(p => Position(p.coordinates))
+            ).map(p => Position(p.coordinates.toArray*))
 
    def getCircularNeighbourhoodPositions(radius: Int = 1): NeighbourhoodLocator[TwoDimensionalSpace] =
-      val center = Position(List(radius, radius))
+      val center = Position(radius, radius)
       var neighbours: List[Position[TwoDimensionalSpace]] = List.empty
       for
          i <- (0 to radius + 1)
          j <- (0 to radius + 1)
-      do neighbours = neighbours :+ Position(List(i, j))
+      do neighbours = neighbours :+ Position(i, j)
       new NeighbourhoodLocator[TwoDimensionalSpace]:
          override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
             neighbours.filter(_ != center) map (_ - radius)

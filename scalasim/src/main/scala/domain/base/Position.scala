@@ -18,7 +18,7 @@ object Position:
    *
    * @param coordinates a collection (iterable) of integers representing spatial cooridinates.
    */
-  def apply[D <: Dimension](coordinates: Iterable[Int]): Position[D] = coordinates.toList match
+  def apply[D <: Dimension](coordinates: Int*): Position[D] = coordinates.toList match
     case x if x.size == 2 => Position2D(x).asInstanceOf[Position[D]]
     case x if x.size == 3 => Position3D(x).asInstanceOf[Position[D]]
     case _ => throw new NotImplementedError(s"Position${coordinates.size}D is not yet implemented")
