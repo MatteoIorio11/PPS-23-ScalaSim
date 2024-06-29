@@ -26,5 +26,5 @@ class GameOfLifeEnvironmentTest extends AnyFunSuite with BeforeAndAfterEach:
             .filter(state => state == CellState.ALIVE).length should not be 0
     
     test("The neighboors of a cell should always exits"):
-        val cell: Cell[TwoDimensionalSpace] = Cell(Position((0,0).toList), CellState.DEAD)
+        val cell: Cell[TwoDimensionalSpace] = Cell(Position(0, 0), CellState.DEAD)
         env.neighbours(cell = cell) shouldNot be (List.empty)

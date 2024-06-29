@@ -27,14 +27,13 @@ object NeighborRuleUtility:
 
       def coordinates: List[Int] = List(x, y)
       
-      
    trait NeighbourhoodLocator[D <: Dimension]:
       def relativeNeighboursLocations: Iterable[Position[D]]
 
       def absoluteNeighboursLocations(center: Position[D]): Iterable[Position[D]] =
          relativeNeighboursLocations.map(c =>
-            Position((center.coordinates zip c.coordinates) map { case (a, b) => a + b})
-         )
+            Position(((center.coordinates zip c.coordinates) map { case (a, b) => a + b}).toArray*)
+         ).filter(p => !p.coordinates.toList.exists(_ < 0))
 
    given circleNeighbourhoodLocator: NeighbourhoodLocator[TwoDimensionalSpace] = new NeighbourhoodLocator[TwoDimensionalSpace]:
       override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
@@ -48,7 +47,7 @@ object NeighborRuleUtility:
             BottomLeft,
             BottomCenter,
             BottomRight,
-         ).map(p => Position(p.coordinates))
+         ).map(p => Position(p.coordinates*))
 
    def getNeighboursWithState[D <: Dimension](state: State, neighbours: Neighbour[D]): List[Cell[D]] = 
       neighbours.neighbourhood.filter(cell => cell.state == state)

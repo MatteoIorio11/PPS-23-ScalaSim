@@ -26,10 +26,10 @@ class EnvironmentTest extends AnyFunSuite:
             .filter(state => state == DummyState.ALIVE).length should not be 0
     
     test("The neighboors of a cell should always exits"):
-        val cell: Cell[TwoDimensionalSpace] = Cell(Position((0,0).toList), DummyState.DEAD)
+        val cell: Cell[TwoDimensionalSpace] = Cell(Position(0, 0), DummyState.DEAD)
         env.neighbours(cell = cell) shouldNot be (List.empty)
 
     test("Apply the rule of the CA should return the expected cell"):
-        val cell: Cell[TwoDimensionalSpace] = Cell(Position((0,0).toList), DummyState.DEAD)
+        val cell: Cell[TwoDimensionalSpace] = Cell(Position(0, 0), DummyState.DEAD)
         val neigh = env.neighbours(cell)
-        env.applyRule(cell, neigh) shouldBe Cell(Position((0,0).toList), DummyState.ALIVE)
+        env.applyRule(cell, neigh) shouldBe Cell(Position(0, 0), DummyState.ALIVE)

@@ -25,39 +25,39 @@ class GameOfLifeTest extends AnyFunSuite with BeforeAndAfterEach:
     gameOfLife.rules should not be (Map.empty)
   
   test("Alive cell should be Dead with less than two Alive neighbors"):
-    val cell = Cell(Position2D((0,0).toList), CellState.ALIVE)
-    val neighbors = List(
-      Cell(Position2D((1, 1).toList), CellState.ALIVE),
+    val cell = Cell[TwoDimensionalSpace](Position(0, 0), CellState.ALIVE)
+    val neighbors: List[Cell[TwoDimensionalSpace]] = List(
+      Cell(Position(1, 1), CellState.ALIVE),
     )
     val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
-    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position((0,0).toList), CellState.DEAD)
+    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position(0, 0), CellState.DEAD)
 
   test("Alive cell should be Dead with more than three Alive neighbors"):
-    val cell = Cell(Position2D((0,0).toList), CellState.ALIVE)
-    val neighbors = List(
-      Cell(Position2D((1, 1).toList), CellState.ALIVE),
-      Cell(Position2D((-1, 1).toList), CellState.ALIVE),
-      Cell(Position2D((-1, -1).toList), CellState.ALIVE),
-      Cell(Position2D((0, 1).toList), CellState.ALIVE),
+    val cell = Cell[TwoDimensionalSpace](Position(0,0), CellState.ALIVE)
+    val neighbors: List[Cell[TwoDimensionalSpace]] = List(
+      Cell(Position(1, 1), CellState.ALIVE),
+      Cell(Position(-1, 1), CellState.ALIVE),
+      Cell(Position(-1, -1), CellState.ALIVE),
+      Cell(Position(0, 1), CellState.ALIVE),
     )
     val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
-    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position((0,0).toList), CellState.DEAD)
+    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position(0, 0), CellState.DEAD)
 
   test("Alive cell should be Alive with two Alive neighbors"):
-    val cell = Cell(Position2D((0,0).toList), CellState.ALIVE)
-    val neighbors = List(
-      Cell(Position2D((1, 1).toList), CellState.ALIVE),
-      Cell(Position2D((1, -1).toList), CellState.ALIVE),
+    val cell = Cell[TwoDimensionalSpace](Position(0, 0), CellState.ALIVE)
+    val neighbors: List[Cell[TwoDimensionalSpace]] = List(
+      Cell(Position(1, 1), CellState.ALIVE),
+      Cell(Position(1, -1), CellState.ALIVE),
     )
     val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
-    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position((0,0).toList), CellState.ALIVE)
+    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position(0, 0), CellState.ALIVE)
 
   test("Alive cell should be Alive with three Alive neighbors"):
-    val cell = Cell(Position2D((0, 0).toList), CellState.ALIVE)
-    val neighbors = List(
-      Cell(Position2D((1, 1).toList), CellState.ALIVE),
-      Cell(Position2D((1, -1).toList), CellState.ALIVE),
-      Cell(Position2D((-1, -1).toList), CellState.ALIVE),
+    val cell = Cell[TwoDimensionalSpace](Position(0, 0), CellState.ALIVE)
+    val neighbors: List[Cell[TwoDimensionalSpace]] = List(
+      Cell(Position(1, 1), CellState.ALIVE),
+      Cell(Position(1, -1), CellState.ALIVE),
+      Cell(Position(-1, -1), CellState.ALIVE),
     )
     val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
-    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position((0, 0).toList), CellState.ALIVE)
+    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position(0, 0), CellState.ALIVE)
