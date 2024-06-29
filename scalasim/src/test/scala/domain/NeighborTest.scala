@@ -3,7 +3,6 @@ package domain
 import org.scalatest.matchers.should.Matchers.*
 import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
 import domain.base.Dimensions.TwoDimensionalSpace
-import domain.base.Position.Position2D
 import domain.automaton.Neighbour
 import domain.automaton.Cell
 import domain.automaton.CellularAutomaton.State
@@ -12,15 +11,6 @@ import domain.base.Position
 import domain.automaton.NeighborRuleUtility.getCircularNeighbourhoodPositions
 
 class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
-    test("Neighborhoodlocator should work as expected"):
-      val neig: List[Position[TwoDimensionalSpace]] = List(Position(-1, -1), Position(1, 1))
-      val nLocator = new NeighbourhoodLocator[TwoDimensionalSpace]:
-        override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] = neig
-
-      val center: Position[TwoDimensionalSpace] = Position(0, 0)
-
-      nLocator.absoluteNeighboursLocations(center) should contain theSameElementsAs neig.toIterable
-
     test("A two dimensional neighborhood should be mapped correctly"):
       val c0 = Cell[TwoDimensionalSpace](Position(0, 0), new State {})
       val others: List[Cell[TwoDimensionalSpace]] = List(
@@ -52,24 +42,24 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
 
       val diagonalNeighbourhoodLocator = new NeighbourhoodLocator[TwoDimensionalSpace]:
         override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
-           List((-1, -1), (1, 1)).map(c => Position2D(c.toList))
+           List(Position(-1, -1), Position(1, 1))
           
       diagonalNeighbourhoodLocator.absoluteNeighboursLocations(c0.position) shouldBe List(c1, c2).toIterable
 
     test("Neighbourhood locator with circular neighbourhood positions should work as expected"):
-      val center: Position[TwoDimensionalSpace] = Position(List(1, 1))
+      val center: Position[TwoDimensionalSpace] = Position(1, 1)
 
       val absNeighbourhood: List[Position[TwoDimensionalSpace]] = List(
         (0, 0), (0, 1), (0, 2),
         (1, 0),         (1, 2),
         (2, 0), (2, 1), (2, 2)
-      ).map(x => Position(x.toList))
+      ).map(x => Position(x._1, x._2))
 
       val relativeNeighbourhood: List[Position[TwoDimensionalSpace]] = List(
         (-1, -1), (-1, 0), (-1, 1),
         (0, -1),         (0, 1),
         (1, -1), (1, 0), (1, 1)
-      ).map(x => Position(x.toList))
+      ).map(x => Position(x._1, x._2))
 
       val locator = getCircularNeighbourhoodPositions(radius = 1)
       locator.relativeNeighboursLocations.toList should contain theSameElementsAs relativeNeighbourhood

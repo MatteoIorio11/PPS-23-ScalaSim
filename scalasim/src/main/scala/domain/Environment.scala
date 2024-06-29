@@ -5,7 +5,6 @@ import domain.base.Dimensions.*
 import domain.automaton.CellularAutomaton.*
 import domain.automaton.Cell.*
 import scala.util.Random
-import domain.base.Position.Position2D
 import domain.simulations.gameoflife.GameOfLife.*
 import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
 import automaton.Cell
@@ -62,7 +61,7 @@ object Environment:
               val array = ArrayBuffer.fill(dimension, dimension)(initialCell)
               for (y <- 0 until dimension)
                   for (x <- 0 until dimension)
-                      array(x)(y) = (Cell(Position2D((x, y).toList), CellState.DEAD))
+                      array(x)(y) = (Cell(Position[TwoDimensionalSpace](x, y), CellState.DEAD))
               array
 
           def initializeCells(nCells: Int, dimension: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
@@ -70,7 +69,7 @@ object Environment:
               while (spawnedCells < nCells)
                   val x = Random.nextInt(dimension)
                   val y = Random.nextInt(dimension)
-                  val position = Position2D((x, y).toList)
+                  val position = Position[TwoDimensionalSpace](x, y)
                   if (array(x)(y).state != state)
                       array(x)(y) = (Cell(position, state))
                       spawnedCells = spawnedCells + 1

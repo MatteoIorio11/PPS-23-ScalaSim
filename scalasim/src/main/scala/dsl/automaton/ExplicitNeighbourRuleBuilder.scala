@@ -181,13 +181,13 @@ object ExplicitNeighbourRuleBuilder:
 
     override def addCell(s: Option[State]): this.type =
       s match
-        case Some(state) => cells = cells :+ Cell((i, j).toPosition, state)
+        case Some(state) => cells = cells :+ Cell(Position(i, j), state)
         case _ =>
       j += 1
       this
 
     override def setCenter(s: State): this.type =
-      center = Some(Cell((i, j).toPosition, s))
+      center = Some(Cell(Position(i, j), s))
       j += 1
       this
 
@@ -211,7 +211,7 @@ object ExplicitNeighbourRuleBuilder:
         case _ => throw IllegalStateException("Cannot compute relative positions if center is not defined")
 
     override def relativeNeighbourhood: Neighbour[TwoDimensionalSpace] =
-      Neighbour(Cell((0, 0).toPosition, center.get.state), relativePositions)
+      Neighbour(Cell(Position(0, 0), center.get.state), relativePositions)
 
     /**
      * Builds a [[Neighbour]] based on relative neighbourhood built with the DSL, using [[cntr]] as
@@ -241,6 +241,3 @@ object ExplicitNeighbourRuleBuilder:
       this
 
     override def addRule(nr: NeighbourRule[TwoDimensionalSpace]): Unit = rules = rules + nr
-
-    extension (t: (Int, Int))
-      private def toPosition: Position[TwoDimensionalSpace] = Position(t.toList)

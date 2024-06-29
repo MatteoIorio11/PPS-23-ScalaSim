@@ -9,6 +9,7 @@ import dsl.automaton.ExplicitNeighbourRuleBuilder.*
 import domain.automaton.Cell
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Neighbour
+import domain.base.Position
 
 class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest:
   val dead = Dead()
@@ -34,14 +35,14 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
     val aliveRule = builder.rules.head
 
     val aliveNeighbourhood = Neighbour[TwoDimensionalSpace](
-        Cell((1, 0).toPostion, dead),
+        Cell(Position(1, 0), dead),
         List(
-          Cell((0, 0).toPostion, alive),
-          Cell((2, 0).toPostion, alive),
+          Cell(Position(0, 0), alive),
+          Cell(Position(2, 0), alive),
         ),
     )
 
-    val aliveCell = Cell((1, 0).toPostion,  alive)
+    val aliveCell = Cell(Position(1, 0),  alive)
     aliveRule.applyTransformation(aliveNeighbourhood) shouldBe aliveCell
 
   test("The DSL shoudl map a correct rule even without optional parameters"):
@@ -52,41 +53,41 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
     val rule = builder.rules.head
 
     val n = Neighbour[TwoDimensionalSpace](
-        Cell((1, 0).toPostion, alive),
+        Cell(Position(1, 0), alive),
         List(
-          Cell((0, 0).toPostion, alive),
-          Cell((2, 0).toPostion, dead),
+          Cell(Position(0, 0), alive),
+          Cell(Position(2, 0), dead),
         ),
     )
 
-    val expected = Cell((1, 0).toPostion, dead)
+    val expected = Cell(Position(1, 0), dead)
     rule.applyTransformation(n) shouldBe expected
 
   private object RulesTestUtils:
       val aliveNeighbourhood = Neighbour[TwoDimensionalSpace](
-          Cell((1, 0).toPostion, dead),
+          Cell(Position(1, 0), dead),
           List(
-            Cell((0, 0).toPostion, alive),
-            Cell((2, 0).toPostion, alive),
+            Cell(Position(0, 0), alive),
+            Cell(Position(2, 0), alive),
           ),
       )
 
       val deadNeighbourhood = Neighbour[TwoDimensionalSpace](
-          Cell((1, 1).toPostion, alive),
+          Cell(Position(1, 1), alive),
           List(
-            (0, 0) -> dead,
-            (2, 2) -> dead,
-            (0, 2) -> dead,
-            (2, 0) -> dead,
-            (0, 1) -> alive,
-            (1, 0) -> alive,
-            (1, 2) -> alive,
-            (2, 1) -> alive,
-          ).map(x => Cell(x._1.toPostion, x._2))
+            Position[TwoDimensionalSpace](0, 0) -> dead,
+            Position[TwoDimensionalSpace](2, 2) -> dead,
+            Position[TwoDimensionalSpace](0, 2) -> dead,
+            Position[TwoDimensionalSpace](2, 0) -> dead,
+            Position[TwoDimensionalSpace](0, 1) -> alive,
+            Position[TwoDimensionalSpace](1, 0) -> alive,
+            Position[TwoDimensionalSpace](1, 2) -> alive,
+            Position[TwoDimensionalSpace](2, 1) -> alive,
+          ).map(x => Cell(x._1, x._2))
       )
 
-      val aliveCell = Cell((1, 0).toPostion, alive)
-      val deadCell = Cell((1, 1).toPostion, dead)
+      val aliveCell = Cell(Position(1, 0), alive)
+      val deadCell = Cell(Position(1, 1), dead)
 
   test("It should be possible to configure multiple rules in one configuration block"):
     val builder = DeclarativeRuleBuilder.configureRules:

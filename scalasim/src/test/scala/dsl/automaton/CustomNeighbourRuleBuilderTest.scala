@@ -24,14 +24,14 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
 
   test("The dsl should map a correct set of cells"):
     nrb.center.isEmpty should not be true
-    nrb.center.get shouldBe Cell(Position(List(1, 1)), alive)
+    nrb.center.get shouldBe Cell(Position(1, 1), alive)
 
     val expectedPositions: List[Cell[TwoDimensionalSpace]] = List(
-      (0, 0) -> alive,
-      (0, 2) -> dead,
-      (2, 0) -> alive,
-      (2, 2) -> dead,
-    ).map(x => Cell(Position(x._1.toList), x._2))
+      Position[TwoDimensionalSpace](0, 0) -> alive,
+      Position[TwoDimensionalSpace](0, 2) -> dead,
+      Position[TwoDimensionalSpace](2, 0) -> alive,
+      Position[TwoDimensionalSpace](2, 2) -> dead,
+    ).map(x => Cell(x._1, x._2))
 
     nrb.cells should contain theSameElementsAs expectedPositions
 
@@ -43,11 +43,11 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
     assert(!exc.getMessage.isBlank)
 
   private val expectedCells: List[Cell[TwoDimensionalSpace]] = List(
-    alive -> (-1, -1),
-    dead -> (-1, 1),
-    alive -> (1, -1),
-    dead -> (1, 1),
-  ).map (e => Cell(Position(e._2.toList), e._1))
+    alive -> Position[TwoDimensionalSpace](-1, -1),
+    dead  -> Position[TwoDimensionalSpace](-1, 1),
+    alive -> Position[TwoDimensionalSpace](1, -1),
+    dead  -> Position[TwoDimensionalSpace](1, 1),
+  ).map (e => Cell(e._2, e._1))
 
   test("Relative neighbours cells can be retrieved if center is set"):
     val rpos: List[Cell[TwoDimensionalSpace]] = nrb.relativePositions
@@ -55,7 +55,7 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
 
   test("The DSL should be able to produce a proper relative Neighbour instance"):
     val expectedNeighbourhood = Neighbour[TwoDimensionalSpace](
-      Cell(Position((0, 0).toList), nrb.center.get.state), nrb.relativePositions
+      Cell(Position(0, 0), nrb.center.get.state), nrb.relativePositions
     )
     nrb.relativeNeighbourhood shouldBe expectedNeighbourhood
 
@@ -63,14 +63,14 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
     val builder = ExplicitNeighbourRuleBuilder.configureRule(alive):
       state(alive) | c(dead) | state(alive)
 
-    val center = Cell[TwoDimensionalSpace](Position((0, 1).toList), dead)
+    val center = Cell[TwoDimensionalSpace](Position(0, 1), dead)
     val cells = List(
-      (0, 0) -> alive,
-      (0, 2) -> alive,
-    ).map(x => Cell[TwoDimensionalSpace](Position(x._1.toList), x._2))
+      Position[TwoDimensionalSpace](0, 0) -> alive,
+      Position[TwoDimensionalSpace](0, 2) -> alive,
+    ).map(x => Cell[TwoDimensionalSpace](x._1, x._2))
 
     val neighbourhood = Neighbour[TwoDimensionalSpace](center, cells)
-    val expectedCell = Cell[TwoDimensionalSpace](Position((0, 1).toList), alive)
+    val expectedCell = Cell[TwoDimensionalSpace](Position(0, 1), alive)
 
     val rule: NeighbourRule[TwoDimensionalSpace] = builder.rules.head
     rule.applyTransformation(neighbourhood) shouldBe expectedCell
@@ -86,23 +86,23 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
     builder.rules.size shouldBe 2
 
     val aliveNeighbourhood = Neighbour[TwoDimensionalSpace](
-      center = Cell(Position((1, 1).toList), dead),
+      center = Cell(Position(1, 1), dead),
       List(
-        Position[TwoDimensionalSpace]((1, 0).toList) -> alive,
-        Position[TwoDimensionalSpace]((1, 2).toList) -> alive,
+        Position[TwoDimensionalSpace](1, 0) -> alive,
+        Position[TwoDimensionalSpace](1, 2) -> alive,
       ).map(x => Cell(x._1, x._2))
     )
 
     val deadNeighbourhood = Neighbour[TwoDimensionalSpace](
-      center = Cell(Position((1, 0).toList), alive),
+      center = Cell(Position(1, 0), alive),
       List(
-        Position[TwoDimensionalSpace]((0, 0).toList) -> dead,
-        Position[TwoDimensionalSpace]((2, 0).toList) -> dead,
+        Position[TwoDimensionalSpace](0, 0) -> dead,
+        Position[TwoDimensionalSpace](2, 0) -> dead,
       ).map(x => Cell(x._1, x._2))
     )
 
-    builder.rules.toList(0).applyTransformation(aliveNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position((1, 1).toList), alive)
-    builder.rules.toList(1).applyTransformation(deadNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position((1, 0).toList), dead)
+    builder.rules.toList(0).applyTransformation(aliveNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position(1, 1), alive)
+    builder.rules.toList(1).applyTransformation(deadNeighbourhood) shouldBe Cell[TwoDimensionalSpace](Position(1, 0), dead)
 
   test("Complex rule should hold"):
     val builder = ExplicitNeighbourRuleBuilder.configureRule(dead):
@@ -111,20 +111,17 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
       state(dead) | x        | state(dead)
     
     val deadNeighbourhood = Neighbour[TwoDimensionalSpace](
-        Cell((1, 1).toPostion, alive),
+        Cell(Position(1, 1), alive),
         List(
-          (0, 0) -> dead,
-          (2, 2) -> dead,
-          (0, 2) -> dead,
-          (2, 0) -> dead,
-          (0, 1) -> alive,
-          (1, 0) -> alive,
-          (1, 2) -> alive,
-          (2, 1) -> alive,
-        ).map(x => Cell(x._1.toPostion, x._2))
+          Position[TwoDimensionalSpace](0, 0) -> dead,
+          Position[TwoDimensionalSpace](2, 2) -> dead,
+          Position[TwoDimensionalSpace](0, 2) -> dead,
+          Position[TwoDimensionalSpace](2, 0) -> dead,
+          Position[TwoDimensionalSpace](0, 1) -> alive,
+          Position[TwoDimensionalSpace](1, 0) -> alive,
+          Position[TwoDimensionalSpace](1, 2) -> alive,
+          Position[TwoDimensionalSpace](2, 1) -> alive,
+        ).map(x => Cell(x._1, x._2))
     )
 
-    builder.rules.head.applyTransformation(deadNeighbourhood) shouldBe Cell((1, 1).toPostion, dead)
-
-  extension (t: (Int, Int))
-    def toPostion: Position[TwoDimensionalSpace] = Position(t.toList)
+    builder.rules.head.applyTransformation(deadNeighbourhood) shouldBe Cell(Position(1, 1), dead)
