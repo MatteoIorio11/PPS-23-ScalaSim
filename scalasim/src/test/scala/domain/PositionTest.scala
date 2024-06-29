@@ -11,20 +11,20 @@ class PositionTest extends org.scalatest.funsuite.AnyFunSuite:
 
   test("Two dimensional position should be created properly"):
     val p: Position[TwoDimensionalSpace] = Position(10, 20)
-    p.coordinates shouldBe List(10, 20).toIterable
+    p.coordinates shouldBe List(10, 20)
 
   test("Three dimensional position should be created properly"):
     val p: Position[ThreeDimensionalSpace] = Position(10, 20, 30)
-    p.coordinates shouldBe List(10, 20, 30).toIterable
+    p.coordinates shouldBe List(10, 20, 30)
 
   test("Generic position construction with two coordinates should map a Postion2D"):
     val p = Position(10, 20)
-    p.coordinates shouldBe List(10, 20).toIterable
+    p.coordinates shouldBe List(10, 20)
     p.isInstanceOf[Position2D] shouldBe true
 
   test("Generic position construction with three coordinates should map a Postion3D"):
     val p = Position(10, 20, 30)
-    p.coordinates shouldBe List(10, 20, 30).toIterable
+    p.coordinates shouldBe List(10, 20, 30)
     p.isInstanceOf[Position3D] shouldBe true
 
   test("Casting with `asPosition` should work as expected"):
