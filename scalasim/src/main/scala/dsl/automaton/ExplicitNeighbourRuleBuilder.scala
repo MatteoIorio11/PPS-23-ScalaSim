@@ -164,7 +164,6 @@ object ExplicitNeighbourRuleBuilder:
     extension (builder: ExplicitNeighbourRuleBuilder)
       @targetName("separator") def |(b: ExplicitNeighbourRuleBuilder): ExplicitNeighbourRuleBuilder = b
 
-
   private class ExplicitNeighbourBuilderImpl extends ExplicitNeighbourRuleBuilder:
 
     private var i: Int = 0
@@ -194,9 +193,11 @@ object ExplicitNeighbourRuleBuilder:
     override def build: Iterable[NeighbourRule[TwoDimensionalSpace]] = rules
 
     override def buildRule(s: State): Unit =
+      if center.isEmpty then throw IllegalStateException("Cannot build rule without a center!")
+
       import domain.automaton.NeighborRuleUtility.*
 
-      rules = rules + ((n: Neighbour[TwoDimensionalSpace]) =>
+      rules = rules + NeighbourRule(Some(center.get.state))((n: Neighbour[TwoDimensionalSpace]) =>
         val neigbours = toAbsolutePosition(n.center).neighbourhood
         neigbours forall (n.neighbourhood.contains(_)) match
           case true => Cell(n.center.position, s)

@@ -306,18 +306,18 @@ object DeclarativeRuleBuilder:
 
       _rules = _rules ++ neighbourRulesConfigs.map(config =>
           val locator = getCircularNeighbourhoodPositions(config.neighbourRadius)
-          new NeighbourRule[TwoDimensionalSpace]:
-            override def tFunc(in: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] = in.center match
+          NeighbourRule(Some(config.initialState)): (n: Neighbour[TwoDimensionalSpace]) =>
+            n.center match
                 case x if x.state == config.initialState || config.initialState == AnyState =>
-                  val expectedNeighbourhood = locator.absoluteNeighboursLocations(in.center.position).toList
-                  if in.neighbourhood.map(_.position) forall(expectedNeighbourhood.contains(_))
+                  val expectedNeighbourhood = locator.absoluteNeighboursLocations(n.center.position).toList
+                  if n.neighbourhood.map(_.position) forall(expectedNeighbourhood.contains(_))
                   then
-                    getNeighboursWithState(config.neighboursState.get, in).size match
-                      case x if config.numNeighbours.get(x) => Cell(in.center.position, config.finalState.get)
-                      case _ => in.center
-                  else in.center
-                case _ => in.center
-          )
+                    getNeighboursWithState(config.neighboursState.get, n).size match
+                      case x if config.numNeighbours.get(x) => Cell(n.center.position, config.finalState.get)
+                      case _ => n.center
+                  else n.center
+                case _ => n.center
+      )
 
     private def buildNextRule: Unit =
       currentConfig foreach (c => neighbourRulesConfigs = neighbourRulesConfigs :+ c)
