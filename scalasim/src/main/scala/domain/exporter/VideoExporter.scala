@@ -3,6 +3,9 @@ package domain.exporter
 import domain.automaton.Cell
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
 import domain.simulations.gameoflife.GameOfLife.CellState
+import org.jcodec.common.io.{NIOUtils, SeekableByteChannel}
+import org.jcodec.common.model.Rational
+import org.jcodec.api.awt.AWTSequenceEncoder
 
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -37,4 +40,25 @@ object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensiona
 
 trait VideoGenerator {
   def generate(videoFilename: String, images: Seq[BufferedImage], secondsPerImage: Double): Unit
+}
+
+object JCodecVideoGenerator extends VideoGenerator {
+  def generate(videoFilename: String, images: Seq[BufferedImage], secondsPerImage: Double): Unit = {
+    var out: SeekableByteChannel = null
+    try {
+      out = NIOUtils.writableFileChannel(videoFilename)
+      val encoder = new AWTSequenceEncoder(out, Rational.R(25, 1))
+      val framesPerImage = (secondsPerImage * 25).toInt
+
+      images.foreach { image =>
+        for (_ <- 1 to framesPerImage) {
+          encoder.encodeImage(image)
+        }
+      }
+
+      encoder.finish()
+    } finally {
+      NIOUtils.closeQuietly(out)
+    }
+  }
 }
