@@ -77,10 +77,9 @@ object NeighborRuleUtility:
    def getCircularNeighbourhoodPositions(radius: Int = 1): NeighbourhoodLocator[TwoDimensionalSpace] =
       val center = Position(radius, radius)
       var neighbours: List[Position[TwoDimensionalSpace]] = List.empty
-      for
-         i <- (0 to radius + 1)
-         j <- (0 to radius + 1)
-      do neighbours = neighbours :+ Position(i, j)
+      for (i <- 0 until (2 * radius + 1))
+         for (j <- 0 until (2 * radius + 1))
+            neighbours = neighbours :+ Position(i, j)
       new NeighbourhoodLocator[TwoDimensionalSpace]:
          override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
             neighbours.filter(_ != center) map (_ - radius)
