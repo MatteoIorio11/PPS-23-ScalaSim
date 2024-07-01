@@ -17,6 +17,7 @@ import domain.engine.Engine.IterableEngine2D
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import javax.swing.JFrame
 
 object Engine:
     /**
@@ -118,6 +119,7 @@ object Engine:
         override def stopEngine = 
           running = false
           killEngine
+        override def nextIteration = fastIteration
         /**
           * Fast implementation of the cellular automaton iteration.
           */
@@ -125,6 +127,19 @@ object Engine:
             executor = Executors.newVirtualThreadPerTaskExecutor()
             agents.foreach(agent => executor.execute(() => agent.execute))
             executor.close()
+    /**
+      * Trait that represent a general View that will be attached to the engine.
+      */
+    trait EngineView[D <: Dimension]:
+      def updateView(cells: Iterable[Cell[D]]): Unit
+    /**
+      * Engine with a GUI, this will be used for real time simulation with a GUI.
+      */
+    trait GuiEngine2D extends IterableEngine2D:
+      def view: EngineView[TwoDimensionalSpace]
+      def updateView: Unit
+
+
 /**
   * Basic Engine 2D for Cellular Automaton Environment execution.
   */
@@ -165,5 +180,19 @@ object FastEngine2D:
     private case class FastEngine2D(val env: Environment[TwoDimensionalSpace], val timer: Int) 
         extends IterableThreadEngine2D with IterableTimerEngine2D with IterableFastEngine2D:
       var history = LazyList()
-      override def nextIteration = fastIteration
       override def run() = startTimer
+/**
+  * 
+  */
+object GUIEngine2D:
+  import Engine.* 
+  private case class GUIEngine2DImpl(val env: Environment[TwoDimensionalSpace], val view: EngineView[TwoDimensionalSpace], val tick: Int) 
+    extends IterableThreadEngine2D with IterableFastEngine2D with GuiEngine2D:
+    var history = LazyList()
+    override def updateView = view.updateView(List.empty)
+    override def run() = 
+      saveInHistory
+        while (running)
+          nextIteration
+          updateView
+          Thread.sleep(tick)
