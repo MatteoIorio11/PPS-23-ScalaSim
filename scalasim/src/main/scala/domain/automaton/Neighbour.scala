@@ -23,5 +23,5 @@ trait Neighbour[D <: Dimension]:
 object Neighbour:
     def apply[D <: Dimension](center: Cell[D], neighbors: Iterable[Cell[D]]): Neighbour[D] = NeighbourImpl(center, neighbors)
 
-    private class NeighbourImpl[D <: Dimension](override val center: Cell[D], val neighbors: Iterable[Cell[D]]) extends Neighbour[D]:
+    private case class NeighbourImpl[D <: Dimension](override val center: Cell[D], val neighbors: Iterable[Cell[D]]) extends Neighbour[D]:
         override def neighbourhood: Neighbourhood = neighbors.toList

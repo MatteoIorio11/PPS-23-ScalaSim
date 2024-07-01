@@ -18,4 +18,5 @@ trait Cell[D <: Dimension]:
   */
 object Cell:
     def apply[D <: Dimension](p: Position[D], s: State): Cell[D] = CellImpl(p, s)
+    def unapply[D <: Dimension](cell: Cell[D]): Option[(Position[D], State)] = Some((cell.position, cell.state))
     private case class CellImpl[D <: Dimension](override val position: Position[D], override val state: State) extends Cell[D]
