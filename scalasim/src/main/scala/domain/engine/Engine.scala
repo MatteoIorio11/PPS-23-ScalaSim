@@ -33,7 +33,7 @@ object Engine:
       * [[Iterable(Iterable(Cell(TwoDimensionalSpace)))]].
       */
     trait IterableEngine2D extends Engine[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]]:
-        var history: LazyList[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
+        var history: LazyList[Iterable[Iterable[Cell[TwoDimensionalSpace]]]] = LazyList()
         override def currentMatrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]] = 
             environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
         override def nextIteration: Unit = 
@@ -109,7 +109,9 @@ object Engine:
         override def stopEngine = 
           running = false
           killEngine
-        override def nextIteration = fastIteration
+        override def nextIteration = 
+          fastIteration
+          saveInHistory
         /**
           * Fast implementation of the cellular automaton iteration.
           */
@@ -142,7 +144,6 @@ object Engine2D:
 
     private case class SimulationEngine2D(val env: Environment[TwoDimensionalSpace], private val tick: Int) extends IterableThreadEngine2D:
         require(tick >= 100)
-        var history = LazyList()
         override def run() = 
             saveInHistory
             while (running)
@@ -158,7 +159,6 @@ object TimerEngine2D:
     private case class TimerEngine2D(val env: Environment[TwoDimensionalSpace], val timer: Int) 
     extends IterableThreadEngine2D with IterableTimerEngine2D:
       require(timer >= 0)
-      var history = LazyList()
       override def run() = startTimer
 /**
   * Fast Engine 2D for Cellular Automaton Environment execution. Inside this Fast Engine It is used the Timer Engine.
@@ -169,7 +169,6 @@ object FastEngine2D:
          FastEngine2D(env, timer) 
     private case class FastEngine2D(val env: Environment[TwoDimensionalSpace], val timer: Int) 
         extends IterableThreadEngine2D with IterableTimerEngine2D with IterableFastEngine2D:
-      var history = LazyList()
       override def run() = startTimer
 /**
   * 
@@ -179,11 +178,10 @@ object GUIEngine2D:
   import Engine.* 
   private case class GUIEngine2DImpl(val env: Environment[TwoDimensionalSpace], val view: EngineView[TwoDimensionalSpace], val tick: Int) 
     extends IterableThreadEngine2D with IterableFastEngine2D with GuiEngine2D:
-    var history = LazyList()
     override def updateView = view.updateView(currentMatrix.flatMap(it => it.map(cell => cell)))
     override def run() = 
       saveInHistory
-        while (running)
-          nextIteration
-          Thread.ofVirtual().start(() => updateView)
-          Thread.sleep(ONE_SECOND)
+      while (running)
+        nextIteration
+        Thread.ofVirtual().start(() => updateView)
+        Thread.sleep(ONE_SECOND)
