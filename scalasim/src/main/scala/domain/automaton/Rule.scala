@@ -10,8 +10,14 @@ import CellularAutomaton.State
 trait Rule[I, O]:
    def tFunc(in: I): O
    def applyTransformation(ca: I): O = tFunc(ca)
+   def matchingState: Option[State] = Option.empty
 
 trait NeighbourRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D]]
+
+object NeighbourRule:
+   def apply[D <: Dimension](state: Option[State])(f: Neighbour[D] => Cell[D]): NeighbourRule[D] = new NeighbourRule[D]:
+      override def tFunc(n: Neighbour[D]): Cell[D] = f(n)
+      override def matchingState: Option[State] = state
 
 object NeighborRuleUtility:
    private enum RelativePositions(x: Int, y: Int):
@@ -26,8 +32,7 @@ object NeighborRuleUtility:
       case BottomRight  extends RelativePositions(1, 1)
 
       def coordinates: List[Int] = List(x, y)
-      
-      
+
    trait NeighbourhoodLocator[D <: Dimension]:
       def relativeNeighboursLocations: Iterable[Position[D]]
 

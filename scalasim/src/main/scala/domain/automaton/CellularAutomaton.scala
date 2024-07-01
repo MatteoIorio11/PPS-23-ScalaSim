@@ -26,4 +26,4 @@ object CellularAutomaton:
         protected def ruleCollection: Rules
         def applyRule(cell: Cell[D], neighbors: Neighbour[D]): Cell[D]
         def rules: Rules
-        def addRule(cellState: State, rule: NeighbourRule[D]): Unit
+        def addRule(rule: NeighbourRule[D]): Unit
