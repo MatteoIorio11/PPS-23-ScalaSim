@@ -15,3 +15,13 @@ class Cell2DTest extends AnyFunSuite:
         val state: State = MyState.TEST
         val position = Position(0, 0)
         val cell = Cell(position, state)
+
+    test("`unapply` should work as expected"):
+        val cells: List[Cell[TwoDimensionalSpace]] = List(Cell(Position(0, 0), MyState.TEST))
+        val unappliedCell: Option[(Position[TwoDimensionalSpace], State)] = cells.head match
+            case Cell(p, s) => Some((p, s))
+            case _ => None
+
+        unappliedCell should not be None
+        unappliedCell.get._1 shouldBe Position(0, 0)
+        unappliedCell.get._2 shouldBe MyState.TEST
