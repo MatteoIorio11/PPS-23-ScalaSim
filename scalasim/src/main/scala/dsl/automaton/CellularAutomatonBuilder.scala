@@ -1,25 +1,65 @@
 package dsl.automaton
 
-import domain.base.Dimensions.{ Dimension, TwoDimensionalSpace}
-import domain.automaton.CellularAutomaton.CellularAutomaton
-import domain.automaton.NeighbourRule
-import domain.automaton.CellularAutomaton.State
 import domain.automaton.Cell
+import domain.automaton.CellularAutomaton.CellularAutomaton
+import domain.automaton.CellularAutomaton.MultipleRuleCellularAutomaton
+import domain.automaton.CellularAutomaton.MutlipleRulesCellularAutomaton
+import domain.automaton.CellularAutomaton.State
 import domain.automaton.Neighbour
+import domain.automaton.NeighbourRule
+import domain.base.Dimensions.Dimension
+import domain.base.Dimensions.TwoDimensionalSpace
+
 import rule.NeighbourRuleBuilder
 import rule.DeclarativeRuleBuilder
 import rule.DeclarativeRuleBuilder.*
 
+/**
+  * A Generic [[CellularAutomaton]] builder for dive [[D]] dimensional space.
+  */
 trait CellularAutomatonBuilder[D <: Dimension]:
+  /**
+    * Adds a provided dset of [[NeighbourRule]]s of a [[D]] dimensional space
+    * to the rule collections of the generated [[CellularAutomaton]].
+    *
+    * @param rules
+    * @return this builder.
+    */
   def setRules(rules: Iterable[NeighbourRule[D]]): this.type
+  
+  /**
+    * Build and retrieve the generated [[CellularAutomaton]]
+    *
+    * @return the built [[CellularAutomaton]]
+    */
   def build(): CellularAutomaton[TwoDimensionalSpace]
 
+/**
+  * A [[CellularAutomatonBuilder]] companion object for two dimensional space.
+  */
 object CellularAutomatonBuilder:
 
   def apply(): CellularAutomatonBuilder[TwoDimensionalSpace] = CellularAutomatonBuilder2DImpl()
 
+  /**
+    * Generates a [[CellularAutomaton]] from a specified set of rules, in the form of
+    * a [[NeighbourRuleBuilder]] block.
+    *
+    * @example
+    * A CellularAutomaton can be built with a [[DeclarativeRuleBuilder]] in this way:
+    * {{{
+    * CellularAutomatonBuilder.fromRuleBuilder:
+    *   DeclarativeRuleBuilder.configureRules:
+    *     dead when fewerThan(2) withState alive whenCenterIs(alive)
+    *     alive when surroundedBy(2) withState alive whenCenterIs(alive)
+    *     alive whenNeighbourhoodIsExactlyLike:
+    *       state(alive) | c(dead) | state(dead)
+    * }}}
+    * @param ruleBuilder the [[NeighbourRuleBuilder]] configuration block.
+    * @return A [[CellularAutomatonBuilder]] of a two dimensional space.
+    */
   def fromRuleBuilder
-    (ruleBuilder: NeighbourRuleBuilder[TwoDimensionalSpace] ?=> NeighbourRuleBuilder[TwoDimensionalSpace]) : CellularAutomatonBuilder[TwoDimensionalSpace] =
+    (ruleBuilder: NeighbourRuleBuilder[TwoDimensionalSpace] ?=> NeighbourRuleBuilder[TwoDimensionalSpace]): CellularAutomatonBuilder[TwoDimensionalSpace] =
     given b: DeclarativeRuleBuilder = DeclarativeRuleBuilder()
     ruleBuilder
     val caBuilder = CellularAutomatonBuilder()
@@ -28,41 +68,10 @@ object CellularAutomatonBuilder:
 
   private class CellularAutomatonBuilder2DImpl() extends CellularAutomatonBuilder[TwoDimensionalSpace]:
 
-    private val ca: CellularAutomaton[TwoDimensionalSpace] = MultipleRuleCellularAutomaton[TwoDimensionalSpace]()
+    private val ca: CellularAutomaton[TwoDimensionalSpace] = MutlipleRulesCellularAutomaton[TwoDimensionalSpace]()
 
     override def setRules(rules: Iterable[NeighbourRule[TwoDimensionalSpace]]): this.type =
       rules foreach ca.addRule
       this
 
     override def build(): CellularAutomaton[TwoDimensionalSpace] = ca
-
-/**
- * Used when no specific state is needed for the center in order to match with the rules.
- */
-object AnyState extends State
-
-class MultipleRuleCellularAutomaton[D <: Dimension] extends CellularAutomaton[D]:
-    type Rules = Map[State, Set[NeighbourRule[D]]]
-
-    protected var ruleCollection: Rules = Map()
-
-    override def addRule(rule: NeighbourRule[D]): Unit =
-      val cellState = rule.matchingState.getOrElse(AnyState)
-      ruleCollection.get(cellState) match
-        case Some(rulez) => ruleCollection = ruleCollection + (cellState -> (rulez + rule))
-        case None => ruleCollection = ruleCollection + (cellState -> Set(rule))
-
-    override def rules: Rules = ruleCollection
-
-    override def applyRule(cell: Cell[D], neighbors: Neighbour[D]): Cell[D] =
-      ruleCollection.get(cell.state) match
-        case None => cell
-        case Some(rulez) => rulez.map(r => r.applyTransformation(neighbors)).find(_ != cell) match
-          case Some(Cell(p, s)) => Cell(p, s)
-          case _ => cell
-
-object MultipleRuleCellularAutomaton2D:
-  def apply(rules: Iterable[NeighbourRule[TwoDimensionalSpace]]): MultipleRuleCellularAutomaton[TwoDimensionalSpace] =
-    val ca = MultipleRuleCellularAutomaton[TwoDimensionalSpace]()
-    rules foreach ca.addRule
-    ca

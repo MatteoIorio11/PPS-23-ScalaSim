@@ -1,8 +1,8 @@
 package dsl.automaton.rule
 
+import domain.automaton.NeighbourRule
 import domain.base.Dimensions.Dimension
 import domain.base.Dimensions.TwoDimensionalSpace
-import domain.automaton.NeighbourRule
 
 /**
  * A generic [[NeighbourRule]] for [[D]] dimensional spaces.

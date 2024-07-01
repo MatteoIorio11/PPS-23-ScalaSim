@@ -1,14 +1,14 @@
 package dsl.automaton.rule
 
-import domain.base.Dimensions.TwoDimensionalSpace
-import domain.base.Position
 import domain.automaton.Cell
-import domain.automaton.NeighbourRule
-import domain.automaton.Neighbour
+import domain.automaton.CellularAutomaton.AnyState
 import domain.automaton.CellularAutomaton.State
 import domain.automaton.NeighborRuleUtility.getCircularNeighbourhoodPositions
 import domain.automaton.NeighborRuleUtility.getNeighboursWithState
-import dsl.automaton.AnyState
+import domain.automaton.Neighbour
+import domain.automaton.NeighbourRule
+import domain.base.Dimensions.TwoDimensionalSpace
+import domain.base.Position
 
 /**
  * This trait represents a [[NeighbourRuleBuilder]] that supports building a [[NeighbourRule]]

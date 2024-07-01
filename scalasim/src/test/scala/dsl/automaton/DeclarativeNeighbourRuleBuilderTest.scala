@@ -1,17 +1,16 @@
 package dsl.automaton.rule
 
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers.*
-import domain.automaton.CellularAutomaton.State
+import domain.automaton.Cell
+import domain.automaton.CellularAutomaton.AnyState
+import domain.automaton.Neighbour
+import domain.base.Dimensions.TwoDimensionalSpace
+import domain.base.Position
 import dsl.automaton.rule.DeclarativeRuleBuilder.*
 import dsl.automaton.rule.DeclarativeRuleBuilder.DSLExtensions.*
 import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.*
-import domain.automaton.Cell
-import domain.base.Dimensions.TwoDimensionalSpace
-import domain.automaton.Neighbour
-import domain.base.Position
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers.*
 import utility.DummyAutomaton
-import dsl.automaton.AnyState
 
 class DeclarativeNeighbourRuleBuilderTest extends AnyFunSuite:
   private val dead = DummyAutomaton.DummyState.DEAD

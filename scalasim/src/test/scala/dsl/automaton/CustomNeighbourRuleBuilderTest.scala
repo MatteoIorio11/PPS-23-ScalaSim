@@ -1,7 +1,9 @@
 package dsl.automaton.rule
 
+import domain.automaton.Cell
 import domain.automaton.CellularAutomaton.State
-import domain.automaton.{Cell, Neighbour, NeighbourRule}
+import domain.automaton.Neighbour
+import domain.automaton.NeighbourRule
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position
 import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.{*, given}

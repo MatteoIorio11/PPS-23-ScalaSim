@@ -1,21 +1,19 @@
 package dsl.automaton
 
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers.*
-import domain.automaton.CellularAutomaton.State
-import dsl.automaton.rule.DeclarativeRuleBuilder.*
-import dsl.automaton.rule.DeclarativeRuleBuilder.DSLExtensions.*
-import dsl.automaton.CellularAutomatonBuilder.*
-import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.CustomNeighbourhoodDSL.*
-import dsl.automaton.rule.DeclarativeRuleBuilder
+import domain.automaton.Cell
+import domain.automaton.CellularAutomaton.CellularAutomaton
+import domain.automaton.CellularAutomaton.MutlipleRulesCellularAutomaton
 import domain.automaton.Neighbour
 import domain.base.Dimensions.TwoDimensionalSpace
-import domain.automaton.Cell
 import domain.base.Position
-import domain.automaton.CellularAutomaton.CellularAutomaton
+import dsl.automaton.CellularAutomatonBuilder.*
+import dsl.automaton.rule.DeclarativeRuleBuilder
+import dsl.automaton.rule.DeclarativeRuleBuilder.*
+import dsl.automaton.rule.DeclarativeRuleBuilder.DSLExtensions.*
+import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.CustomNeighbourhoodDSL.*
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers.*
 import utility.DummyAutomaton
-import domain.GameOfLifeTest
-import domain.simulations.gameoflife.GameOfLifeEnvironment.maxCellsToSpawn
 
 class CellularAutomatonBuilderTest extends AnyFunSuite:
   private val alive = DummyAutomaton.DummyState.ALIVE
@@ -27,7 +25,8 @@ class CellularAutomatonBuilderTest extends AnyFunSuite:
       alive when surroundedBy(2) withState alive whenCenterIs(alive)
     }.build
 
-    val ca = MultipleRuleCellularAutomaton2D(rules)
+    val ca = MutlipleRulesCellularAutomaton[TwoDimensionalSpace]()
+    rules foreach ca.addRule
     testCa(ca)
 
   test("`MultipleRuleCellularAutomaton` created with builder should behave as expected"):

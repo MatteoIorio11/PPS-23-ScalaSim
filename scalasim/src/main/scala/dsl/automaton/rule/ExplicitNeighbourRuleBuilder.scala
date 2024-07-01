@@ -1,12 +1,12 @@
 package dsl.automaton.rule
 
-import domain.automaton.CellularAutomaton.CellularAutomaton
-import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Cell
-import domain.base.Position
+import domain.automaton.CellularAutomaton.CellularAutomaton
 import domain.automaton.CellularAutomaton.State
 import domain.automaton.Neighbour
 import domain.automaton.NeighbourRule
+import domain.base.Dimensions.TwoDimensionalSpace
+import domain.base.Position
 
 import scala.annotation.targetName
 
