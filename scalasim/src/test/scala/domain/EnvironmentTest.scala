@@ -45,7 +45,7 @@ class ToroidEnvironmentTest extends AnyFunSuite:
             .flatMap(array => array.map(cell => cell.state))
             .filter(state => state == DummyState.ALIVE).length shouldNot be (0)
     
-    test("The neighboors of a cell should always exits and they have to respect the toroid environment"):
+    test("The neighboors of a cell should always exits and they have to respect the toroid's space"):
         val cell: Cell[TwoDimensionalSpace] = Cell(Position(0, 0), DummyState.DEAD)
         val neighbours = List(List(0,9), List(1,9), List(1,0), List(1,1), List(0,1), List(3,9), List(3,1), List(3,0))
         env.neighbours(cell = cell) shouldNot be (List.empty)
