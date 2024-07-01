@@ -2,6 +2,7 @@ package domain.exporter
 
 import domain.automaton.Cell
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
+import domain.engine.Engine.Engine
 import domain.simulations.gameoflife.GameOfLife.CellState
 import org.jcodec.common.io.{NIOUtils, SeekableByteChannel}
 import org.jcodec.common.model.Rational
@@ -62,3 +63,14 @@ object JCodecVideoGenerator extends VideoGenerator {
     }
   }
 }
+
+object Exporter {
+  def exportMatrix[D <: Dimension, M](engine: Engine[D, M], converter: MatrixToImageConverter[D, M], videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double): Unit = {
+    val images = engine.history.zipWithIndex.map { case (matrix, _) =>
+    converter.convert(matrix, cellSize)
+    }.toList
+
+    videoGenerator.generate(videoFilename, images, secondsPerImage)
+  }
+}
+
