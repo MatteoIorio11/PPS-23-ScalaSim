@@ -10,10 +10,11 @@ import domain.automaton.Cell
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Neighbour
 import domain.base.Position
+import utility.DummyAutomaton
 
-class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest:
-  val dead = Dead()
-  val alive = Alive()
+class DeclarativeNeighbourRuleBuilderTest extends AnyFunSuite:
+  private val dead = DummyAutomaton.DummyState.DEAD
+  private val alive = DummyAutomaton.DummyState.ALIVE
 
   test("DSL syntax should work as expected"):
     DeclarativeRuleBuilder.configureRules:

@@ -225,7 +225,7 @@ object DeclarativeRuleBuilder:
        */
       infix def whenNeighbourhoodIsExactlyLike(neighPlacement: ExplicitNeighbourRuleBuilder ?=> ExplicitNeighbourRuleBuilder)(using builder: DeclarativeRuleBuilder): DeclarativeRuleBuilder =
         builder.addRule(
-          ExplicitNeighbourRuleBuilder.configureRule(s)(neighPlacement).rules.head
+          ExplicitNeighbourRuleBuilder.configureRule(s)(neighPlacement).build.head
         )
         builder
 

@@ -7,16 +7,12 @@ import domain.base.Position
 import dsl.automaton.ExplicitNeighbourRuleBuilder.{*, given}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
+import utility.DummyAutomaton
 
 class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
-  class Alive extends State:
-    val name: String = "alive"
+  private val alive = DummyAutomaton.DummyState.ALIVE
+  private val dead = DummyAutomaton.DummyState.DEAD
 
-  class Dead extends State:
-    val name: String = "dead"
-
-  private val alive = Alive()
-  private val dead = Dead()
   private val nrb = ExplicitNeighbourRuleBuilder.configureRule(dead):
     state(alive) | x        | state(dead) | n |
     x            | c(alive) | x            | n |

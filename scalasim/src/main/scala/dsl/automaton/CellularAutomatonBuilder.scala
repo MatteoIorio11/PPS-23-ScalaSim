@@ -25,12 +25,13 @@ object CellularAutomatonBuilder:
 
   private class CellularAutomatonBuilder2DImpl() extends CellularAutomatonBuilder[TwoDimensionalSpace]:
 
-    private var _ca: CellularAutomaton[TwoDimensionalSpace] = MultipleRuleCellularAutomaton[TwoDimensionalSpace]()
+    private var ca: CellularAutomaton[TwoDimensionalSpace] = MultipleRuleCellularAutomaton[TwoDimensionalSpace]()
 
-    override def setRules(rules: Iterable[NeighbourRule[TwoDimensionalSpace]]): this.type = ???
+    override def setRules(rules: Iterable[NeighbourRule[TwoDimensionalSpace]]): this.type =
+      rules foreach (ca.addRule(_))
+      this
 
-    override def build(): CellularAutomaton[TwoDimensionalSpace] = _ca
-
+    override def build(): CellularAutomaton[TwoDimensionalSpace] = ca
 
 /**
  * Used when no specific state is needed for the center in order to match with the rules.

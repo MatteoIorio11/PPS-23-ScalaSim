@@ -11,10 +11,12 @@ import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Cell
 import domain.base.Position
 import domain.automaton.CellularAutomaton.CellularAutomaton
+import dsl.automaton.ExplicitNeighbourRuleBuilder.CustomNeighbourhoodDSL.*
+import utility.DummyAutomaton
 
 class CellularAutomatonBuilderTest extends AnyFunSuite:
-  val alive = new State {}
-  val dead  = new State {}
+  private val alive = DummyAutomaton.DummyState.ALIVE
+  private val dead  = DummyAutomaton.DummyState.DEAD
 
   test("`MultipleRuleCellularAutomaton` should behave as expected"):
     val rules = DeclarativeRuleBuilder.configureRules {
@@ -22,6 +24,32 @@ class CellularAutomatonBuilderTest extends AnyFunSuite:
       alive when surroundedBy(2) withState alive whenCenterIs(alive)
     }.build
 
+    val ca = MultipleRuleCellularAutomaton2D(rules)
+    testCa(ca)
+
+  test("`MultipleRuleCellularAutomaton` created with builder should behave as expected"):
+      val caBuilder = CellularAutomatonBuilder.fromRuleBuilder:
+        DeclarativeRuleBuilder.configureRules:
+          dead when fewerThan(2) withState alive whenCenterIs(alive)
+          alive when surroundedBy(2) withState alive whenCenterIs(alive)
+          alive whenNeighbourhoodIsExactlyLike:
+            state(alive) | c(dead) | state(dead)
+      
+      val ca = caBuilder.build()
+
+      testCa(ca)
+
+      val specificNeighbourhood = Neighbour[TwoDimensionalSpace](
+        center = Cell(Position(0, 1), dead),
+        neighbors = List(
+          Cell(Position(0, 0), alive),
+          Cell(Position(0, 2), dead)
+        )
+      )
+
+      ca.applyRule(Cell(Position(0, 1), dead), specificNeighbourhood).state shouldBe alive
+
+  private def testCa(ca: CellularAutomaton[TwoDimensionalSpace]): Unit =
     val center = Cell[TwoDimensionalSpace](Position(1, 1), alive)
 
     val aliveNeighbourhood = Neighbour[TwoDimensionalSpace](
@@ -35,19 +63,10 @@ class CellularAutomatonBuilderTest extends AnyFunSuite:
     val deadNeighbourhood = Neighbour[TwoDimensionalSpace](
       center,
       List(
-        Cell(Position(0, 1), alive),
         Cell(Position(2, 1), dead),
+        Cell(Position(0, 1), alive),
       )
     )
 
-    val ca = MultipleRuleCellularAutomaton2D(rules)
-
     ca.applyRule(center, aliveNeighbourhood).state shouldBe alive
     ca.applyRule(center, deadNeighbourhood).state shouldBe dead
-
-  // test("`MultipleRuleCellularAutomaton` created with builder should behave as expected"):
-  //     val ca = CellularAutomatonBuilder.fromRuleBuilder {
-  //       DeclarativeRuleBuilder.configureRules:
-  //         dead when fewerThan(2) withState alive whenCenterIs(alive)
-  //         dead when surroundedBy(3) withState alive whenCenterIs(alive)
-  //     }.build()
