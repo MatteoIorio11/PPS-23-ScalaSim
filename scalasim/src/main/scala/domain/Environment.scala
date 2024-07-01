@@ -23,7 +23,7 @@ object Environment:
         def cellularAutomata: CellularAutomaton[D]
         def matrix: Matrix
         def neighbours(cell: Cell[D]): Iterable[Cell[D]]
-        protected def saveCell(cell: Cell[D]): Unit 
+        protected def saveCell(cells: Cell[D]*): Unit 
         def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
             val neighbour = Neighbour(cell, neighbors)
             val newCell = cellularAutomata.applyRule(cell, neighbour)
@@ -53,10 +53,11 @@ object Environment:
     */
     trait ArrayEnvironment2D extends Environment[TwoDimensionalSpace]:
         override type Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]
-        override protected def saveCell(cell: Cell[TwoDimensionalSpace]): Unit = 
+        override protected def saveCell(cells: Cell[TwoDimensionalSpace]*): Unit = 
+          cells.foreach(cell => 
             val x = cell.position.coordinates.head
             val y = cell.position.coordinates.last
-            matrix(x)(y) = cell
+            matrix(x)(y) = cell)
         override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
             matrix.deepCopy
         /**
@@ -74,10 +75,11 @@ object Environment:
       */
     trait ToroidEnvironment extends RectangularEnvironment with ArrayEnvironment2D:
         val MAX_SIZE = 2 // width and height
-        override protected def saveCell(cell: Cell[TwoDimensionalSpace]) =  
-          val x = cell.position.coordinates.head
-          val y = cell.position.coordinates.last
-          matrix(x /%/ heigth)(y /%/ width) = cell
+        override protected def saveCell(cells: Cell[TwoDimensionalSpace]*) = 
+          cells.foreach(cell => 
+            val x = cell.position.coordinates.head
+            val y = cell.position.coordinates.last
+            matrix(x /%/ heigth)(y /%/ width) = cell)
         override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]) = 
           positions.map(pos => {
               pos.coordinates match
