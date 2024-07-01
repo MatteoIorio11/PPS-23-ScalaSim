@@ -25,8 +25,7 @@ object Environment:
         def neighbours(cell: Cell[D]): Iterable[Cell[D]]
         protected def saveCell(cells: Cell[D]*): Unit 
         def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
-            val neighbour = Neighbour(cell, neighbors)
-            val newCell = cellularAutomata.applyRule(cell, neighbour)
+            val newCell = cellularAutomata.applyRule(cell, Neighbour(cell, neighbors))
             saveCell(newCell)
             newCell
         protected def initialise(): Unit
@@ -52,12 +51,15 @@ object Environment:
       * very efficient because it allows us to have an O(1) random time access.
     */
     trait ArrayEnvironment2D extends Environment[TwoDimensionalSpace]:
+      protected val MAX_SIZE = 2
         override type Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]
         override protected def saveCell(cells: Cell[TwoDimensionalSpace]*): Unit = 
-          cells.foreach(cell => 
-            val x = cell.position.coordinates.head
-            val y = cell.position.coordinates.last
-            matrix(x)(y) = cell)
+          cells
+            .filter(cell => cell.position.coordinates.size == MAX_SIZE)
+            .foreach(cell => 
+              val x = cell.position.coordinates.head
+              val y = cell.position.coordinates.last
+              matrix(x)(y) = cell)
         override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
             matrix.deepCopy
         /**
@@ -74,86 +76,86 @@ object Environment:
       * This trait represent a Toroid Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
     trait ToroidEnvironment extends RectangularEnvironment with ArrayEnvironment2D:
-        val MAX_SIZE = 2 // width and height
-        override protected def saveCell(cells: Cell[TwoDimensionalSpace]*) = 
-          cells.foreach(cell => 
-            val x = cell.position.coordinates.head
-            val y = cell.position.coordinates.last
-            matrix(x /%/ heigth)(y /%/ width) = cell)
-        override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]) = 
-          positions.map(pos => {
-              pos.coordinates match
-                  case head :: next :: tail => List(head /%/ heigth, next /%/ width)
-                  case Nil => List()
-              })
-              .filter(pos => pos.size == MAX_SIZE)
-              .map(cor => matrix(cor.head)(cor.last))
-              
+      override protected def saveCell(cells: Cell[TwoDimensionalSpace]*) = 
+        cells.foreach(cell => 
+          val x = cell.position.coordinates.head
+          val y = cell.position.coordinates.last
+          matrix(x /%/ heigth)(y /%/ width) = cell)
+      override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]) = 
+        positions
+          .map(pos => {
+            pos.coordinates match
+                case head :: next :: tail => List(head /%/ heigth, next /%/ width)
+                case Nil => List()
+            })
+            .filter(pos => pos.size == MAX_SIZE)
+            .map(cor => matrix(cor.head)(cor.last))
+            
+      /**
+        * Extension method for create a new custom mod operation.
+        */
+      extension (dividend: Int)
         /**
-          * Extension method for create a new custom mod operation.
+          * Mod operation that is able to manage negative numbers.
+          * @param divisor: Number to which the dividend is divided. (a mod b) b is the divisor.
+          * @return the mod of the operation (dividend mod divisor)
           */
-        extension (dividend: Int)
+        infix def /%/(divisor: Int): Int = 
+          val result = dividend % divisor
+          result match
+            case value if value < 0 => result + divisor
+            case _ => result
+      /**
+        * Extension methods for initialize the Space.
+        */
+      extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
           /**
-            * Mod operation that is able to manage negative numbers.
-            * @param divisor: Number to which the dividend is divided. (a mod b) b is the divisor.
-            * @return the mod of the operation (dividend mod divisor)
+            * This extension method initialize the toroid space using the input initial cell, the initial cell
+            * will be used only for the input state, all the coordinates will be fixed automatically.
+            * @param initialCell: initial cell to use for initialize the space.
+            * @return a new Matrix initialized with the input initial cell.
             */
-          infix def /%/(divisor: Int): Int = 
-            val result = dividend % divisor
-            result match
-              case value if value < 0 => result + divisor
-              case _ => result
-        /**
-          * Extension methods for initialize the Space.
-          */
-        extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-            /**
-              * This extension method initialize the toroid space using the input initial cell, the initial cell
-              * will be used only for the input state, all the coordinates will be fixed automatically.
-              * @param initialCell: initial cell to use for initialize the space.
-              * @return a new Matrix initialized with the input initial cell.
-              */
-            def initializeSpace(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-              val array = ArrayBuffer.fill(heigth, width)(initialCell)
-              for (y <- 0 until width)
-                  for (x <- 0 until heigth)
-                      array(x)(y) = (Cell(Position(x, y), initialCell.state))
-              array
-            /**
-              * This extension method returns a new Matrix in which there a #nCells cells with the input state.
-              * @param nCells: number of cells to spawn 
-              * @param state: input state to use inside the spawned cells.
-              * @return a new Matrix where there are #nCells with the input state.
-              */
-            def spawnCells(nCells: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-              var spawnedCells = 0
-              while (spawnedCells < nCells)
-                  val x = Random.nextInt(heigth) % width
-                  val y = Random.nextInt(width) % heigth
-                  val position = Position[TwoDimensionalSpace](x, y)
-                  if (array(x)(y).state != state)
-                      array(x)(y) = (Cell(position, state))
-                      spawnedCells = spawnedCells + 1
-              array
-            /**
-              * This extension method returns a new Matrix in which there can be X cells with the inputState
-              * otherwise the cell has It's initial state. The selected state is choosen by using a random value
-              * where if the random value is True then It is selected the inputState otherwise the original state.
-              * @param inputState: Input state to use If the probability returned from the random value is True
-              * @return a new Matrix in which there can be spawned a number of cell with the input state.
-              */
-            def spawnCell(inputState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-              val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), inputState)
-              val array = ArrayBuffer.fill(heigth, width)(initialCell)
-              for (y <- 0 until width)
+          def initializeSpace(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            val array = ArrayBuffer.fill(heigth, width)(initialCell)
+            for (y <- 0 until width)
                 for (x <- 0 until heigth)
-                    val probability = Random().nextBoolean()
-                    val state = probability match
-                        case x if x => inputState
-                        case _ => array(x)(y).state
-                    array(x)(y) = Cell(Position(x, y), state)
-              array(0)(0) = Cell(Position(0, 0), inputState)
-              array
+                    array(x)(y) = (Cell(Position(x, y), initialCell.state))
+            array
+          /**
+            * This extension method returns a new Matrix in which there a #nCells cells with the input state.
+            * @param nCells: number of cells to spawn 
+            * @param state: input state to use inside the spawned cells.
+            * @return a new Matrix where there are #nCells with the input state.
+            */
+          def spawnCells(nCells: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            var spawnedCells = 0
+            while (spawnedCells < nCells)
+                val x = Random.nextInt(heigth) % width
+                val y = Random.nextInt(width) % heigth
+                val position = Position[TwoDimensionalSpace](x, y)
+                if (array(x)(y).state != state)
+                    array(x)(y) = (Cell(position, state))
+                    spawnedCells = spawnedCells + 1
+            array
+          /**
+            * This extension method returns a new Matrix in which there can be X cells with the inputState
+            * otherwise the cell has It's initial state. The selected state is choosen by using a random value
+            * where if the random value is True then It is selected the inputState otherwise the original state.
+            * @param inputState: Input state to use If the probability returned from the random value is True
+            * @return a new Matrix in which there can be spawned a number of cell with the input state.
+            */
+          def spawnCell(inputState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), inputState)
+            val array = ArrayBuffer.fill(heigth, width)(initialCell)
+            for (y <- 0 until width)
+              for (x <- 0 until heigth)
+                  val probability = Random().nextBoolean()
+                  val state = probability match
+                      case x if x => inputState
+                      case _ => array(x)(y).state
+                  array(x)(y) = Cell(Position(x, y), state)
+            array(0)(0) = Cell(Position(0, 0), inputState)
+            array
 
     /**
       * Square Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
@@ -162,6 +164,7 @@ object Environment:
         override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]): Iterable[Cell[TwoDimensionalSpace]] =
           positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < side))
             .map(pos => pos.coordinates.toList)
+            .filter(cor => cor.size == MAX_SIZE)
             .map(cor => matrix(cor.head)(cor.last))
         /**
           * Utilities methods.
@@ -217,9 +220,9 @@ object Environment:
       * Rectangula Environment2D where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
     trait RectangularArrayEnvironment2D extends RectangularEnvironment with ArrayEnvironment2D:
-        override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]) = 
-            positions
-              .filter(pos => pos.coordinates.size == 2)
-              .filter(pos => pos.coordinates.head >= 0 && pos.coordinates.last < heigth &&
-                             pos.coordinates.last >= 0 && pos.coordinates.last < width)
-              .map(pos => matrix(pos.coordinates.head)(pos.coordinates.last))
+      override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]) = 
+          positions
+            .filter(pos => pos.coordinates.size == MAX_SIZE)
+            .filter(pos => pos.coordinates.head >= 0 && pos.coordinates.last < heigth &&
+                            pos.coordinates.last >= 0 && pos.coordinates.last < width)
+            .map(pos => matrix(pos.coordinates.head)(pos.coordinates.last))
