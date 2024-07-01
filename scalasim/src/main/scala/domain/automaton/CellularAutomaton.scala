@@ -4,7 +4,6 @@ import domain.base.Dimensions.*
 import domain.automaton.Neighbour
 import domain.automaton.Rule
 import domain.automaton.Cell.*
-import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
 import domain.automaton.Cell
 import domain.base.Position
 import domain.automaton.NeighbourRule
@@ -26,7 +25,8 @@ object CellularAutomaton:
         protected def ruleCollection: Rules
         def applyRule(cell: Cell[D], neighbors: Neighbour[D]): Cell[D]
         def rules: Rules
-        def addRule(cellState: State, rule: NeighbourRule[D]): Unit
+        def addRule(rule: NeighbourRule[D]): Unit
+
     /**
       * Trait in which the type Rules is represented by a Map of: [[State]] -> [[Rule]]
       */

@@ -66,8 +66,8 @@ object DummyAutomaton:
         val dummy = DummyAutomatonImpl()
         automatonColors = automatonColors + (DummyState.DEAD -> Color.RED)
         automatonColors = automatonColors + (DummyState.ALIVE -> Color.GREEN)
-        dummy.addRule(DummyState.ALIVE, (x) => Cell(x.center.position, DummyState.DEAD))
-        dummy.addRule(DummyState.DEAD, (x) => Cell(x.center.position, DummyState.ALIVE))
+        dummy.addRule(NeighbourRule(Some(DummyState.ALIVE))((x) => Cell(x.center.position, DummyState.DEAD)))
+        dummy.addRule(NeighbourRule(Some(DummyState.DEAD))((x) => Cell(x.center.position, DummyState.ALIVE)))
         dummy
 
     private class DummyAutomatonImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapRules2D:
@@ -77,5 +77,5 @@ object DummyAutomaton:
                 .map(rule => rule.applyTransformation(neighbours))
                 .getOrElse(Cell(cell.position, DummyState.DEAD))
         override def rules: Rules = ruleCollection
-        override def addRule(cellState: State, neighborRule: NeighbourRule[TwoDimensionalSpace]) =
-            ruleCollection = ruleCollection + (cellState -> neighborRule)
+        override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]) =
+            ruleCollection = ruleCollection + (neighborRule.matchingState.get -> neighborRule)
