@@ -120,7 +120,7 @@ object Engine:
             agents.foreach(agent => executor.execute(() => agent.execute))
             executor.close()
     /**
-      * Trait that represent a general View that will be attached to the engine.
+      * Trait that represent a general View that will be attached to the engine. The view is defined in [[Dimension]].
       */
     trait EngineView[D <: Dimension]:
       def updateView(cells: Iterable[Cell[D]]): Unit
