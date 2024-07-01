@@ -19,6 +19,7 @@ import org.scalatest.tools.AnsiColor
 import org.scalatest.tools.ColorBar
 import java.awt.Color
 import domain.Environment.SquareArrayEnvironment2D
+import domain.Environment.ToroidEnvironment
 
 /**
   * 
@@ -37,6 +38,21 @@ object DummyAutomatonEnvironment:
       override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
           import domain.automaton.NeighborRuleUtility.given
           availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
+object DummyToroidEnv:
+  def apply(w: Int, h: Int): Environment[TwoDimensionalSpace] =
+        DummyToroidEnvironmentImpl(w, h, DummyAutomaton())
+
+  private case class DummyToroidEnvironmentImpl(val width: Int, val heigth: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace]) 
+      extends Environment[TwoDimensionalSpace] with ToroidEnvironment:
+    require(width > 0)
+    require(heigth > 0)
+    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(Cell(Position(-1, -1), DummyState.DEAD))
+    initialise()
+    override protected def initialise() = matrix = matrix.spawnCell(DummyState.ALIVE)
+    override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
+      import domain.automaton.NeighborRuleUtility.given
+        availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
+
 
 /**
   * 
