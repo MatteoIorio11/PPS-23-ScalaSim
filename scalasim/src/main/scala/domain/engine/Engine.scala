@@ -1,23 +1,13 @@
 package domain.engine
 
-import domain.Environment.Environment
-import domain.base.Dimensions.Dimension
-import domain.Environment.ArrayEnvironment2D
+import domain.Environment.{Environment, ArrayEnvironment2D}
 import domain.Environment.*
-import domain.base.Dimensions.TwoDimensionalSpace
-import domain.automaton.Neighbour
-import domain.automaton.Cell
-import domain.automaton.NeighborRuleUtility
-import domain.simulations.gameoflife.GameOfLifeEnvironment
 import domain.base.Position
+import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
+import domain.automaton.{Neighbour, Cell, NeighborRuleUtility}
 import scala.collection.mutable.ArrayBuffer
-import domain.engine.Engine.IterableThreadEngine2D
-import domain.engine.Engine.IterableTimerEngine2D
-import domain.engine.Engine.IterableEngine2D
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
-import javax.swing.JFrame
+import domain.engine.Engine.{IterableThreadEngine2D, IterableTimerEngine2D, IterableEngine2D}
+import java.util.concurrent.{ExecutorService, Executor, Executors}
 
 object Engine:
     /**
@@ -185,14 +175,15 @@ object FastEngine2D:
   * 
   */
 object GUIEngine2D:
+  private val ONE_SECOND = 1000
   import Engine.* 
   private case class GUIEngine2DImpl(val env: Environment[TwoDimensionalSpace], val view: EngineView[TwoDimensionalSpace], val tick: Int) 
     extends IterableThreadEngine2D with IterableFastEngine2D with GuiEngine2D:
     var history = LazyList()
-    override def updateView = view.updateView(List.empty)
+    override def updateView = view.updateView(currentMatrix.flatMap(it => it.map(cell => cell)))
     override def run() = 
       saveInHistory
         while (running)
           nextIteration
-          updateView
-          Thread.sleep(tick)
+          Thread.ofVirtual().start(() => updateView)
+          Thread.sleep(ONE_SECOND)
