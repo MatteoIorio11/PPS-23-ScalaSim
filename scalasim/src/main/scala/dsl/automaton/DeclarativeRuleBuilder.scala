@@ -283,7 +283,7 @@ object DeclarativeRuleBuilder:
 
     override def setNumNeighbours(count: Int => Boolean): this.type =
       currentConfig match
-        case Some(config) => neighbourRulesConfigs = neighbourRulesConfigs :+ config
+        case Some(config) => buildNextRule
         case None =>
       currentConfig = Some(NeighbourRuleConfig(numNeighbours = Some(count)))
       this
@@ -297,7 +297,7 @@ object DeclarativeRuleBuilder:
       this
 
     override def build: Iterable[NeighbourRule[TwoDimensionalSpace]] =
-      currentConfig foreach (c => neighbourRulesConfigs = neighbourRulesConfigs :+ c)
+      buildNextRule
       configureRules
       rules
 
@@ -323,3 +323,6 @@ object DeclarativeRuleBuilder:
                   else in.center
                 case _ => in.center
           )
+
+    private def buildNextRule: Unit =
+      currentConfig foreach (c => neighbourRulesConfigs = neighbourRulesConfigs :+ c)
