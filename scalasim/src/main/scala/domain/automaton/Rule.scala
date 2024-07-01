@@ -11,6 +11,7 @@ import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
 trait Rule[I, O]:
    def tFunc(in: I): O
    def applyTransformation(ca: I): O = tFunc(ca)
+   def matchingState: Option[State] = Option.empty
 
 /**
   * A Neighbor rule is a [[Rule]] based on neighbors' states of a given
@@ -20,6 +21,11 @@ trait Rule[I, O]:
   * @param D the dimension of the space.
   */
 trait NeighbourRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D]]
+
+object NeighbourRule:
+   def apply[D <: Dimension](state: Option[State])(f: Neighbour[D] => Cell[D]): NeighbourRule[D] = new NeighbourRule[D]:
+      override def tFunc(n: Neighbour[D]): Cell[D] = f(n)
+      override def matchingState: Option[State] = state
 
 object NeighborRuleUtility:
    enum RelativePositions(x: Int, y: Int):

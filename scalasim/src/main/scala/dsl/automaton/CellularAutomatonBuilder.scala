@@ -31,12 +31,19 @@ object CellularAutomatonBuilder:
 
     override def build(): CellularAutomaton[TwoDimensionalSpace] = _ca
 
+
+/**
+ * Used when no specific state is needed for the center in order to match with the rules.
+ */
+object AnyState extends State
+
 class MultipleRuleCellularAutomaton[D <: Dimension] extends CellularAutomaton[D]:
     type Rules = Map[State, Set[NeighbourRule[D]]]
 
     protected var ruleCollection: Rules = Map()
 
-    override def addRule(cellState: State, rule: NeighbourRule[D]): Unit =
+    override def addRule(rule: NeighbourRule[D]): Unit =
+      val cellState = rule.matchingState.getOrElse(AnyState)
       ruleCollection.get(cellState) match
         case Some(rulez) => ruleCollection = ruleCollection + (cellState -> (rulez + rule))
         case None => ruleCollection = ruleCollection + (cellState -> Set(rule))
@@ -51,7 +58,7 @@ class MultipleRuleCellularAutomaton[D <: Dimension] extends CellularAutomaton[D]
           case _ => cell
 
 object MultipleRuleCellularAutomaton2D:
-  def apply(rules: Iterable[(State, NeighbourRule[TwoDimensionalSpace])]): MultipleRuleCellularAutomaton[TwoDimensionalSpace] =
+  def apply(rules: Iterable[NeighbourRule[TwoDimensionalSpace]]): MultipleRuleCellularAutomaton[TwoDimensionalSpace] =
     val ca = MultipleRuleCellularAutomaton[TwoDimensionalSpace]()
-    rules.foreach(entry => ca.addRule(entry._1, entry._2))
+    rules foreach(ca.addRule(_))
     ca

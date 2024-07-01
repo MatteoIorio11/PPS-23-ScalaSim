@@ -8,6 +8,7 @@ import domain.automaton.Neighbour
 import domain.automaton.CellularAutomaton.State
 import domain.automaton.NeighborRuleUtility.getCircularNeighbourhoodPositions
 import domain.automaton.NeighborRuleUtility.getNeighboursWithState
+import dsl.automaton.AnyState
 
 /**
  * This trait represents a [[NeighbourRuleBuilder]] that supports building a [[NeighbourRule]]
@@ -106,11 +107,6 @@ object DeclarativeRuleBuilder:
    * Domain Specific Language for configuring the rules in a declarative fashion.
    */
   object ExpressionRuleDSL:
-
-    /**
-     * Used when no specific state is needed for the center in order to match with the rules.
-     */
-    object AnyState extends State
 
     /**
      * Used when a needing to specify an **exact** amount of neighbours that must have the same state
@@ -307,7 +303,6 @@ object DeclarativeRuleBuilder:
      */
     private def configureRules: Unit =
       import domain.automaton.NeighborRuleUtility
-      import dsl.automaton.DeclarativeRuleBuilder.ExpressionRuleDSL.AnyState
 
       _rules = _rules ++ neighbourRulesConfigs.map(config =>
           val locator = getCircularNeighbourhoodPositions(config.neighbourRadius)

@@ -40,7 +40,7 @@ class CellularAutomatonBuilderTest extends AnyFunSuite:
       )
     )
 
-    val ca = MultipleRuleCellularAutomaton2D(List(alive, alive) zip rules)
+    val ca = MultipleRuleCellularAutomaton2D(rules)
 
     ca.applyRule(center, aliveNeighbourhood).state shouldBe alive
     ca.applyRule(center, deadNeighbourhood).state shouldBe dead
