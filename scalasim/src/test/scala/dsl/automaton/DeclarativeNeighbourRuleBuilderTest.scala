@@ -1,16 +1,17 @@
-package dsl.automaton
+package dsl.automaton.rule
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.automaton.CellularAutomaton.State
-import dsl.automaton.DeclarativeRuleBuilder.*
-import dsl.automaton.DeclarativeRuleBuilder.DSLExtensions.*
-import dsl.automaton.ExplicitNeighbourRuleBuilder.*
+import dsl.automaton.rule.DeclarativeRuleBuilder.*
+import dsl.automaton.rule.DeclarativeRuleBuilder.DSLExtensions.*
+import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.*
 import domain.automaton.Cell
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Neighbour
 import domain.base.Position
 import utility.DummyAutomaton
+import dsl.automaton.AnyState
 
 class DeclarativeNeighbourRuleBuilderTest extends AnyFunSuite:
   private val dead = DummyAutomaton.DummyState.DEAD
@@ -50,8 +51,7 @@ class DeclarativeNeighbourRuleBuilderTest extends AnyFunSuite:
     val builder = DeclarativeRuleBuilder.configureRules:
       dead when atLeastSurroundedBy(1) withState(dead)
 
-    builder.build
-    val rule = builder.rules.head
+    val rule = builder.build.head
 
     val n = Neighbour[TwoDimensionalSpace](
         Cell(Position(1, 0), alive),

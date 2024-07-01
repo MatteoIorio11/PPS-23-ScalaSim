@@ -1,10 +1,10 @@
-package dsl.automaton
+package dsl.automaton.rule
 
 import domain.automaton.CellularAutomaton.State
 import domain.automaton.{Cell, Neighbour, NeighbourRule}
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position
-import dsl.automaton.ExplicitNeighbourRuleBuilder.{*, given}
+import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.{*, given}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import utility.DummyAutomaton
@@ -33,7 +33,7 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
 
   test("Relative neighbours positions cannot be retrieved if center is not set"):
     val exc = intercept[IllegalStateException]:
-      ExplicitNeighbourRuleBuilder.configureRule(alive) {
+       ExplicitNeighbourRuleBuilder.configureRule(alive) {
         state(alive) | state(dead) | state(alive)
       }.relativePositions
     assert(!exc.getMessage.isBlank)

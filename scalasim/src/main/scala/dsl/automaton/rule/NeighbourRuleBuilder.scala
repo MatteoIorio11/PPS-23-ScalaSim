@@ -1,4 +1,4 @@
-package dsl.automaton
+package dsl.automaton.rule
 
 import domain.base.Dimensions.Dimension
 import domain.base.Dimensions.TwoDimensionalSpace

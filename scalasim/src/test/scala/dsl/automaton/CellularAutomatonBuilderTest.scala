@@ -3,15 +3,15 @@ package dsl.automaton
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.automaton.CellularAutomaton.State
-import dsl.automaton.DeclarativeRuleBuilder.*
-import dsl.automaton.DeclarativeRuleBuilder.DSLExtensions.*
+import dsl.automaton.rule.DeclarativeRuleBuilder.*
+import dsl.automaton.rule.DeclarativeRuleBuilder.DSLExtensions.*
 import dsl.automaton.CellularAutomatonBuilder.*
 import domain.automaton.Neighbour
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Cell
 import domain.base.Position
 import domain.automaton.CellularAutomaton.CellularAutomaton
-import dsl.automaton.ExplicitNeighbourRuleBuilder.CustomNeighbourhoodDSL.*
+import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.CustomNeighbourhoodDSL.*
 import utility.DummyAutomaton
 
 class CellularAutomatonBuilderTest extends AnyFunSuite:
@@ -19,7 +19,7 @@ class CellularAutomatonBuilderTest extends AnyFunSuite:
   private val dead  = DummyAutomaton.DummyState.DEAD
 
   test("`MultipleRuleCellularAutomaton` should behave as expected"):
-    val rules = DeclarativeRuleBuilder.configureRules {
+    val rules = rule.DeclarativeRuleBuilder.configureRules {
       dead when fewerThan(2) withState alive whenCenterIs(alive)
       alive when surroundedBy(2) withState alive whenCenterIs(alive)
     }.build
@@ -29,7 +29,7 @@ class CellularAutomatonBuilderTest extends AnyFunSuite:
 
   test("`MultipleRuleCellularAutomaton` created with builder should behave as expected"):
       val caBuilder = CellularAutomatonBuilder.fromRuleBuilder:
-        DeclarativeRuleBuilder.configureRules:
+        rule.DeclarativeRuleBuilder.configureRules:
           dead when fewerThan(2) withState alive whenCenterIs(alive)
           alive when surroundedBy(2) withState alive whenCenterIs(alive)
           alive whenNeighbourhoodIsExactlyLike:

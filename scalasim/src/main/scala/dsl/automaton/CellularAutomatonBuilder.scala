@@ -6,6 +6,9 @@ import domain.automaton.NeighbourRule
 import domain.automaton.CellularAutomaton.State
 import domain.automaton.Cell
 import domain.automaton.Neighbour
+import rule.NeighbourRuleBuilder
+import rule.DeclarativeRuleBuilder
+import rule.DeclarativeRuleBuilder.*
 
 trait CellularAutomatonBuilder[D <: Dimension]:
   def setRules(rules: Iterable[NeighbourRule[D]]): this.type

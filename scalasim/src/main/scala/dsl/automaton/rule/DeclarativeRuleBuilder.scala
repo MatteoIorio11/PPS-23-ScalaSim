@@ -1,4 +1,4 @@
-package dsl.automaton
+package dsl.automaton.rule
 
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position
@@ -224,9 +224,7 @@ object DeclarativeRuleBuilder:
        * @return the builder.
        */
       infix def whenNeighbourhoodIsExactlyLike(neighPlacement: ExplicitNeighbourRuleBuilder ?=> ExplicitNeighbourRuleBuilder)(using builder: DeclarativeRuleBuilder): DeclarativeRuleBuilder =
-        builder.addRule(
-          ExplicitNeighbourRuleBuilder.configureRule(s)(neighPlacement).build.head
-        )
+        builder.addRule(ExplicitNeighbourRuleBuilder.configureRule(s)(neighPlacement).build.head)
         builder
 
   /**
