@@ -35,18 +35,7 @@ object GameOfLifeEnvironment:
             availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
         override protected def initialise(): Unit =
-            val initialCell = Cell(Position(-1, -1), CellState.DEAD)
-            val array = ArrayBuffer.fill(side, side)(initialCell)
-            for (y <- 0 until side)
-                for (x <- 0 until side)
-                    val probability = Random().nextBoolean()
-                    val state = probability match
-                        case x if x => CellState.ALIVE
-                        case _ => CellState.DEAD
-                    array(x)(y) = Cell(Position(x, y), state)
-            array(0)(0) = Cell(Position(0, 0), CellState.DEAD)
-            matrix = array.asInstanceOf[Matrix]
-
+            matrix = matrix.spawnCell(CellState.ALIVE)
 object GameOfLife:
     def apply(): CellularAutomaton[TwoDimensionalSpace] =
         val gameOfLife = GameOfLifeImpl()
