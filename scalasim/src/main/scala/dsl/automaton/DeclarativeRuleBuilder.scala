@@ -135,6 +135,17 @@ object DeclarativeRuleBuilder:
       builder.setNumNeighbours(_ >= n)
 
     /**
+      * Used when needing to specify that the rule matches if less than [[n]] neighbours
+      * have the specified state.
+      *
+     * @param n the number of how many neighbours should have the same state.
+     * @param builder the implicit context (i.e. the builder).
+     * @return this builder.
+      */
+    def fewerThan(n: Int)(using builder: DeclarativeRuleBuilder): DeclarativeRuleBuilder =
+      builder.setNumNeighbours(_ < n)
+
+    /**
      * Placeholder for ending a declarative block, avoiding to compose illegal syntax.
      */
     enum EndClause:

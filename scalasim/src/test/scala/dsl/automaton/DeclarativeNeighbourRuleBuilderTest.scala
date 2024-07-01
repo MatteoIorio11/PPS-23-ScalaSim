@@ -128,3 +128,24 @@ class DeclarativeNeighbourRuleBuilderTest extends CustomNeighbourRuleBuilderTest
     val deadRule = builder.rules.head
     aliveRule.applyTransformation(RulesTestUtils.aliveNeighbourhood) shouldBe RulesTestUtils.aliveCell
     deadRule.applyTransformation(RulesTestUtils.deadNeighbourhood) shouldBe RulesTestUtils.deadCell
+
+  test("`fewerThan` should work as expected"):
+    val neighbourhood: Neighbour[TwoDimensionalSpace] = Neighbour(
+      center = Cell(Position(1, 1), alive),
+      List(
+        Position[TwoDimensionalSpace](0, 0) -> dead,
+        Position[TwoDimensionalSpace](0, 1) -> alive,
+        Position[TwoDimensionalSpace](0, 2) -> alive,
+        Position[TwoDimensionalSpace](1, 0) -> dead,
+        Position[TwoDimensionalSpace](1, 2) -> dead,
+        Position[TwoDimensionalSpace](2, 0) -> dead,
+        Position[TwoDimensionalSpace](2, 1) -> dead,
+        Position[TwoDimensionalSpace](2, 2) -> dead,
+      ).map(x => Cell(x._1, x._2))
+    )
+
+    val builder = DeclarativeRuleBuilder.configureRules:
+      dead when fewerThan(3) withState(alive) whenCenterIs(alive)
+
+    val rule = builder.build.head
+    rule.applyTransformation(neighbourhood) shouldBe Cell(Position(1, 1), dead)
