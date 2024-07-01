@@ -25,10 +25,10 @@ object CellularAutomatonBuilder:
 
   private class CellularAutomatonBuilder2DImpl() extends CellularAutomatonBuilder[TwoDimensionalSpace]:
 
-    private var ca: CellularAutomaton[TwoDimensionalSpace] = MultipleRuleCellularAutomaton[TwoDimensionalSpace]()
+    private val ca: CellularAutomaton[TwoDimensionalSpace] = MultipleRuleCellularAutomaton[TwoDimensionalSpace]()
 
     override def setRules(rules: Iterable[NeighbourRule[TwoDimensionalSpace]]): this.type =
-      rules foreach (ca.addRule(_))
+      rules foreach ca.addRule
       this
 
     override def build(): CellularAutomaton[TwoDimensionalSpace] = ca
@@ -54,12 +54,12 @@ class MultipleRuleCellularAutomaton[D <: Dimension] extends CellularAutomaton[D]
     override def applyRule(cell: Cell[D], neighbors: Neighbour[D]): Cell[D] =
       ruleCollection.get(cell.state) match
         case None => cell
-        case Some(rulez) => rulez.map(r => r.applyTransformation(neighbors)).filter(_ != cell).headOption match
-          case Some(Cell[D](p, s)) => Cell(p, s)
+        case Some(rulez) => rulez.map(r => r.applyTransformation(neighbors)).find(_ != cell) match
+          case Some(Cell(p, s)) => Cell(p, s)
           case _ => cell
 
 object MultipleRuleCellularAutomaton2D:
   def apply(rules: Iterable[NeighbourRule[TwoDimensionalSpace]]): MultipleRuleCellularAutomaton[TwoDimensionalSpace] =
     val ca = MultipleRuleCellularAutomaton[TwoDimensionalSpace]()
-    rules foreach(ca.addRule(_))
+    rules foreach ca.addRule
     ca

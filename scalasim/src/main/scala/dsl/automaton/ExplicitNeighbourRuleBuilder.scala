@@ -198,11 +198,9 @@ object ExplicitNeighbourRuleBuilder:
       import domain.automaton.NeighborRuleUtility.*
 
       rules = rules + NeighbourRule(Some(center.get.state))((n: Neighbour[TwoDimensionalSpace]) =>
-        val neigbours = toAbsolutePosition(n.center).neighbourhood
-        neigbours forall (n.neighbourhood.contains(_)) match
-          case true => Cell(n.center.position, s)
-          case _ => n.center
-        )
+        val neighbours = toAbsolutePosition(n.center).neighbourhood
+        if neighbours forall (n.neighbourhood.contains(_)) then Cell(n.center.position, s) else n.center
+      )
 
     override def relativePositions: List[Cell[TwoDimensionalSpace]] =
       import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
@@ -224,15 +222,6 @@ object ExplicitNeighbourRuleBuilder:
     private def toAbsolutePosition(cntr: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
       import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
       Neighbour(cntr, relativePositions.map(c => Cell(c.position + cntr.position, c.state)))
-
-    /**
-     * Resets building parameters for this builder, without altering rules list.
-     */
-    private def resetBuild: Unit =
-      i = 0
-      j = 0
-      center = Option.empty
-      cells = List.empty
 
     override def configureAnother(s: State)(config: ExplicitNeighbourRuleBuilder ?=> Unit): ExplicitNeighbourRuleBuilder =
       val otherBuilder = ExplicitNeighbourBuilderImpl()
