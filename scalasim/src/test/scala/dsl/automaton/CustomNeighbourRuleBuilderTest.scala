@@ -16,9 +16,9 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
   private val dead = DummyAutomaton.DummyState.DEAD
 
   private val nrb = ExplicitNeighbourRuleBuilder.configureRule(dead):
-    state(alive) | x        | state(dead) | n |
+    neighbour(alive) | x        | neighbour(dead) | n |
     x            | c(alive) | x            | n |
-    state(alive) | x        | state(dead)
+    neighbour(alive) | x        | neighbour(dead)
 
   test("The dsl should map a correct set of cells"):
     nrb.center.isEmpty should not be true
@@ -36,7 +36,7 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
   test("Relative neighbours positions cannot be retrieved if center is not set"):
     val exc = intercept[IllegalStateException]:
        ExplicitNeighbourRuleBuilder.configureRule(alive) {
-        state(alive) | state(dead) | state(alive)
+        neighbour(alive) | neighbour(dead) | neighbour(alive)
       }.relativePositions
     assert(!exc.getMessage.isBlank)
 
@@ -59,7 +59,7 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
 
   test("Rule specified in DSL should work as expected"):
     val builder = ExplicitNeighbourRuleBuilder.configureRule(alive):
-      state(alive) | c(dead) | state(alive)
+      neighbour(alive) | c(dead) | neighbour(alive)
 
     val center = Cell[TwoDimensionalSpace](Position(0, 1), dead)
     val cells = List(
@@ -75,11 +75,11 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
 
   test("Rule composition should be made available through `configureAnother`"):
     val builder = ExplicitNeighbourRuleBuilder.configureRule(alive) {
-      state(alive) | c(dead) | state(alive)
+      neighbour(alive) | c(dead) | neighbour(alive)
     }.configureAnother(dead):
-      state(dead) | n |
+      neighbour(dead) | n |
       c(alive)   | n |
-      state(dead)
+      neighbour(dead)
     
     builder.rules.size shouldBe 2
 
@@ -104,9 +104,9 @@ class CustomNeighbourRuleBuilderTest extends AnyFunSuite:
 
   test("Complex rule should hold"):
     val builder = ExplicitNeighbourRuleBuilder.configureRule(dead):
-      state(dead) | x        | state(dead) | n |
+      neighbour(dead) | x        | neighbour(dead) | n |
       x           | c(alive) | x           | n |
-      state(dead) | x        | state(dead)
+      neighbour(dead) | x        | neighbour(dead)
     
     val deadNeighbourhood = Neighbour[TwoDimensionalSpace](
         Cell(Position(1, 1), alive),

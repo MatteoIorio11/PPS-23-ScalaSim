@@ -107,9 +107,9 @@ class DeclarativeNeighbourRuleBuilderTest extends AnyFunSuite:
   test("It should be possible to specify an exact neighbour configuration as a rule"):
     val builder = DeclarativeRuleBuilder.configureRules:
         dead whenNeighbourhoodIsExactlyLike:
-          state(dead) | x        | state(dead) | n |
+          neighbour(dead) | x        | neighbour(dead) | n |
           x           | c(alive) | x           | n |
-          state(dead) | x        | state(dead)
+          neighbour(dead) | x        | neighbour(dead)
 
     val deadRule = builder.build.head
     deadRule.applyTransformation(RulesTestUtils.deadNeighbourhood) shouldBe RulesTestUtils.deadCell
@@ -118,9 +118,9 @@ class DeclarativeNeighbourRuleBuilderTest extends AnyFunSuite:
     val builder = DeclarativeRuleBuilder.configureRules:
       alive when atLeastSurroundedBy(2) withState(alive) whenCenterIs(dead)
       dead whenNeighbourhoodIsExactlyLike:
-          state(dead) | x        | state(dead) | n |
+          neighbour(dead) | x        | neighbour(dead) | n |
           x           | c(alive) | x           | n |
-          state(dead) | x        | state(dead)
+          neighbour(dead) | x        | neighbour(dead)
 
     builder.build
 

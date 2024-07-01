@@ -35,7 +35,7 @@ class CellularAutomatonBuilderTest extends AnyFunSuite:
           dead when fewerThan(2) withState alive whenCenterIs(alive)
           alive when surroundedBy(2) withState alive whenCenterIs(alive)
           alive whenNeighbourhoodIsExactlyLike:
-            state(alive) | c(dead) | state(dead)
+            neighbour(alive) | c(dead) | neighbour(dead)
       
       val ca = caBuilder.build()
 

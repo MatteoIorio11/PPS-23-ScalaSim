@@ -19,7 +19,7 @@ import rule.DeclarativeRuleBuilder.*
   */
 trait CellularAutomatonBuilder[D <: Dimension]:
   /**
-    * Adds a provided dset of [[NeighbourRule]]s of a [[D]] dimensional space
+    * Adds a provided set of [[NeighbourRule]]s of a [[D]] dimensional space
     * to the rule collections of the generated [[CellularAutomaton]].
     *
     * @param rules
@@ -53,7 +53,7 @@ object CellularAutomatonBuilder:
     *     dead when fewerThan(2) withState alive whenCenterIs(alive)
     *     alive when surroundedBy(2) withState alive whenCenterIs(alive)
     *     alive whenNeighbourhoodIsExactlyLike:
-    *       state(alive) | c(dead) | state(dead)
+    *       neighbour(alive) | c(dead) | neighbour(dead)
     * }}}
     * @param ruleBuilder the [[NeighbourRuleBuilder]] configuration block.
     * @return A [[CellularAutomatonBuilder]] of a two dimensional space.

@@ -20,9 +20,9 @@ import scala.annotation.targetName
  * @example
  * {{{
  * NeighbourRule2DBuilder.configureNeighborhood(dead):
- *    state(alive) | x        | state(dead) | n |
- *     x            | c(alive) | x            | n |
- *     state(alive) | x        | state(dead)
+ *    neighbour(alive) | x        | neighbour(dead) | n |
+ *    x                | c(alive) | x               | n |
+ *    neighbour(alive) | x        | neighbour(dead)
  * }}}
  * In this example, we specify the DSL block through the `configureNeighbourhood` function,
  * indicating the state that the cell to which the function is applied (the center) will have
@@ -140,7 +140,7 @@ object ExplicitNeighbourRuleBuilder:
      * @param builder the [[ExplicitNeighbourRuleBuilder]] representing the current configuration.
      * @return the input [[ExplicitNeighbourRuleBuilder]] with an empty cell added.
      */
-    def state(s: State)(using builder: ExplicitNeighbourRuleBuilder): ExplicitNeighbourRuleBuilder = builder.addCell(Some(s))
+    def neighbour(s: State)(using builder: ExplicitNeighbourRuleBuilder): ExplicitNeighbourRuleBuilder = builder.addCell(Some(s))
 
     /**
      * Specify a newline. This is used for the representation of the grid in order to insert
@@ -151,9 +151,9 @@ object ExplicitNeighbourRuleBuilder:
      * The newline character should be used as shown in the following example:
      * {{{
      * NeighbourRule2DBuilder.configureNeighborhood(dead):
-     *    state(alive) | x        | state(dead) | n |
-     *     x            | c(alive) | x            | n |
-     *     state(alive) | x        | state(dead)
+     *    neighbour(alive) | x        | neighbour(dead) | n |
+     *    x                | c(alive) | x               | n |
+     *    neighbour(alive) | x        | neighbour(dead)
      * }}}
      * Basically, when reaching the end of line, just add `| n |` for representing a new line.
      * @param builder the [[ExplicitNeighbourRuleBuilder]] representing the current configuration.
