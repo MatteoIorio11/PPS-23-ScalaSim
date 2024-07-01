@@ -34,3 +34,7 @@ object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensiona
     bufferedImage
   }
 }
+
+trait VideoGenerator {
+  def generate(videoFilename: String, images: Seq[BufferedImage], secondsPerImage: Double): Unit
+}
