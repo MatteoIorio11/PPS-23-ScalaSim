@@ -10,6 +10,7 @@ import domain.automaton.Neighbour
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Cell
 import domain.base.Position
+import domain.automaton.CellularAutomaton.CellularAutomaton
 
 class CellularAutomatonBuilderTest extends AnyFunSuite:
   val alive = new State {}
@@ -22,7 +23,17 @@ class CellularAutomatonBuilderTest extends AnyFunSuite:
     }.build
 
     val ca = MultipleRuleCellularAutomaton2D(List(alive, alive) zip rules)
+    testCa(ca)
 
+  test("`MultipleRuleCellularAutomaton` created with builder should behave as expected"):
+      val ca = CellularAutomatonBuilder.fromRuleBuilder {
+        DeclarativeRuleBuilder.configureRules:
+          dead when fewerThan(2) withState alive whenCenterIs(alive)
+          dead when surroundedBy(3) withState alive whenCenterIs(alive)
+      }.build()
+      
+
+  private def testCa(ca: CellularAutomaton[TwoDimensionalSpace]) =
     val center = Cell[TwoDimensionalSpace](Position(0, 1), alive)
 
     val firstRuleNeigh: Neighbour[TwoDimensionalSpace] = Neighbour(
