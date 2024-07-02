@@ -70,7 +70,7 @@ object DummyAutomaton:
         dummy.addRule(NeighbourRule(Some(DummyState.DEAD))((x) => Cell(x.center.position, DummyState.ALIVE)))
         dummy
 
-    private class DummyAutomatonImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapRules2D:
+    private class DummyAutomatonImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapSingleRules[TwoDimensionalSpace]:
         var ruleCollection: Rules = Map()
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]) =
             ruleCollection.get(cell.state)
