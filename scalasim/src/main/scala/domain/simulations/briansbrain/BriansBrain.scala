@@ -41,6 +41,11 @@ object BriansBrainEnvironment:
 object BriansBrain:
   def apply(): CellularAutomaton[TwoDimensionalSpace] =
     val briansBrain = BriansBrainImpl()
+    val onRule = NeighbourRule(Some(CellState.ON)) { (x: Neighbour[TwoDimensionalSpace]) =>
+      Cell(x.center.position, CellState.DYING)
+    }
+
+    briansBrain.addRule(onRule)
     briansBrain
 
   enum CellState extends State:
