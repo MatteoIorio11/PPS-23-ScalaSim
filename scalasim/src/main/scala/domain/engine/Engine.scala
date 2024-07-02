@@ -8,6 +8,7 @@ import domain.automaton.{Neighbour, Cell, NeighborRuleUtility}
 import scala.collection.mutable.ArrayBuffer
 import domain.engine.Engine.{IterableThreadEngine2D, IterableTimerEngine2D, IterableEngine2D}
 import java.util.concurrent.{ExecutorService, Executor, Executors}
+import domain.simulations.gameoflife.GameOfLife
 
 object Engine:
     /**
@@ -25,8 +26,18 @@ object Engine:
         protected def environment(): Environment[D]
         protected def nextIteration: Unit
         protected def saveInHistory: Unit = history = history:+currentMatrix
+        /**
+          * This method is based on the used environment, the matrix that will be returned is the environment's matrix deep copy.
+          * @return the deep copy of the current matrix.
+          */
         def currentMatrix: R
+        /**
+          * Start the Engine. If the engine is already running nothing is done.
+          */
         def startEngine: Unit
+        /**
+          * Stop the Engine. If the Engine is already stopped nothing is done.
+          */
         def stopEngine: Unit
     /**
       * This trait represent a specific type of 2D engine where the matrix type is in the form:
@@ -50,7 +61,10 @@ object Engine:
             this.synchronized:
                 env
         override def stopEngine = running = false
-        override def startEngine: Unit =
+        /**
+          * Start the Engine by creating a new Virtual Thread that is responsible for the engine's execution.
+          */
+        override def startEngine =
             if (!running)
                 running = true
                 Thread.ofVirtual().start(() => this.run())
@@ -61,6 +75,10 @@ object Engine:
     trait IterableTimerEngine2D extends IterableEngine2D:
         def timer: Int
         private val ONE_SECOND = 1_000
+        /**
+          * Start the Timer, by doing an iteration on each second. The simulation will stop after reaching the maximum input time or by
+          * stopping the Engine using the stopEngine method.
+          */
         protected def startTimer: Unit = 
             var currentTimer = 0
             while (currentTimer < timer && running) do 
@@ -105,10 +123,16 @@ object Engine:
                         i = i + 1
                     i = i + 1
             agents = map.values.map(list => Agent(list)).toList
+        /**
+          * Kill the Executor by shutting down the execution.
+          */
         protected def killEngine: Unit = executor.shutdown()
         override def stopEngine = 
           running = false
           killEngine
+        /**
+          * Execute a new step for the iteration by using the fast strategy.
+          */
         override def nextIteration = 
           fastIteration
           saveInHistory
@@ -129,6 +153,9 @@ object Engine:
       */
     trait GuiEngine2D extends IterableEngine2D:
       def view: EngineView[TwoDimensionalSpace]
+      /**
+        * Update the current view attached to this engine.
+        */
       def updateView: Unit
 
 
@@ -176,7 +203,7 @@ object FastEngine2D:
 object GUIEngine2D:
   private val ONE_SECOND = 1000
   import Engine.* 
-  private case class GUIEngine2DImpl(val env: Environment[TwoDimensionalSpace], val view: EngineView[TwoDimensionalSpace], val tick: Int) 
+  private case class GUIEngine2DImpl(val env: Environment[TwoDimensionalSpace], val view: EngineView[TwoDimensionalSpace]) 
     extends IterableThreadEngine2D with IterableFastEngine2D with GuiEngine2D:
     override def updateView = view.updateView(currentMatrix.flatMap(it => it.map(cell => cell)))
     override def run() = 
