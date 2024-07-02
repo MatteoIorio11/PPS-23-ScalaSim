@@ -52,6 +52,11 @@ object CellularAutomaton:
       */
     trait MapRules2D extends CellularAutomaton[TwoDimensionalSpace]:
       override type Rules = Map[State, NeighbourRule[TwoDimensionalSpace]]
+      override def applyRule(cell: Cell[TwoDimensionalSpace], neighbors: Neighbour[TwoDimensionalSpace]) = 
+        ruleCollection.get(cell.state) match
+          case Some(rule) => rule.applyTransformation(neighbors)
+          case None => cell
+        
 
     trait MultipleRuleCellularAutomaton[D <: Dimension] extends CellularAutomaton[D]:
       override type Rules = Map[State, Set[NeighbourRule[D]]]
