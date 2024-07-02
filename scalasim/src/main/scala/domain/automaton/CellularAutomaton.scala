@@ -15,6 +15,20 @@ object CellularAutomaton:
     trait State
 
     /**
+      * A [[State]] representing a state with an associated value of type [[T]].
+      */
+    trait ValuedState[T] extends State:
+      /**
+        *
+        * @return the value associated with this state.
+        */
+      def value: T
+
+      infix def map[B](f: T => B): ValuedState[B] =
+        val v: B = f(value)
+        new ValuedState[B] { override def value: B = v }
+
+    /**
      * Used when no specific state is needed for the center in order to match with the rules.
      */
     object AnyState extends State
@@ -47,7 +61,7 @@ object CellularAutomaton:
       override def applyRule(cell: Cell[D], neighbors: Neighbour[D]): Cell[D] =
         ruleCollection.get(cell.state) match
           case None => cell
-          case Some(rules) => rules.map(_.applyTransformation(neighbors))find(_ != cell) match
+          case Some(rules) => rules.map(_.applyTransformation(neighbors)).find(_ != cell) match
             case Some(Cell(p, s)) => Cell(p, s)
             case _ => cell
 
@@ -57,7 +71,7 @@ object CellularAutomaton:
       private class MutlipleRulesCellularAutomatonImpl[D <: Dimension] extends MultipleRuleCellularAutomaton[D]:
         protected var ruleCollection: Rules = Map()
         override def addRule(rule: NeighbourRule[D]): Unit =
-          val cellState = rule.matchingState.getOrElse(AnyState)
+          val cellState = rule.matcher.getOrElse(AnyState)
           ruleCollection.get(cellState) match
             case Some(rulez) => ruleCollection = ruleCollection + (cellState -> (rulez + rule))
             case None => ruleCollection = ruleCollection + (cellState -> Set(rule))

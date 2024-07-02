@@ -13,18 +13,22 @@ import domain.automaton.Cell
 import domain.base.Position
 import domain.automaton.Neighbour
 import domain.automaton.NeighborRuleUtility.getNeighboursWithState
+import domain.automaton.ParametricNeighbourRule
+import domain.automaton.ParametricCell
+import domain.automaton.CellularAutomaton.ValuedState
+import domain.automaton.ParametricNeighbour
 
 class RuleTest extends org.scalatest.funsuite.AnyFunSuite:
 
   test("An identity Rule should return the same input"):
-    val r: Rule[Any, Any] = x => x
+    val r: Rule[Any, Any, Any] = (x: Any) => x
     val ca = GameOfLife()
 
     r.applyTransformation(ca) shouldBe ca
     r.applyTransformation((1234, "1234")) shouldBe (1234, "1234")
 
   test("A rule can represent any functions"):
-    val r: Rule[Int, String] = x => s"${x} as a string"
+    val r: Rule[Int, String, Any] = x => s"${x} as a string"
     r.applyTransformation(10) shouldBe "10 as a string"
 
   test("A basic NeighbourRule should apply transformations"):
@@ -54,3 +58,46 @@ class RuleTest extends org.scalatest.funsuite.AnyFunSuite:
     )
 
     nRule.applyTransformation(neighbourhood).state shouldBe DEAD
+
+
+  test("A `ParametricNeighbourRule` should behave as expected"):
+    import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
+    val pAlive = new ValuedState[Int] { override def value: Int = 1 }
+    val pDead = new ValuedState[Int] { override def value: Int = 0 }
+
+    val rule: ParametricNeighbourRule[TwoDimensionalSpace, Int] =
+      ParametricNeighbourRule((x: ParametricCell[TwoDimensionalSpace, Int]) => x.state.value > 0): n =>
+        n.neighbourhood.foldLeft(0)((acc, curr) => acc + curr.state.value) match
+          case x if x >= 2 => ParametricCell(n.center.position + 1, n.center.state map (_ - 1))
+          case _ => ParametricCell(n.center.position, n.center.state map (_ - 1))
+
+    val neighbours = List(
+        ParametricCell[TwoDimensionalSpace, Int](Position(0, 1), pAlive),
+        ParametricCell[TwoDimensionalSpace, Int](Position(1, 0), pAlive),
+        ParametricCell[TwoDimensionalSpace, Int](Position(2, 1), pDead),
+      ) 
+    
+    var center = ParametricCell[TwoDimensionalSpace, Int](Position(1, 1), pAlive)
+
+    val n: ParametricNeighbour[TwoDimensionalSpace, Int] = ParametricNeighbour(
+      center,
+      neighbours
+    )
+
+    center = rule.matcher match
+      case Some(pred) if pred(center) => rule.applyTransformation(n)
+      case _  => center
+    
+    val n1 = ParametricNeighbour[TwoDimensionalSpace, Int](
+      center,
+      neighbours
+    )
+
+    val n2Center = rule.matcher match
+      case Some(pred) if pred(center) => rule.applyTransformation(n1)
+      case _ => center
+
+    n1.center.state.value shouldBe 0
+    n1.center.position shouldBe Position(2, 2)
+
+    n2Center shouldBe n1.center

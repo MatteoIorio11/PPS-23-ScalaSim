@@ -3,6 +3,7 @@ package domain.automaton
 import domain.base.Dimensions.*
 import domain.automaton.Cell.*
 import domain.automaton.Cell
+import domain.automaton.ParametricCell
 
 /**
  * A Neighbor represents a collection of [[Cell]]s which are
@@ -14,14 +15,26 @@ import domain.automaton.Cell
  * @param D the [[Dimension]] of the space.
  */
 trait Neighbour[D <: Dimension]:
-    type Neighbourhood = List[Cell[D]]
-
-    def neighbourhood: Neighbourhood
-
+    def neighbourhood: List[? <: Cell[D]]
     def center: Cell[D]
 
-object Neighbour:
-    def apply[D <: Dimension](center: Cell[D], neighbors: Iterable[Cell[D]]): Neighbour[D] = NeighbourImpl(center, neighbors)
+/**
+  * A [[Neighbour]] of [[ParametricCell]]s.
+  *
+  * @param D the [[Dimension]] of the space.
+  * @param T the type of the parameter held by each [[ParametricCell]].
+  */
+trait ParametricNeighbour[D <: Dimension, T] extends Neighbour[D]:
+    override def neighbourhood: List[ParametricCell[D, T]]
+    override def center: ParametricCell[D, T]
 
-    private case class NeighbourImpl[D <: Dimension](override val center: Cell[D], val neighbors: Iterable[Cell[D]]) extends Neighbour[D]:
-        override def neighbourhood: Neighbourhood = neighbors.toList
+object Neighbour:
+    def apply[D <: Dimension](center: Cell[D], neighbors: Iterable[Cell[D]]): Neighbour[D] = NeighbourImpl(center, neighbors.toList)
+
+    private case class NeighbourImpl[D <: Dimension](override val center: Cell[D], override val neighbourhood: List[Cell[D]]) extends Neighbour[D]
+
+object ParametricNeighbour:
+    def apply[D <: Dimension, T](center: ParametricCell[D, T], neighbours: Iterable[ParametricCell[D, T]]): ParametricNeighbour[D, T] = ParametricNeighbourImpl(center, neighbours.toList)
+    private class ParametricNeighbourImpl[D <: Dimension, T]
+        (override val center: ParametricCell[D, T], override val neighbourhood: List[ParametricCell[D, T]])
+    extends ParametricNeighbour[D, T]

@@ -68,4 +68,4 @@ object GameOfLife:
         override def rules: Rules = ruleCollection
 
         override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
-            ruleCollection = ruleCollection + (neighborRule.matchingState.get -> neighborRule)
+            ruleCollection = ruleCollection + (neighborRule.matcher.get -> neighborRule)
