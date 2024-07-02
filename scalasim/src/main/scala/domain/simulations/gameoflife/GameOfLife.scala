@@ -36,7 +36,7 @@ object GameOfLifeEnvironment:
 
         override protected def initialise(): Unit =
             val initialCell = Cell(Position(-1, -1), CellState.DEAD)
-            matrix.spawnCells(side)(CellState.ALIVE)
+            matrix.spawnCells(side*side/3)(CellState.ALIVE)
 
 object GameOfLife:
     def apply(): CellularAutomaton[TwoDimensionalSpace] =
