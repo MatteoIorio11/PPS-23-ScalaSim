@@ -11,13 +11,12 @@ import org.jcodec.api.awt.AWTSequenceEncoder
 
 import java.awt.Color
 import java.awt.image.BufferedImage
-
 trait MatrixToImageConverter[D <: Dimension, M, S <: State] {
   def convert(matrix: M, cellSize: Int, stateColorMap: Map[S, Color]): BufferedImage
 }
 
-object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]], CellState] {
-  def convert(matrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]], cellSize: Int, stateColorMap: Map[CellState, Color]): BufferedImage = {
+object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]], State] {
+  def convert(matrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]], cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage = {
     val rows = matrix.size
     val cols = matrix.head.size
 
@@ -29,7 +28,7 @@ object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensiona
 
     matrix.zipWithIndex.foreach { case (row, rowIndex) =>
       row.zipWithIndex.foreach { case (cell, colIndex) =>
-        val color = stateColorMap.getOrElse(cell.state.asInstanceOf[CellState], Color.WHITE)
+        val color = stateColorMap.getOrElse(cell.state, Color.WHITE)
         graphics.setColor(color)
         graphics.fillRect(colIndex * cellSize, rowIndex * cellSize, cellSize, cellSize)
       }
