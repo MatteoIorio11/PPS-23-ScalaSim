@@ -43,8 +43,25 @@ object CellularAutomaton:
     trait CellularAutomaton[D <: Dimension]:
         type Rules
         protected def ruleCollection: Rules
+        /**
+          * 
+          *
+          * @param cell
+          * @param neighbors
+          * @return
+          */
         def applyRule(cell: Cell[D], neighbors: Neighbour[D]): Cell[D]
+        /**
+          * 
+          *
+          * @return
+          */
         def rules: Rules
+        /**
+          * 
+          *
+          * @param rule
+          */
         def addRule(rule: NeighbourRule[D]): Unit
 
     /**
@@ -56,20 +73,25 @@ object CellularAutomaton:
         ruleCollection.get(cell.state) match
           case Some(rule) => rule.applyTransformation(neighbors)
           case None => cell
-        
-
-    trait MultipleRuleCellularAutomaton[D <: Dimension] extends CellularAutomaton[D]:
+    /**
+      * 
+      */
+    trait MapMultipleRules[D <: Dimension]  extends CellularAutomaton[D]:
       override type Rules = Map[State, Set[NeighbourRule[D]]]
-
-      override def rules: Rules = ruleCollection
-
       override def applyRule(cell: Cell[D], neighbors: Neighbour[D]): Cell[D] =
         ruleCollection.get(cell.state) match
           case None => cell
           case Some(rules) => rules.map(_.applyTransformation(neighbors)).find(_ != cell) match
             case Some(Cell(p, s)) => Cell(p, s)
             case _ => cell
-
+    /**
+      * 
+      */
+    trait MultipleRuleCellularAutomaton[D <: Dimension] extends CellularAutomaton[D] with MapMultipleRules[D]:
+      override def rules: Rules = ruleCollection
+    /**
+      * 
+      */
     object MutlipleRulesCellularAutomaton:
       def apply[D <: Dimension](): MultipleRuleCellularAutomaton[D] = MutlipleRulesCellularAutomatonImpl()
 
