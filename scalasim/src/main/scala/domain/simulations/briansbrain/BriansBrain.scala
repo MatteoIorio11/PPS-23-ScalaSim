@@ -19,7 +19,7 @@ object BriansBrainEnvironment:
 
   def apply(dimension: Int): BriansBrainEnvironmentImpl =
     maxCellsToSpawn = (dimension / 2) + 1
-    BriansBrainEnvironmentImpl(dimension, cellularAutomata = BriansBrain())
+    BriansBrainEnvironmentImpl(dimension, cellularAutomata = ???)
 
   import Environment.*
   class BriansBrainEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
@@ -34,4 +34,6 @@ object BriansBrainEnvironment:
       import domain.automaton.NeighborRuleUtility.given
       availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
-    override protected def initialise(): Unit = ???
+    override protected def initialise(): Unit =
+      val initialCell = Cell(Position(-1, -1), CellState.DEAD)
+      matrix.spawnCells(side*side/3)(CellState.ALIVE)
