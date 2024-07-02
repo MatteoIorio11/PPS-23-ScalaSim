@@ -23,6 +23,7 @@ object Environment:
         def cellularAutomata: CellularAutomaton[D]
         def matrix: Matrix
         def neighbours(cell: Cell[D]): Iterable[Cell[D]]
+        def dimension: Tuple
         protected def saveCell(cells: Cell[D]*): Unit 
         def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
             val newCell = cellularAutomata.applyRule(cell, Neighbour(cell, neighbors))
@@ -30,22 +31,26 @@ object Environment:
             newCell
         protected def initialise(): Unit
         protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
+        
     /**
       * This trait represent a Square Environment 2D.
       */
     trait SquareEnvironment extends Environment[TwoDimensionalSpace]:
         def side: Int
+        override def dimension = (side, side)
     /**
       * This trait represent a Cubic Environment 3D. 
       */
     trait CubicEnvironment extends Environment[ThreeDimensionalSpace]:
         def edge: Int
+        override def dimension = (edge, edge, edge)
     /**
       * This trait represent a Rectangular Environment 2D.
       */
     trait RectangularEnvironment extends Environment[TwoDimensionalSpace]:
         def width: Int
         def heigth: Int
+        override def dimension = (heigth, width)
     /**
       * Environment 2D, where the matrix is defined as an [[ArrayBuffer(ArrayBuffer)]]. This type of matrix can be 
       * very efficient because it allows us to have an O(1) random time access.
