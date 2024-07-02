@@ -1,6 +1,7 @@
 package domain.exporter
 
 import domain.automaton.Cell
+import domain.automaton.CellularAutomaton.State
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
 import domain.engine.Engine.Engine
 import domain.simulations.gameoflife.GameOfLife.CellState
@@ -11,12 +12,12 @@ import org.jcodec.api.awt.AWTSequenceEncoder
 import java.awt.Color
 import java.awt.image.BufferedImage
 
-trait MatrixToImageConverter[D <: Dimension, M] {
-  def convert(matrix: M, cellSize: Int): BufferedImage
+trait MatrixToImageConverter[D <: Dimension, M, S <: State] {
+  def convert(matrix: M, cellSize: Int, stateColorMap: Map[S, Color]): BufferedImage
 }
 
-object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]] {
-  def convert(matrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]], cellSize: Int): BufferedImage = {
+object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]], CellState] {
+  def convert(matrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]], cellSize: Int, stateColorMap: Map[CellState, Color]): BufferedImage = {
     val rows = matrix.size
     val cols = matrix.head.size
 
@@ -28,7 +29,7 @@ object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensiona
 
     matrix.zipWithIndex.foreach { case (row, rowIndex) =>
       row.zipWithIndex.foreach { case (cell, colIndex) =>
-        val color = if (cell.state == CellState.ALIVE) Color.BLACK else Color.WHITE
+        val color = stateColorMap.getOrElse(cell.state.asInstanceOf[CellState], Color.WHITE)
         graphics.setColor(color)
         graphics.fillRect(colIndex * cellSize, rowIndex * cellSize, cellSize, cellSize)
       }
@@ -65,9 +66,9 @@ object JCodecVideoGenerator extends VideoGenerator {
 }
 
 object Exporter {
-  def exportMatrix[D <: Dimension, M](engine: Engine[D, M], converter: MatrixToImageConverter[D, M], videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double): Unit = {
+  def exportMatrix[D <: Dimension, M, S <: State](engine: Engine[D, M], converter: MatrixToImageConverter[D, M, S], videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double, stateColorMap: Map[S, Color]): Unit = {
     val images = engine.history.zipWithIndex.map { case (matrix, _) =>
-    converter.convert(matrix, cellSize)
+      converter.convert(matrix, cellSize, stateColorMap)
     }.toList
 
     videoGenerator.generate(videoFilename, images, secondsPerImage)
