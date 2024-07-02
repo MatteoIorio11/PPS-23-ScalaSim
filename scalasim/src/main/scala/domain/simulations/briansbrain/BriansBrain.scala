@@ -19,7 +19,7 @@ object BriansBrainEnvironment:
 
   def apply(dimension: Int): BriansBrainEnvironmentImpl =
     maxCellsToSpawn = (dimension / 2) + 1
-    BriansBrainEnvironmentImpl(dimension, cellularAutomata = ???)
+    BriansBrainEnvironmentImpl(dimension, cellularAutomata = BriansBrain())
 
   import Environment.*
   class BriansBrainEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
@@ -37,3 +37,28 @@ object BriansBrainEnvironment:
     override protected def initialise(): Unit =
       val initialCell = Cell(Position(-1, -1), CellState.DEAD)
       matrix.spawnCells(side*side/3)(CellState.ALIVE)
+
+object BriansBrain:
+  def apply(): CellularAutomaton[TwoDimensionalSpace] =
+    val briansBrain = BriansBrainImpl()
+    briansBrain
+
+  enum CellState extends State:
+    case ON
+    case OFF
+    case DYING
+
+  private case class BriansBrainImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapRules2D:
+    var ruleCollection: Rules = Map()
+
+    override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
+      ruleCollection.get(cell.state)
+        .map(rule => rule.applyTransformation(neighbours))
+        .getOrElse(Cell(Position(0, 0), CellState.OFF))
+
+    override def rules: Rules = ruleCollection
+
+    override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
+      ruleCollection = ruleCollection + (neighborRule.matchingState.get -> neighborRule)
+
+
