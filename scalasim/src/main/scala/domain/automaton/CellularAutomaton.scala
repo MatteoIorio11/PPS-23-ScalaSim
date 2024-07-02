@@ -24,6 +24,10 @@ object CellularAutomaton:
         */
       def value: T
 
+      infix def map[B](f: T => B): ValuedState[B] =
+        val v: B = f(value)
+        new ValuedState[B] { override def value: B = v }
+
     /**
      * Used when no specific state is needed for the center in order to match with the rules.
      */

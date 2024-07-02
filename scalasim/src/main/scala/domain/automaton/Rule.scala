@@ -4,9 +4,10 @@ import domain.base.Dimensions.Dimension
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position
 import domain.automaton.Cell
+import domain.automaton.ParametricCell
 import domain.automaton.Neighbour
+import domain.automaton.ParametricNeighbour
 import CellularAutomaton.State
-import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
 
 /**
   * A generic rule for specifying the behaviour of a [[CellularAutomaton]].
@@ -46,9 +47,21 @@ trait Rule[I, O, P]:
    def matcher: Option[P] = Option.empty
 
 /**
-  * Rule that matches multiple rules
+  * [[Rule]] that matches multiple rules
+  * 
+  * @param I this rule input type.
+  * @param O this rule output type after applying the transformation.
   */
 trait MultipleStateRule[I, O] extends Rule[I, O, Iterable[State]]
+
+/**
+  * [[Rule]] that matches against a [[ParametricRule]] that satisfy
+  * a given predicate (defined in [[ParametricRule.matcher]]).
+  *
+  * @param I this rule input type.
+  * @param O this rule output type after applying the transformation.
+  */
+trait ParametricRule[I, O, T, D <: Dimension] extends Rule[I, O, (ParametricCell[D, T]) => Boolean]
 
 /**
   * A Neighbor rule is a [[Rule]] based on neighbors' states of a given
@@ -59,6 +72,14 @@ trait MultipleStateRule[I, O] extends Rule[I, O, Iterable[State]]
   * @param D the dimension of the space.
   */
 trait NeighbourRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D], State]
+
+
+/**
+  * A [[ParametricRule]] that represents a rule for a [[ParametricNeighbour]].
+  * The behavior of this rule is equals to a standard [[NeighbourRule]], the only
+  * difference is in [[State]] of the handled cells.
+  */
+trait ParametricNeighbourRule[D <: Dimension, T] extends ParametricRule[ParametricNeighbour[D, T], ParametricCell[D, T], T, D]
 
 /**
   * Companion object for a generic [[NeighbourRule]].
@@ -75,12 +96,22 @@ object NeighbourRule:
    def apply[D <: Dimension](state: Option[State])(f: Neighbour[D] => Cell[D]): NeighbourRule[D] = new NeighbourRule[D]:
       override def tFunc(n: Neighbour[D]): Cell[D] = f(n)
       override def matcher: Option[State] = state
+  
+object ParametricNeighbourRule:
+  def apply[D <: Dimension, T]
+    (matchingCondition: ParametricCell[D, T] => Boolean)
+    (f: ParametricNeighbour[D, T] => ParametricCell[D, T]): ParametricNeighbourRule[D, T] =
+    new ParametricNeighbourRule[D, T]:
+      override def tFunc(n: ParametricNeighbour[D, T]): ParametricCell[D, T] = f(n)
+      override def matcher: Option[ParametricCell[D, T] => Boolean] = Some(matchingCondition)
 
 /**
   * Various utility functions for both [[NeighbourRule]]s and [[Neighbour]]s objects.
   * Most of this methods are used when specifying [[NeighbourRule]]s' behaviours.
   */
 object NeighborRuleUtility:
+   import PositionArithmeticOperations.*
+
    enum RelativePositions(x: Int, y: Int):
       case TopLeft      extends RelativePositions(-1, -1)
       case TopCenter    extends RelativePositions(-1, 0)
@@ -198,5 +229,5 @@ object NeighborRuleUtility:
      * @param neighbours neighbourhood to look for matching cells with the provided [[State]].
      * @return the neighbours of this neighbourhood that have the given [[State]].
      */
-   def getNeighboursWithState[D <: Dimension](state: State, neighbours: Neighbour[D]): List[Cell[D]] = 
-      neighbours.neighbourhood.filter(cell => cell.state == state)
+   def getNeighboursWithState[D <: Dimension](state: State, neighbours: Neighbour[D]): List[Cell[D]] =
+      neighbours.neighbourhood.filter(_.state == state)
