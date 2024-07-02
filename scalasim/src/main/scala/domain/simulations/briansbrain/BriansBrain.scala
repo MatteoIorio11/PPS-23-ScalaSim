@@ -45,7 +45,13 @@ object BriansBrain:
       Cell(x.center.position, CellState.DYING)
     }
 
+    val offRule = NeighbourRule(Some(CellState.OFF)): (x: Neighbour[TwoDimensionalSpace]) =>
+      NeighborRuleUtility.getNeighboursWithState(CellState.ON, x).length match
+        case 2 => Cell(x.center.position, CellState.ON)
+        case _ => Cell(x.center.position, CellState.OFF)
+
     briansBrain.addRule(onRule)
+    briansBrain.addRule(offRule)
     briansBrain
 
   enum CellState extends State:
