@@ -57,7 +57,7 @@ object CellularAutomaton:
       private class MutlipleRulesCellularAutomatonImpl[D <: Dimension] extends MultipleRuleCellularAutomaton[D]:
         protected var ruleCollection: Rules = Map()
         override def addRule(rule: NeighbourRule[D]): Unit =
-          val cellState = rule.matchingState.getOrElse(AnyState)
+          val cellState = rule.matcher.getOrElse(AnyState)
           ruleCollection.get(cellState) match
             case Some(rulez) => ruleCollection = ruleCollection + (cellState -> (rulez + rule))
             case None => ruleCollection = ruleCollection + (cellState -> Set(rule))

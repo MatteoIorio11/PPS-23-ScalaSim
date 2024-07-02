@@ -17,14 +17,14 @@ import domain.automaton.NeighborRuleUtility.getNeighboursWithState
 class RuleTest extends org.scalatest.funsuite.AnyFunSuite:
 
   test("An identity Rule should return the same input"):
-    val r: Rule[Any, Any] = x => x
+    val r: Rule[Any, Any, Any] = x => x
     val ca = GameOfLife()
 
     r.applyTransformation(ca) shouldBe ca
     r.applyTransformation((1234, "1234")) shouldBe (1234, "1234")
 
   test("A rule can represent any functions"):
-    val r: Rule[Int, String] = x => s"${x} as a string"
+    val r: Rule[Int, String, Any] = x => s"${x} as a string"
     r.applyTransformation(10) shouldBe "10 as a string"
 
   test("A basic NeighbourRule should apply transformations"):

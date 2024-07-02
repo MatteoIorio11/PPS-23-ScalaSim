@@ -17,8 +17,9 @@ import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
   * 
   * @param I the input type for the transformation function.
   * @param O the output type for the transformation funtcion.
+  * @param P the type of the matcher used to match this rule against an object of type [[P]].
   */
-trait Rule[I, O]:
+trait Rule[I, O, P]:
    /**
      * Generic transformation function that takes an object of type [[I]]
      * and returns an object of type [[O]].
@@ -37,22 +38,27 @@ trait Rule[I, O]:
    def applyTransformation(ca: I): O = tFunc(ca)
    
    /**
-     * The [[State]] that this function must match in order to 
-     * proceed to evaluation.
+     * The matcher for this rule represented by an object of type [[P]] which
+     * compose the predicate to be tested when it comes to rule matching.
      *
-     * @return an [[Option]] representing the [[State]] associated to this rule.
+     * @return the matcher composed by a state (or more) boxed in an object of type [[B]]
      */
-   def matchingState: Option[State] = Option.empty
+   def matcher: Option[P] = Option.empty
+
+/**
+  * Rule that matches multiple rules
+  */
+trait MultipleStateRule[I, O] extends Rule[I, O, Iterable[State]]
 
 /**
   * A Neighbor rule is a [[Rule]] based on neighbors' states of a given
   * cell. Transformation functions of this rules should map
   * a D dimensional [[Neighbour]] into a D dimensional [[Cell]] with
   * (hopefully) a mutated state.
-  * 
+  *
   * @param D the dimension of the space.
   */
-trait NeighbourRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D]]
+trait NeighbourRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D], State]
 
 /**
   * Companion object for a generic [[NeighbourRule]].
@@ -68,7 +74,7 @@ object NeighbourRule:
      */
    def apply[D <: Dimension](state: Option[State])(f: Neighbour[D] => Cell[D]): NeighbourRule[D] = new NeighbourRule[D]:
       override def tFunc(n: Neighbour[D]): Cell[D] = f(n)
-      override def matchingState: Option[State] = state
+      override def matcher: Option[State] = state
 
 /**
   * Various utility functions for both [[NeighbourRule]]s and [[Neighbour]]s objects.

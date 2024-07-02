@@ -78,4 +78,4 @@ object DummyAutomaton:
                 .getOrElse(Cell(cell.position, DummyState.DEAD))
         override def rules: Rules = ruleCollection
         override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]) =
-            ruleCollection = ruleCollection + (neighborRule.matchingState.get -> neighborRule)
+            ruleCollection = ruleCollection + (neighborRule.matcher.get -> neighborRule)
