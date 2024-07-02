@@ -8,14 +8,13 @@ import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule, Ru
 import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
 import domain.automaton.Cell.*
 import domain.base.Position
-import domain.simulations.gameoflife.GameOfLife.CellState
+import domain.simulations.briansbrain.BriansBrain.CellState
 
-import scala.util.Random
 import scala.collection.mutable.ArrayBuffer
 
 object BriansBrainEnvironment:
   var maxCellsToSpawn = 0
-  val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.DEAD)
+  val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.OFF)
 
   def apply(dimension: Int): BriansBrainEnvironmentImpl =
     maxCellsToSpawn = (dimension / 2) + 1
@@ -35,8 +34,8 @@ object BriansBrainEnvironment:
       availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
     override protected def initialise(): Unit =
-      val initialCell = Cell(Position(-1, -1), CellState.DEAD)
-      matrix.spawnCells(side*side/3)(CellState.ALIVE)
+      val initialCell = Cell(Position(-1, -1), CellState.OFF)
+      matrix.spawnCells(side*side/3)(CellState.ON)
 
 object BriansBrain:
   def apply(): CellularAutomaton[TwoDimensionalSpace] =
