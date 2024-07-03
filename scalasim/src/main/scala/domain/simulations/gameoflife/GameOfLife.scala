@@ -35,7 +35,7 @@ object GameOfLifeEnvironment:
             availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
         override protected def initialise(): Unit =
-            matrix = matrix.spawnCell(CellState.ALIVE)
+            matrix = matrix.spawnCell(CellState.DEAD)(CellState.ALIVE)
 object GameOfLife:
     def apply(): CellularAutomaton[TwoDimensionalSpace] =
         val gameOfLife = GameOfLifeImpl()

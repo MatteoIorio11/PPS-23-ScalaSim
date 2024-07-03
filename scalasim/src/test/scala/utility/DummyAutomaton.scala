@@ -34,7 +34,7 @@ object DummyAutomatonEnvironment:
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
       initialise()
       override protected def initialise() = 
-        matrix = matrix.spawnCell(DummyState.ALIVE)
+        matrix = matrix.spawnCell(DummyState.DEAD)(DummyState.ALIVE)
       override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
           import domain.automaton.NeighborRuleUtility.given
           availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
@@ -48,7 +48,7 @@ object DummyToroidEnv:
     require(heigth > 0)
     var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(Cell(Position(-1, -1), DummyState.DEAD))
     initialise()
-    override protected def initialise() = matrix = matrix.spawnCell(DummyState.ALIVE)
+    override protected def initialise() = matrix = matrix.spawnCell(DummyState.DEAD)(DummyState.ALIVE)
     override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
       import domain.automaton.NeighborRuleUtility.given
         availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
