@@ -26,7 +26,7 @@ object BriansBrainEnvironment:
     require(side > 0)
     require(cellularAutomata != null)
 
-    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(initialCell)
+    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(CellState.OFF)
 
     initialise()
     override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
@@ -63,8 +63,8 @@ object BriansBrain:
     case OFF
     case DYING
 
-  private case class BriansBrainImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapRules2D:
-    var ruleCollection: Rules = Map()
+  private case class BriansBrainImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapSingleRules[TwoDimensionalSpace]:
+    var ruleCollection = Map()
 
     override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
       ruleCollection.get(cell.state)
@@ -74,6 +74,8 @@ object BriansBrain:
     override def rules: Rules = ruleCollection
 
     override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
-      ruleCollection = ruleCollection + (neighborRule.matchingState.get -> neighborRule)
+      neighborRule.matcher  match
+        case Some(state) =>  ruleCollection = ruleCollection + (state -> neighborRule)
+        case None => ruleCollection
 
 

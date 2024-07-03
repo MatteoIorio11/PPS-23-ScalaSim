@@ -27,7 +27,7 @@ object GameOfLifeEnvironment:
         require(side > 0)
         require(cellularAutomata != null)
 
-        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(initialCell)
+        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(CellState.DEAD)
 
         initialise()
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
@@ -59,7 +59,7 @@ object GameOfLife:
     enum CellState extends State:
         case ALIVE
         case DEAD
-    private case class GameOfLifeImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapRules2D:
+    private case class GameOfLifeImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapSingleRules[TwoDimensionalSpace]:
         var ruleCollection: Rules = Map()
 
         override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
@@ -68,6 +68,8 @@ object GameOfLife:
               .getOrElse(Cell(Position(0, 0), CellState.DEAD))
 
         override def rules: Rules = ruleCollection
-
         override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
-            ruleCollection = ruleCollection + (neighborRule.matchingState.get -> neighborRule)
+            neighborRule.matcher  match
+                case Some(state) =>  ruleCollection = ruleCollection + (state -> neighborRule)
+                case None => ruleCollection
+
