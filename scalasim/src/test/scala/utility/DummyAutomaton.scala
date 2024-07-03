@@ -19,7 +19,7 @@ import org.scalatest.tools.AnsiColor
 import org.scalatest.tools.ColorBar
 import java.awt.Color
 import domain.Environment.SquareArrayEnvironment2D
-import domain.Environment.ToroidEnvironment
+import domain.Environment.ArrayToroidEnvironment
 
 /**
   * 
@@ -43,7 +43,7 @@ object DummyToroidEnv:
         DummyToroidEnvironmentImpl(w, h, DummyAutomaton())
 
   private case class DummyToroidEnvironmentImpl(val width: Int, val heigth: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace]) 
-      extends Environment[TwoDimensionalSpace] with ToroidEnvironment:
+      extends Environment[TwoDimensionalSpace] with ArrayToroidEnvironment:
     require(width > 0)
     require(heigth > 0)
     var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(Cell(Position(-1, -1), DummyState.DEAD))

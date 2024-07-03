@@ -9,6 +9,7 @@ import automaton.Cell
 import base.Position
 import automaton.Neighbour
 import scala.collection.concurrent.TrieMap
+import java.awt.Color
 
 object Environment:
     /**
@@ -19,20 +20,62 @@ object Environment:
       * based on the input cell and all Its neighbours [[Iterable[Cell[D]]]].
       */
     trait Environment[D <: Dimension]:
-        type Matrix
-        def currentMatrix: Matrix
-        def cellularAutomata: CellularAutomaton[D]
-        def matrix: Matrix
-        def neighbours(cell: Cell[D]): Iterable[Cell[D]]
-        def dimension: Tuple
-        protected def saveCell(cells: Cell[D]*): Unit 
-        def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
-            val newCell = cellularAutomata.applyRule(cell, Neighbour(cell, neighbors))
-            saveCell(newCell)
-            newCell
-        protected def initialise(): Unit
-        protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
-        
+      /**
+        * Matrix that will be used for representing the environment, where all the cells will be stored.
+        */
+      type Matrix
+      /**
+        * (Getter) Return the current matrix stored inside the Environment. This method depends on the Matrix type, so It will be
+        * necessary to specify which type of Data Strucuture will be used.
+        * @return the current matrix that is stored in the Environment.
+        */
+      def currentMatrix: Matrix
+      /**
+        * The cellular automaton that will be used in this Environment, the Cellular Automaton works in the same dimension
+        * of the Environment, which is D: [[Dimension]].
+        */
+      def cellularAutomata: CellularAutomaton[D]
+      /**
+        * Data strucuture that will be used for manage the Matrix.
+        */
+      def matrix: Matrix
+      /**
+        * This method is used for retrieve all the Neighbours of a specific input cell. This method is usefull for the
+        * rule application and other operations that can be done on a Cellular Automaton.
+        * @param cell input cell for which It is necessary to search the Neighbours.
+        * @return A collection where are stored all the neighbours of the input cell.
+        */
+      def neighbours(cell: Cell[D]): Iterable[Cell[D]]
+      /**
+        * Space dimension of the Environment.
+        */
+      def dimension: Tuple
+      /**
+        * This method is used for saving the input sequence of cells into the matrix.
+        * @param cells sequence of cells to be stored inside the current matrix.
+        */
+      protected def saveCell(cells: Cell[D]*): Unit
+      /**
+        * This method is used for applying a rule on a specific cell given It's neighbours, this method will return the output cell.
+        * @param cell input cell where It is necessary to apply the rule.
+        * @param neighbors input cell's neighbours.
+        * @return the result cell after applying the specific rule.
+        */
+      def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
+          val newCell = cellularAutomata.applyRule(cell, Neighbour(cell, neighbors))
+          saveCell(newCell)
+          newCell
+      /**
+        * Initialise the matrix, with a specific configuration of cells.
+        */
+      protected def initialise(): Unit
+      /**
+        * Return a collection of all the available cells given a list of position, this is important because
+        * the available cells can be different depending on the Space that It is modelled (Square Env, Cubic Env, Toroid Env).
+        * @param positions collection of all the positions that needs to be check.
+        * @return a collection of all the available cell with existing position inside the matrix.
+        */
+      protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
     /**
       * This trait represent a Square Environment 2D.
       */
@@ -53,10 +96,13 @@ object Environment:
         def heigth: Int
         override def dimension = (heigth, width)
     /**
-      * 
+      * Environment D-dimensional where the matrix is defined as a [[TrieMap]]. This can be used in case It will be necessary
+      * to use thread-safe data structures.
       */
-    trait ConcurrentEnvironment2D extends Environment[TwoDimensionalSpace]:
-      override type Matrix = TrieMap[Position[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]
+    trait TrieMapEnvironment[D <: Dimension] extends Environment[D]:
+      override type Matrix = TrieMap[Position[D], Cell[D]]
+      override def currentMatrix: TrieMap[Position[D], Cell[D]]
+      override def matrix: TrieMap[Position[D], Cell[D]]
     /**
     * Environment 2D, where the matrix is defined as an [[ArrayBuffer(ArrayBuffer)]]. This type of matrix can be 
     * very efficient because it allows us to have an O(1) random time access.
@@ -86,7 +132,7 @@ object Environment:
     /**
       * This trait represent a Toroid Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
-    trait ToroidEnvironment extends RectangularEnvironment with ArrayEnvironment2D:
+    trait ArrayToroidEnvironment extends RectangularEnvironment with ArrayEnvironment2D:
       override protected def saveCell(cells: Cell[TwoDimensionalSpace]*) = 
         cells.foreach(cell => 
           val x = cell.position.coordinates.head
