@@ -33,6 +33,11 @@ object CellularAutomaton:
      */
     object AnyState extends State
 
+    trait GenericCellularAutomaton[D <: Dimension, I, O, R <: Rule[I, O, State]]:
+      def applyRule(input: I): O
+      def addRule(rule: R): Unit
+
+
     /**
      * Cellular automaton trait. It defines all the information about a general automaton.
      * A cellular automaton must define a collection of rules, where inside each rule is stored the logic
@@ -66,6 +71,11 @@ object CellularAutomaton:
           * @param rule input rule to add inside the Cellular Automaton's rule collection.
           */
         def addRule(rule: NeighbourRule[D]): Unit
+    
+    trait ComplexCellularAutomaton[D <: Dimension] extends GenericCellularAutomaton[D, Neighbour[D], Iterable[Cell[D]], MultipleOutputNeighbourRule[D]]:
+      override def applyRule(neighbors: Neighbour[D]): Iterable[Cell[D]]
+      override def addRule(rule: MultipleOutputNeighbourRule[D]): Unit
+
     /**
       * Trait in which the type Rules is represented by a Map of: [[State]] -> [[Rule]]
       */
