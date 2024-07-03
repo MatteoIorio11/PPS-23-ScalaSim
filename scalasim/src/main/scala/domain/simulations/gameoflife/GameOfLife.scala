@@ -61,12 +61,6 @@ object GameOfLife:
         case DEAD
     private case class GameOfLifeImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapSingleRules[TwoDimensionalSpace]:
         var ruleCollection: Rules = Map()
-
-        override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
-            ruleCollection.get(cell.state)
-              .map(rule => rule.applyTransformation(neighbours))
-              .getOrElse(Cell(Position(0, 0), CellState.DEAD))
-
         override def rules: Rules = ruleCollection
         override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
             neighborRule.matcher  match

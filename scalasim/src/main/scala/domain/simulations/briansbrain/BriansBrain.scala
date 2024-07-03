@@ -65,12 +65,6 @@ object BriansBrain:
 
   private case class BriansBrainImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapSingleRules[TwoDimensionalSpace]:
     var ruleCollection = Map()
-
-    override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
-      ruleCollection.get(cell.state)
-        .map(rule => rule.applyTransformation(neighbours))
-        .getOrElse(Cell(Position(0, 0), CellState.OFF))
-
     override def rules: Rules = ruleCollection
 
     override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =

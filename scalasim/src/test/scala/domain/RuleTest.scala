@@ -6,8 +6,6 @@ import domain.automaton.CellularAutomaton.CellularAutomaton
 import domain.simulations.gameoflife.GameOfLife
 import automaton.Rule
 import domain.automaton.NeighbourRule
-import utility.DummyAutomaton.DummyState.ALIVE
-import utility.DummyAutomaton.DummyState.DEAD
 import domain.automaton.CellularAutomaton.AnyState
 import domain.automaton.Cell
 import domain.base.Position
@@ -18,6 +16,8 @@ import domain.automaton.ParametricCell
 import domain.automaton.CellularAutomaton.ValuedState
 import domain.automaton.ParametricNeighbour
 import domain.automaton.MultipleOutputNeighbourRule
+import _root_.utility.DummyAutomaton.DummyState.ALIVE
+import _root_.utility.DummyAutomaton.DummyState.DEAD
 
 class RuleTest extends org.scalatest.funsuite.AnyFunSuite:
 
@@ -58,7 +58,7 @@ class RuleTest extends org.scalatest.funsuite.AnyFunSuite:
       )
     )
 
-    nRule.applyTransformation(neighbourhood).state shouldBe DEAD
+    nRule.applyTransformation(neighbourhood).state shouldBe (DEAD)
 
 
   test("A `MultipleOutputNeighbourRule` should yield a collection of cells"):

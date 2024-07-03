@@ -2,14 +2,15 @@ package domain
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
-import utility.DummyAutomaton
-import utility.DummyAutomaton.DummyState
+import utility.* 
 import domain.automaton.CellularAutomaton.State
 import domain.automaton.Cell
 import domain.base.Position
 import domain.automaton.Neighbour
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.NeighbourRule
+import _root_.utility.DummyAutomaton
+import _root_.utility.DummyAutomaton.DummyState
 
 class CellularAutomatonTestq extends AnyFunSuite:
     val ca = DummyAutomaton()
@@ -28,4 +29,4 @@ class CellularAutomatonTestq extends AnyFunSuite:
         val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
         val rule = NeighbourRule[TwoDimensionalSpace](Some(DummyState.DEAD))((neighbor) => Cell(Position(0, 0), DummyState.ALIVE))
         ca.addRule(rule)
-        ca.applyRule(cell, neighbor) shouldBe Cell(Position(0, 0), DummyState.ALIVE)
+        ca.applyRule(neighbor) shouldBe Cell(Position(0, 0), DummyState.ALIVE)

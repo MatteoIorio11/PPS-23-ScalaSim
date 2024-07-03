@@ -2,13 +2,14 @@ package domain
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
-import utility.DummyAutomatonEnvironment
 import domain.automaton.Cell
-import utility.DummyAutomaton.DummyState
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position
 import scala.collection.mutable.ArrayBuffer
-import utility.DummyToroidEnv
+import _root_.utility.DummyToroidEnv
+import _root_.utility.DummyAutomatonEnvironment.*
+import _root_.utility.DummyAutomatonEnvironment
+import _root_.utility.DummyAutomaton.DummyState
 
 
 class EnvironmentTest extends AnyFunSuite:

@@ -49,7 +49,7 @@ class CellularAutomatonBuilderTest extends AnyFunSuite:
         )
       )
 
-      ca.applyRule(Cell(Position(0, 1), dead), specificNeighbourhood).state shouldBe alive
+      ca.applyRule(specificNeighbourhood).state shouldBe alive
 
   private def testCa(ca: CellularAutomaton[TwoDimensionalSpace]): Unit =
     val center = Cell[TwoDimensionalSpace](Position(1, 1), alive)
@@ -70,5 +70,5 @@ class CellularAutomatonBuilderTest extends AnyFunSuite:
       )
     )
 
-    ca.applyRule(center, aliveNeighbourhood).state shouldBe alive
-    ca.applyRule(center, deadNeighbourhood).state shouldBe dead
+    ca.applyRule(aliveNeighbourhood).state shouldBe alive
+    ca.applyRule(deadNeighbourhood).state shouldBe dead

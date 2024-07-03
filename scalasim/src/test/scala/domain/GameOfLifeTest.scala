@@ -30,7 +30,7 @@ abstract class GameOfLifeTest extends AnyFunSuite with BeforeAndAfterEach:
       Cell(Position(1, 1), CellState.ALIVE),
     )
     val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
-    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position(0, 0), CellState.DEAD)
+    gameOfLife.applyRule(neighbor) shouldBe Cell(Position(0, 0), CellState.DEAD)
 
   test("Alive cell should be Dead with more than three Alive neighbors"):
     val cell = Cell[TwoDimensionalSpace](Position(1, 1), CellState.ALIVE)
@@ -41,7 +41,7 @@ abstract class GameOfLifeTest extends AnyFunSuite with BeforeAndAfterEach:
       Cell(Position(2, 1), CellState.ALIVE),
     )
     val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
-    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position(1, 1), CellState.DEAD)
+    gameOfLife.applyRule(neighbor) shouldBe Cell(Position(1, 1), CellState.DEAD)
 
   test("Alive cell should be Alive with two Alive neighbors"):
     val cell = Cell[TwoDimensionalSpace](Position(0, 1), CellState.ALIVE)
@@ -50,7 +50,7 @@ abstract class GameOfLifeTest extends AnyFunSuite with BeforeAndAfterEach:
       Cell(Position(0, 0), CellState.ALIVE),
     )
     val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
-    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position(0, 1), CellState.ALIVE)
+    gameOfLife.applyRule(neighbor) shouldBe Cell(Position(0, 1), CellState.ALIVE)
 
   test("Alive cell should be Alive with three Alive neighbors"):
     val cell = Cell[TwoDimensionalSpace](Position(0, 1), CellState.ALIVE)
@@ -60,7 +60,7 @@ abstract class GameOfLifeTest extends AnyFunSuite with BeforeAndAfterEach:
       Cell(Position(1, 1), CellState.ALIVE),
     )
     val neighbor: Neighbour[TwoDimensionalSpace] = Neighbour(cell, neighbors)
-    gameOfLife.applyRule(cell, neighbor) shouldBe Cell(Position(0, 1), CellState.ALIVE)
+    gameOfLife.applyRule(neighbor) shouldBe Cell(Position(0, 1), CellState.ALIVE)
 
 class BasicGOFImpl extends GameOfLifeTest:
   override val gameOfLife: CellularAutomaton[TwoDimensionalSpace] = GameOfLife()
