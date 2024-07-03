@@ -204,17 +204,17 @@ object Environment:
             * @param inputState: Input state to use If the probability returned from the random value is True
             * @return a new Matrix in which there can be spawned a number of cell with the input state.
             */
-          def spawnCell(inputState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), inputState)
+          def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), initialState)
             val array = ArrayBuffer.fill(heigth, width)(initialCell)
             for (y <- 0 until width)
               for (x <- 0 until heigth)
                   val probability = Random().nextBoolean()
                   val state = probability match
-                      case x if x => inputState
+                      case x if x => spawnState
                       case _ => array(x)(y).state
                   array(x)(y) = Cell(Position(x, y), state)
-            array(0)(0) = Cell(Position(0, 0), inputState)
+            array(0)(0) = Cell(Position(0, 0), spawnState)
             array
 
     /**
@@ -261,20 +261,21 @@ object Environment:
                 array
             /**
               * This extension method can be used for spawn a random number of cell inside the Matrix with the input state.
-              * @param inputState: state that will be used iniside the spawned cells.
+              * @param initialState
+              * @param spawnState
               * @return a new Matrix where there are a number of random cells with the input state.
               */
-            def spawnCell(inputState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-              val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), inputState)
+            def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+              val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), initialState)
               val array = ArrayBuffer.fill(side, side)(initialCell)
               for (y <- 0 until side)
                 for (x <- 0 until side)
                     val probability = Random().nextBoolean()
                     val state = probability match
-                        case x if x => inputState
+                        case spawn if spawn => spawnState
                         case _ => array(x)(y).state
                     array(x)(y) = Cell(Position(x, y), state)
-              array(0)(0) = Cell(Position(0, 0), inputState)
+              array(0)(0) = Cell(Position(0, 0), spawnState)
               array
     /**
       * Rectangula Environment2D where the matrix is defined using the [[ArrayEnvironment2D]] trait.
