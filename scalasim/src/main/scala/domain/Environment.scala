@@ -8,6 +8,7 @@ import scala.util.Random
 import automaton.Cell
 import base.Position
 import automaton.Neighbour
+import scala.collection.concurrent.TrieMap
 
 object Environment:
     /**
@@ -52,8 +53,13 @@ object Environment:
         def heigth: Int
         override def dimension = (heigth, width)
     /**
-      * Environment 2D, where the matrix is defined as an [[ArrayBuffer(ArrayBuffer)]]. This type of matrix can be 
-      * very efficient because it allows us to have an O(1) random time access.
+      * 
+      */
+    trait ConcurrentEnvironment2D extends Environment[TwoDimensionalSpace]:
+      override type Matrix = TrieMap[Position[TwoDimensionalSpace], Cell[TwoDimensionalSpace]]
+    /**
+    * Environment 2D, where the matrix is defined as an [[ArrayBuffer(ArrayBuffer)]]. This type of matrix can be 
+    * very efficient because it allows us to have an O(1) random time access.
     */
     trait ArrayEnvironment2D extends Environment[TwoDimensionalSpace]:
       protected val MAX_SIZE = 2

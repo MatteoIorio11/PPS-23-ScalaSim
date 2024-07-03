@@ -8,7 +8,6 @@ import domain.automaton.{Neighbour, Cell, NeighborRuleUtility}
 import scala.collection.mutable.ArrayBuffer
 import domain.engine.Engine.{IterableThreadEngine2D, IterableTimerEngine2D, IterableEngine2D}
 import java.util.concurrent.{ExecutorService, Executor, Executors}
-import domain.simulations.gameoflife.GameOfLife
 
 object Engine:
     /**
@@ -59,7 +58,7 @@ object Engine:
         @volatile var running = false
         override protected def environment(): Environment[TwoDimensionalSpace] = 
             this.synchronized:
-                env
+              env
         override def stopEngine = running = false
         /**
           * Start the Engine by creating a new Virtual Thread that is responsible for the engine's execution.
@@ -87,71 +86,16 @@ object Engine:
                 currentTimer = currentTimer + 1
                 Thread.sleep(ONE_SECOND)
             stopEngine
-    /**
-      * This trait represent an optimzed way to execute the step for each cuellular automaton's cell. This implementation will use an 
-      * Iterable Engine 2D. This trait uses an Executor Service, where each row of the matrix will be assigned to a specific Agent, which is 
-      * charge to do every step for It's cells.
-      */
-    trait IterableFastEngine2D extends IterableEngine2D:
-        private case class Agent(var rows: List[Cell[TwoDimensionalSpace]]):
-            def execute: Unit = 
-                rows.map(cell => environment().applyRule(cell, environment().neighbours(cell)))
-        private val nAgents = Math.min(Runtime.getRuntime().availableProcessors() + 1, currentMatrix.size)
-        private var agents = List[Agent]()
-        private var executor: ExecutorService = Executors.newVirtualThreadPerTaskExecutor()
-        initialize // Initialize the Engine
-        /**
-          * Initialize the agents, by assigning to them a collection of rows.
-          */
-        private def initialize: Unit = 
-            val rows = currentMatrix.head.size
-            var map = Map[Int, List[Cell[TwoDimensionalSpace]]]()
-            val matrix = environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
-            val rowsPerAgent = rows / nAgents
-            for (i <- 0 until nAgents)
-                val startIndex = i * rowsPerAgent
-                val endIndex = Math.min((i + 1) * rowsPerAgent, rows)
-                val agentRows = matrix.slice(startIndex, endIndex).head
-                map = map + (i -> agentRows.toList)
-            // handle possible left overs
-            if (rows % nAgents != 0)
-                val leftovers = rows % nAgents
-                var i = 0
-                while (i < leftovers)
-                    for (j <- 0 until nAgents)
-                        map(j).appendedAll(matrix.toList(rows - i - 1))
-                        i = i + 1
-                    i = i + 1
-            agents = map.values.map(list => Agent(list)).toList
-        /**
-          * Kill the Executor by shutting down the execution.
-          */
-        protected def killEngine: Unit = executor.shutdown()
-        override def stopEngine = 
-          running = false
-          killEngine
-        /**
-          * Execute a new step for the iteration by using the fast strategy.
-          */
-        override def nextIteration = 
-          fastIteration
-          saveInHistory
-        /**
-          * Fast implementation of the cellular automaton iteration.
-          */
-        def fastIteration: Unit =
-            executor = Executors.newVirtualThreadPerTaskExecutor()
-            agents.foreach(agent => executor.execute(() => agent.execute))
-            executor.close()
-    /**
+   /**
       * Trait that represent a general View that will be attached to the engine. The view is defined in [[Dimension]].
       */
     trait EngineView[D <: Dimension]:
       def updateView(cells: Iterable[Cell[D]]): Unit
+      def dimension: Tuple
     /**
       * Engine with a GUI, this will be used for real time simulation with a GUI.
       */
-    trait GuiEngine2D extends IterableEngine2D:
+    trait GUIEngine2D extends IterableEngine2D:
       def view: EngineView[TwoDimensionalSpace]
       /**
         * Update the current view attached to this engine.
@@ -188,27 +132,20 @@ object TimerEngine2D:
       require(timer >= 0)
       override def run() = startTimer
 /**
-  * Fast Engine 2D for Cellular Automaton Environment execution. Inside this Fast Engine It is used the Timer Engine.
-  */
-object FastEngine2D:
-    import Engine.* 
-    def apply(env: Environment[TwoDimensionalSpace], timer: Int): Engine[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]] =
-         FastEngine2D(env, timer) 
-    private case class FastEngine2D(val env: Environment[TwoDimensionalSpace], val timer: Int) 
-        extends IterableThreadEngine2D with IterableTimerEngine2D with IterableFastEngine2D:
-      override def run() = startTimer
-/**
   * 
   */
 object GUIEngine2D:
   private val ONE_SECOND = 1000
   import Engine.* 
+  def apply(env: Environment[TwoDimensionalSpace], view: EngineView[TwoDimensionalSpace]): GUIEngine2D = 
+    GUIEngine2DImpl(env, view)
   private case class GUIEngine2DImpl(val env: Environment[TwoDimensionalSpace], val view: EngineView[TwoDimensionalSpace]) 
-    extends IterableThreadEngine2D with IterableFastEngine2D with GuiEngine2D:
-    override def updateView = view.updateView(currentMatrix.flatMap(it => it.map(cell => cell)))
+    extends IterableThreadEngine2D with GUIEngine2D:
+    override def updateView = 
+      view.updateView(environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]].flatMap(it => it.map(cell => cell)))
     override def run() = 
       saveInHistory
       while (running)
-        nextIteration
         Thread.ofVirtual().start(() => updateView)
+        nextIteration
         Thread.sleep(ONE_SECOND)
