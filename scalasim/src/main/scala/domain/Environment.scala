@@ -201,7 +201,8 @@ object Environment:
             * This extension method returns a new Matrix in which there can be X cells with the inputState
             * otherwise the cell has It's initial state. The selected state is choosen by using a random value
             * where if the random value is True then It is selected the inputState otherwise the original state.
-            * @param inputState: Input state to use If the probability returned from the random value is True
+            * @param initialState state used for the matrix initialization.
+            * @param spawnState Input state to use If the probability returned from the random value is True.
             * @return a new Matrix in which there can be spawned a number of cell with the input state.
             */
           def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
@@ -261,8 +262,8 @@ object Environment:
                 array
             /**
               * This extension method can be used for spawn a random number of cell inside the Matrix with the input state.
-              * @param initialState
-              * @param spawnState
+              * @param initialState initial state that will be used for the matrix initialization.
+              * @param spawnState specific state to set on cells.
               * @return a new Matrix where there are a number of random cells with the input state.
               */
             def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
