@@ -15,7 +15,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object GameOfLifeEnvironment:
     var maxCellsToSpawn = 0
-    val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.DEAD)
+    val initialState = CellState.DEAD
 
     def apply(dimension: Int): GameOfLifeEnvironmentImpl =
         maxCellsToSpawn = (dimension / 2) + 1
@@ -27,7 +27,7 @@ object GameOfLifeEnvironment:
         require(side > 0)
         require(cellularAutomata != null)
 
-        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(initialCell)
+        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(initialState)
 
         initialise()
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
