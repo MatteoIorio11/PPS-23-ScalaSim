@@ -113,7 +113,7 @@ object Engine2D:
         SimulationEngine2D(environment, tick)
 
     private case class SimulationEngine2D(val env: Environment[TwoDimensionalSpace], private val tick: Int) extends IterableThreadEngine2D:
-        require(tick >= 100)
+        require(tick >= 5)
         override def run() = 
             saveInHistory
             while (running)
