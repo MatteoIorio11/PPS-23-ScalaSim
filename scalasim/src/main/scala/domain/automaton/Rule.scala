@@ -64,6 +64,16 @@ trait MultipleStateRule[I, O] extends Rule[I, O, Iterable[State]]
 trait ParametricRule[I, O, T, D <: Dimension] extends Rule[I, O, (ParametricCell[D, T]) => Boolean]
 
 /**
+  * [[Rule]] that yields an [[Iterable]] output.
+  *
+  * @param D the dimension of the space.
+  * @param I the transformation function input type.
+  * @param O the transformation function output type.
+  * @param P the type of the matcher used to match this rule against an object of type [[P]].
+  */
+trait MultipleOutputRule[D <: Dimension, I, O <: Iterable[?], P] extends Rule[I, O, P]
+
+/**
   * A Neighbor rule is a [[Rule]] based on neighbors' states of a given
   * cell. Transformation functions of this rules should map
   * a D dimensional [[Neighbour]] into a D dimensional [[Cell]] with
@@ -73,13 +83,24 @@ trait ParametricRule[I, O, T, D <: Dimension] extends Rule[I, O, (ParametricCell
   */
 trait NeighbourRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D], State]
 
-
 /**
   * A [[ParametricRule]] that represents a rule for a [[ParametricNeighbour]].
   * The behavior of this rule is equals to a standard [[NeighbourRule]], the only
   * difference is in [[State]] of the handled cells.
+  * 
+  * @param D the dimension of the space.
+  * @param T the type of the [[ValuedState]] associated to each cell of this neighbourhood.
   */
 trait ParametricNeighbourRule[D <: Dimension, T] extends ParametricRule[ParametricNeighbour[D, T], ParametricCell[D, T], T, D]
+
+/**
+  * A [[MultipleOutputRule]] for a [[Neighbour]] object; Unlike a standard [[NeighbourRule]]
+  * this rule returns an [[Iterable]] of [[Cell]]s representing the result of the application 
+  * of the associated transformation function.
+  * 
+  * @param D the dimension of the space.
+  */
+trait MultipleOutputNeighbourRule[D <: Dimension] extends MultipleOutputRule[D, Neighbour[D], Iterable[Cell[D]], State]
 
 /**
   * Companion object for a generic [[NeighbourRule]].
@@ -104,6 +125,12 @@ object ParametricNeighbourRule:
     new ParametricNeighbourRule[D, T]:
       override def tFunc(n: ParametricNeighbour[D, T]): ParametricCell[D, T] = f(n)
       override def matcher: Option[ParametricCell[D, T] => Boolean] = Some(matchingCondition)
+
+object MultipleOutputNeighbourRule:
+  def apply[D <: Dimension](s: Option[State])(f: Neighbour[D] => Iterable[Cell[D]]): MultipleOutputNeighbourRule[D] =
+    new MultipleOutputNeighbourRule[D]:
+      override def tFunc(n: Neighbour[D]): Iterable[Cell[D]] = f(n)
+      override def matcher: Option[State] = s
 
 /**
   * Various utility functions for both [[NeighbourRule]]s and [[Neighbour]]s objects.

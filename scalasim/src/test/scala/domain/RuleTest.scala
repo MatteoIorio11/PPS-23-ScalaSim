@@ -17,6 +17,7 @@ import domain.automaton.ParametricNeighbourRule
 import domain.automaton.ParametricCell
 import domain.automaton.CellularAutomaton.ValuedState
 import domain.automaton.ParametricNeighbour
+import domain.automaton.MultipleOutputNeighbourRule
 
 class RuleTest extends org.scalatest.funsuite.AnyFunSuite:
 
@@ -58,6 +59,42 @@ class RuleTest extends org.scalatest.funsuite.AnyFunSuite:
     )
 
     nRule.applyTransformation(neighbourhood).state shouldBe DEAD
+
+
+  test("A `MultipleOutputNeighbourRule` should yield a collection of cells"):
+    import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
+    val rule: MultipleOutputNeighbourRule[TwoDimensionalSpace] = MultipleOutputNeighbourRule(Some(ALIVE)): n =>
+      // if left neighbour is DEAD, move right and set old cell DEAD and new ALIVE
+      // move up otherwise.
+      n.neighbourhood.find(_.position == n.center.position - Position[TwoDimensionalSpace](0, 1)) match
+        case Some(Cell(p, s)) if s == DEAD => List(
+          Cell(n.center.position, DEAD),
+          Cell(n.center.position + Position[TwoDimensionalSpace](0, 1), ALIVE)
+        )
+        case _ => List(
+          Cell(n.center.position, DEAD),
+          Cell(n.center.position - Position[TwoDimensionalSpace](1, 0), ALIVE)
+        )
+      
+    rule.matcher shouldBe Some(ALIVE)
+
+    val oldCenter = Cell[TwoDimensionalSpace](Position(1, 1), ALIVE)
+    val neighbours = List(
+      Cell[TwoDimensionalSpace](Position(1, 0), DEAD),
+      Cell[TwoDimensionalSpace](Position(0, 0), ALIVE),
+    )
+    val n1: Neighbour[TwoDimensionalSpace] = Neighbour(oldCenter, neighbours)
+
+    val r1: List[Cell[TwoDimensionalSpace]] = rule.applyTransformation(n1).toList
+
+    r1.head shouldBe Cell(Position(1, 1), DEAD)
+    r1.last shouldBe Cell(Position(1, 2), ALIVE)
+
+    val n2: Neighbour[TwoDimensionalSpace] = Neighbour( r1.last, neighbours)
+
+    val r2 = rule.applyTransformation(n2)
+    r2.head shouldBe Cell(Position(1, 2), DEAD)
+    r2.last shouldBe Cell(Position(0, 2), ALIVE)
 
 
   test("A `ParametricNeighbourRule` should behave as expected"):
