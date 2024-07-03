@@ -128,6 +128,7 @@ object Environment:
     trait ArrayEnvironment2D extends Environment[TwoDimensionalSpace]:
       protected val MAX_SIZE = 2
         override type Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]
+        override def matrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]
         override protected def saveCell(cells: Cell[TwoDimensionalSpace]*): Unit = 
           cells
             .filter(cell => cell.position.coordinates.size == MAX_SIZE)
