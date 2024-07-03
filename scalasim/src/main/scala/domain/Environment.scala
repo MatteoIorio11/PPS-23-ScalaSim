@@ -234,15 +234,16 @@ object Environment:
             /**
               * This extension method can be used for initialize the entire matrix with an initial type of cell,
               * every cell will be placed inside the right coordinates and every cell will have the correct position.
-              * @param initialCell: prototype of the cell.
+              * @param initialCell initial state of matrix, where all cell are off.
               * @return a new Matrix filled with cells.
               */
-            def initializeSpace(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-                val array = ArrayBuffer.fill(side, side)(initialCell)
-                  for (y <- 0 until side)
-                    for (x <- 0 until side)
-                      array(x)(y) = (Cell(Position(x, y), initialCell.state))
-                array
+            def initializeSpace(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+              val cell: Cell[TwoDimensionalSpace] = Cell(Position(-1,-1), state)
+              val array = ArrayBuffer.fill(side, side)(cell)
+                for (y <- 0 until side)
+                  for (x <- 0 until side)
+                    array(x)(y) = (Cell(Position(x, y), state))
+              array
             /**
               * This extension method can be used for spawn a fixed number of cell inside the Matrix with the input
               * state.
@@ -278,6 +279,22 @@ object Environment:
                     array(x)(y) = Cell(Position(x, y), state)
               array(0)(0) = Cell(Position(0, 0), spawnState)
               array
+            /**
+              * 
+              * @param nCells
+              * @param states
+              * @return
+              */
+            def spawnCell(nCells: Int)(states: State*): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+                var spawnedCells = 0
+                while (spawnedCells < nCells)
+                    val x = Random.nextInt(side)
+                    val y = Random.nextInt(side)
+                    val position = Position[TwoDimensionalSpace](x, y)
+                    if (!states.contains(array(x)(y).state))
+                      array(x)(y) = (Cell(position, states(Random.nextInt(states.size))))
+                      spawnedCells = spawnedCells + 1
+                array
     /**
       * Rectangula Environment2D where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
