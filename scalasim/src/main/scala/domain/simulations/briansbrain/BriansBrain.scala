@@ -1,17 +1,20 @@
 package domain.simulations.briansbrain
 
 import domain.Environment
+import domain.Environment.Environment
 import domain.automaton.CellularAutomaton.*
 import domain.base.Dimensions.*
-import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule}
+import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule, Rule}
+import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
 import domain.automaton.Cell.*
 import domain.base.Position
 import domain.simulations.briansbrain.BriansBrain.CellState
+
 import scala.collection.mutable.ArrayBuffer
 
 object BriansBrainEnvironment:
   var maxCellsToSpawn = 0
-  val initialState = CellState.OFF
+  val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.OFF)
 
   def apply(dimension: Int): BriansBrainEnvironmentImpl =
     maxCellsToSpawn = (dimension / 2) + 1
@@ -23,7 +26,7 @@ object BriansBrainEnvironment:
     require(side > 0)
     require(cellularAutomata != null)
 
-    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(initialState)
+    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(CellState.OFF)
 
     initialise()
     override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
@@ -61,16 +64,12 @@ object BriansBrain:
     case DYING
 
   private case class BriansBrainImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapSingleRules[TwoDimensionalSpace]:
-    var ruleCollection: Rules = Map()
-
-    override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
-      ruleCollection.get(cell.state)
-        .map(rule => rule.applyTransformation(neighbours))
-        .getOrElse(Cell(Position(0, 0), CellState.OFF))
-
+    var ruleCollection = Map()
     override def rules: Rules = ruleCollection
 
     override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
-      ruleCollection = ruleCollection + (neighborRule.matcher.get -> neighborRule)
+      neighborRule.matcher  match
+        case Some(state) =>  ruleCollection = ruleCollection + (state -> neighborRule)
+        case None => ruleCollection
 
 

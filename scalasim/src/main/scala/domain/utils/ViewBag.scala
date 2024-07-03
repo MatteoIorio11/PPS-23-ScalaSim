@@ -1,4 +1,4 @@
-package domain.utility
+package domain.utils
 
 import java.awt.Color
 import domain.automaton.CellularAutomaton.State
@@ -10,8 +10,8 @@ object ViewBag:
       * Automaton's states with colors.
       */
     trait ViewBag:
-        /**
-          * Colors to use for each state, a specific key define a specific color.
-          */
-        def colors: Map[State, Color]
+      /**
+        * Colors to use for each state, a specific key define a specific color.
+        */
+      def colors: Map[State, Color]
   

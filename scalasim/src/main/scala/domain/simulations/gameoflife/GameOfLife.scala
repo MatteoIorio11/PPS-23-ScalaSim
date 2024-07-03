@@ -15,7 +15,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object GameOfLifeEnvironment:
     var maxCellsToSpawn = 0
-    val initialState = CellState.DEAD
+    val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.DEAD)
 
     def apply(dimension: Int): GameOfLifeEnvironmentImpl =
         maxCellsToSpawn = (dimension / 2) + 1
@@ -23,11 +23,11 @@ object GameOfLifeEnvironment:
 
     import Environment.*
     class GameOfLifeEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
-      extends Environment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
+        extends Environment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
         require(side > 0)
         require(cellularAutomata != null)
 
-        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(initialState)
+        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(CellState.DEAD)
 
         initialise()
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
@@ -35,18 +35,20 @@ object GameOfLifeEnvironment:
             availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
         override protected def initialise(): Unit =
-            matrix = matrix.spawnCell(CellState.DEAD)(CellState.ALIVE)
+            val initialCell = Cell(Position(-1, -1), CellState.DEAD)
+            matrix.spawnCells(side*side/3)(CellState.ALIVE)
+
 object GameOfLife:
     def apply(): CellularAutomaton[TwoDimensionalSpace] =
         val gameOfLife = GameOfLifeImpl()
 
         val liveRule = NeighbourRule(Some(CellState.ALIVE)): (x: Neighbour[TwoDimensionalSpace]) =>
-            NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x).length match
+            NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x).length match 
                 case y if y < 2 || y > 3 => Cell(x.center.position, CellState.DEAD)
                 case _ => Cell(x.center.position, CellState.ALIVE)
-
+        
         val deadRule = NeighbourRule(Some(CellState.DEAD)): (x: Neighbour[TwoDimensionalSpace]) =>
-            NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x).length match
+            NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x).length match 
                 case 3 => Cell(x.center.position, CellState.ALIVE)
                 case _ => Cell(x.center.position, CellState.DEAD)
 
@@ -59,13 +61,9 @@ object GameOfLife:
         case DEAD
     private case class GameOfLifeImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapSingleRules[TwoDimensionalSpace]:
         var ruleCollection: Rules = Map()
-
-        override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
-            ruleCollection.get(cell.state)
-              .map(rule => rule.applyTransformation(neighbours))
-              .getOrElse(Cell(Position(0, 0), CellState.DEAD))
-
         override def rules: Rules = ruleCollection
-
         override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
-            ruleCollection = ruleCollection + (neighborRule.matcher.get -> neighborRule)
+            neighborRule.matcher  match
+                case Some(state) =>  ruleCollection = ruleCollection + (state -> neighborRule)
+                case None => ruleCollection
+

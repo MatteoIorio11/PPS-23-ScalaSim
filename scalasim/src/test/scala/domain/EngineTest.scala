@@ -3,11 +3,11 @@ package domain
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.*
 import domain.engine.Engine2D
-import utility.DummyAutomatonEnvironment
 import org.scalatest.BeforeAndAfterEach
 import scala.collection.mutable.ArrayBuffer
 import domain.automaton.CellularAutomaton.CellularAutomaton
 import domain.automaton.Cell
+import _root_.utility.DummyAutomatonEnvironment
 
 class EngineTest extends AnyFunSuite with BeforeAndAfterEach:
     var engine = Engine2D(DummyAutomatonEnvironment(10), 100)

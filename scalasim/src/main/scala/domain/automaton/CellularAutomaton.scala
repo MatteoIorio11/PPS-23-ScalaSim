@@ -45,7 +45,7 @@ object CellularAutomaton:
      * where each rule must be used only in a specific state. The cellular automaton manages the logic for all Its Cells.
      * @param D the [[Dimension]] of the space;
       */
-    trait CellularAutomaton[D <: Dimension]:
+    trait CellularAutomaton[D <: Dimension] extends GenericCellularAutomaton[D, Neighbour[D], Cell[D], NeighbourRule[D]]:
         /**
           * Type on which the Cellular Automaton will save all It's rules.
           */
@@ -55,23 +55,10 @@ object CellularAutomaton:
           */
         protected def ruleCollection: Rules
         /**
-          * Apply a specific rule that is based on the input cell state and It's neighbours.
-          * @param cell input cell on which the Cellular Automaton will apply It's logic base on the Cell's State or other informations.
-          * @param neighbors neighbours of the cell, this will be usefull if we have to check the state of other cells around the input cell.
-          * @return the new Cell after applying the rule.
-          */
-        def applyRule(cell: Cell[D], neighbors: Neighbour[D]): Cell[D]
-        /**
           * Getter for all the Cellular Automaton's rules.
           * @return the collection of all the Cellular Automaton's rules.
           */
         def rules: Rules
-        /**
-          * Add a new Rule inside the current Cellular Automaton.
-          * @param rule input rule to add inside the Cellular Automaton's rule collection.
-          */
-        def addRule(rule: NeighbourRule[D]): Unit
-    
     trait ComplexCellularAutomaton[D <: Dimension] extends GenericCellularAutomaton[D, Neighbour[D], Iterable[Cell[D]], MultipleOutputNeighbourRule[D]]:
       override def applyRule(neighbors: Neighbour[D]): Iterable[Cell[D]]
       override def addRule(rule: MultipleOutputNeighbourRule[D]): Unit
@@ -81,7 +68,8 @@ object CellularAutomaton:
       */
     trait MapSingleRules[D <: Dimension] extends CellularAutomaton[D]:
       override type Rules = Map[State, NeighbourRule[D]]
-      override def applyRule(cell: Cell[D], neighbors: Neighbour[D]) = 
+      override def applyRule(neighbors: Neighbour[D]) = 
+        val cell = neighbors.center
         ruleCollection.get(cell.state) match
           case Some(rule) => rule.applyTransformation(neighbors)
           case None => cell
@@ -89,9 +77,10 @@ object CellularAutomaton:
       * Trait that will be used in more complex Cellular Automatons where mapped on a single state there can be multiple rules to apply on a
       * single cell. The criteria of the rules that is applied is: the first rule that modifies the state or position or both of the input cell.
       */
-    trait MapMultipleRules[D <: Dimension]  extends CellularAutomaton[D]:
+    trait MapMultipleRules[D <: Dimension] extends CellularAutomaton[D]:
       override type Rules = Map[State, Set[NeighbourRule[D]]]
-      override def applyRule(cell: Cell[D], neighbors: Neighbour[D]): Cell[D] =
+      override def applyRule(neighbors: Neighbour[D]): Cell[D] =
+        val cell = neighbors.center
         ruleCollection.get(cell.state) match
           case None => cell
           case Some(rules) => rules.map(_.applyTransformation(neighbors)).find(_ != cell) match
@@ -100,7 +89,7 @@ object CellularAutomaton:
     /**
       * Trait that represent a Multiple Rule Cellular Automaton were mapped on a single Cell's state there will be multiple rules to apply.
       */
-    trait MultipleRuleCellularAutomaton[D <: Dimension] extends CellularAutomaton[D] with MapMultipleRules[D]:
+    trait MultipleRuleCellularAutomaton[D <: Dimension] extends MapMultipleRules[D]:
       override def rules: Rules = ruleCollection
     /**
       * Factory for Multiple Rules Cellular Automaton.

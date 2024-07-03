@@ -72,10 +72,6 @@ object DummyAutomaton:
 
     private class DummyAutomatonImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapSingleRules[TwoDimensionalSpace]:
         var ruleCollection: Rules = Map()
-        override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]) =
-            ruleCollection.get(cell.state)
-                .map(rule => rule.applyTransformation(neighbours))
-                .getOrElse(Cell(cell.position, DummyState.DEAD))
         override def rules: Rules = ruleCollection
         override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]) =
             ruleCollection = ruleCollection + (neighborRule.matcher.get -> neighborRule)

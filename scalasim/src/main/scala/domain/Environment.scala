@@ -12,6 +12,23 @@ import scala.collection.concurrent.TrieMap
 import java.awt.Color
 
 object Environment:
+    trait GenericEnvironment[D <: Dimension, R]:
+      protected def saveCell(cells: Cell[D]*): Unit
+      def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): R
+
+    trait SimpleEnvironment[D <: Dimension] extends GenericEnvironment[D, Cell[D]]:
+      def cellularAutomata: CellularAutomaton[D]
+      def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
+        val newCell = cellularAutomata.applyRule(Neighbour(cell, neighbors))
+        saveCell(newCell)
+        newCell
+    trait ComplexEnvironment[D <: Dimension] extends GenericEnvironment[D, Iterable[Cell[D]]]:
+      def cellularAutomata: ComplexCellularAutomaton[D]
+      override def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Iterable[Cell[D]] = 
+          val newCell = cellularAutomata.applyRule(Neighbour(cell, neighbors))
+          saveCell(newCell.toSeq*)
+          newCell
+      
     /**
       * An Environment has inside It a Cellular Automaton [[CellularAutomaton]] and also a Matrix [[Matrix]],
       * that can be defined when this trait is implemented, by doing this the user is able to decide which
@@ -19,7 +36,7 @@ object Environment:
       * that are stored inside the matrix, and for each cell, the Environment apply the right Cellular Automaton rule,
       * based on the input cell and all Its neighbours [[Iterable[Cell[D]]]].
       */
-    trait Environment[D <: Dimension]:
+    trait Space[D <: Dimension]:
       /**
         * Matrix that will be used for representing the environment, where all the cells will be stored.
         */
@@ -34,7 +51,7 @@ object Environment:
         * The cellular automaton that will be used in this Environment, the Cellular Automaton works in the same dimension
         * of the Environment, which is D: [[Dimension]].
         */
-      def cellularAutomata: CellularAutomaton[D]
+      def cellularAutomata: GenericCellularAutomaton[D, ?, ?, ?]
       /**
         * Data strucuture that will be used for manage the Matrix.
         */
@@ -51,21 +68,6 @@ object Environment:
         */
       def dimension: Tuple
       /**
-        * This method is used for saving the input sequence of cells into the matrix.
-        * @param cells sequence of cells to be stored inside the current matrix.
-        */
-      protected def saveCell(cells: Cell[D]*): Unit
-      /**
-        * This method is used for applying a rule on a specific cell given It's neighbours, this method will return the output cell.
-        * @param cell input cell where It is necessary to apply the rule.
-        * @param neighbors input cell's neighbours.
-        * @return the result cell after applying the specific rule.
-        */
-      def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
-          val newCell = cellularAutomata.applyRule(cell, Neighbour(cell, neighbors))
-          saveCell(newCell)
-          newCell
-      /**
         * Initialise the matrix, with a specific configuration of cells.
         */
       protected def initialise(): Unit
@@ -76,6 +78,8 @@ object Environment:
         * @return a collection of all the available cell with existing position inside the matrix.
         */
       protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
+    trait Environment[D <: Dimension] extends Space[D] with SimpleEnvironment[D]
+    trait CEnvironment[D <: Dimension] extends Space[D] with ComplexEnvironment[D]
     /**
       * This trait represent a Square Environment 2D.
       */
