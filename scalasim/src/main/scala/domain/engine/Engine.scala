@@ -8,6 +8,8 @@ import domain.automaton.{Neighbour, Cell, NeighborRuleUtility}
 import scala.collection.mutable.ArrayBuffer
 import domain.engine.Engine.{IterableThreadEngine2D, IterableTimerEngine2D, IterableEngine2D}
 import java.util.concurrent.{ExecutorService, Executor, Executors}
+import java.awt.Color
+import domain.automaton.CellularAutomaton.State
 
 object Engine:
     /**
@@ -97,6 +99,7 @@ object Engine:
       */
     trait GUIEngine2D extends IterableEngine2D:
       def view: EngineView[TwoDimensionalSpace]
+      def colors: Map[State, Color]
       /**
         * Update the current view attached to this engine.
         */
@@ -135,17 +138,25 @@ object TimerEngine2D:
   * 
   */
 object GUIEngine2D:
-  private val ONE_SECOND = 1000
+  private val SLEEP_TICK = 500
+  private var guiThreads = List[Thread]()
+  private val maxSize = Runtime.getRuntime().availableProcessors() + 1
   import Engine.* 
   def apply(env: Environment[TwoDimensionalSpace], view: EngineView[TwoDimensionalSpace]): GUIEngine2D = 
     GUIEngine2DImpl(env, view)
   private case class GUIEngine2DImpl(val env: Environment[TwoDimensionalSpace], val view: EngineView[TwoDimensionalSpace]) 
     extends IterableThreadEngine2D with GUIEngine2D:
+    override val colors: Map[State, Color] = Map()
     override def updateView = 
       view.updateView(environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]].flatMap(it => it.map(cell => cell)))
     override def run() = 
       saveInHistory
       while (running)
-        Thread.ofVirtual().start(() => updateView)
         nextIteration
-        Thread.sleep(ONE_SECOND)
+        guiThreads = guiThreads.::(Thread.ofVirtual().start(() => updateView))
+        guiThreads.size match
+          case x if x == maxSize => 
+            guiThreads.foreach(thread => thread.join())
+            guiThreads = List()
+          case _ => 
+        Thread.sleep(SLEEP_TICK)
