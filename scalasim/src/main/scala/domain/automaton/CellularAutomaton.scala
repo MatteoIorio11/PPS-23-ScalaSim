@@ -66,6 +66,10 @@ object CellularAutomaton:
           * @param rule input rule to add inside the Cellular Automaton's rule collection.
           */
         def addRule(rule: NeighbourRule[D]): Unit
+    
+    trait ComplexCellularAutomaton[D <: Dimension] extends CellularAutomaton[D]:
+      override def applyRule(cell: Cell[D], neighbors: Neighbour[D]): Iterable[Cell[D]]
+      override def addRule(rule: MultipleOutputNeighbourRule[D]): Unit
 
     /**
       * Trait in which the type Rules is represented by a Map of: [[State]] -> [[Rule]]
