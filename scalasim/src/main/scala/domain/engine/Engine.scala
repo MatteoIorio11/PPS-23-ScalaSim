@@ -5,11 +5,8 @@ import domain.Environment.*
 import domain.base.Position
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
 import domain.automaton.{Neighbour, Cell, NeighborRuleUtility}
-import scala.collection.mutable.ArrayBuffer
 import domain.engine.Engine.{IterableThreadEngine2D, IterableTimerEngine2D, IterableEngine2D}
 import java.util.concurrent.{ExecutorService, Executor, Executors}
-import java.awt.Color
-import domain.automaton.CellularAutomaton.State
 
 object Engine:
     /**
@@ -99,7 +96,6 @@ object Engine:
       */
     trait GUIEngine2D extends IterableEngine2D:
       def view: EngineView[TwoDimensionalSpace]
-      def colors: Map[State, Color]
       /**
         * Update the current view attached to this engine.
         */
@@ -146,7 +142,6 @@ object GUIEngine2D:
     GUIEngine2DImpl(env, view)
   private case class GUIEngine2DImpl(val env: Environment[TwoDimensionalSpace], val view: EngineView[TwoDimensionalSpace]) 
     extends IterableThreadEngine2D with GUIEngine2D:
-    override val colors: Map[State, Color] = Map()
     override def updateView = 
       view.updateView(environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]].flatMap(it => it.map(cell => cell)))
     override def run() = 
