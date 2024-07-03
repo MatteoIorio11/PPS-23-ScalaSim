@@ -82,7 +82,7 @@ object CellularAutomaton:
           case None => cell
     /**
       * Trait that will be used in more complex Cellular Automatons where mapped on a single state there can be multiple rules to apply on a
-      * single cell.
+      * single cell. The criteria of the rules that is applied is: the first rule that modifies the state or position or both of the input cell.
       */
     trait MapMultipleRules[D <: Dimension]  extends CellularAutomaton[D]:
       override type Rules = Map[State, Set[NeighbourRule[D]]]
