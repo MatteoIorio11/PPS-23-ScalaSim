@@ -7,13 +7,11 @@ import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule}
 import domain.automaton.Cell.*
 import domain.base.Position
 import domain.simulations.briansbrain.BriansBrain.CellState
-import domain.simulations.gameoflife.GameOfLifeEnvironment.initialState
-
 import scala.collection.mutable.ArrayBuffer
 
 object BriansBrainEnvironment:
   var maxCellsToSpawn = 0
-  val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.OFF)
+  val initialState = CellState.OFF
 
   def apply(dimension: Int): BriansBrainEnvironmentImpl =
     maxCellsToSpawn = (dimension / 2) + 1
