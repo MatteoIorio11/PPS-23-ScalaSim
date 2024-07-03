@@ -180,11 +180,12 @@ object Environment:
             * @param initialCell: initial cell to use for initialize the space.
             * @return a new Matrix initialized with the input initial cell.
             */
-          def initializeSpace(initialCell: Cell[TwoDimensionalSpace]): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            val array = ArrayBuffer.fill(heigth, width)(initialCell)
+          def initializeSpace(initialCell: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            val cell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), initialCell)
+            val array = ArrayBuffer.fill(heigth, width)(cell)
             for (y <- 0 until width)
                 for (x <- 0 until heigth)
-                    array(x)(y) = (Cell(Position(x, y), initialCell.state))
+                    array(x)(y) = (Cell(Position(x, y), initialCell))
             array
           /**
             * This extension method returns a new Matrix in which there a #nCells cells with the input state.
