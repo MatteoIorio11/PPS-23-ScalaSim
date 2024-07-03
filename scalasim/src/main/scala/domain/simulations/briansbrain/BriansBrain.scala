@@ -1,14 +1,13 @@
 package domain.simulations.briansbrain
 
 import domain.Environment
-import domain.Environment.Environment
 import domain.automaton.CellularAutomaton.*
 import domain.base.Dimensions.*
-import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule, Rule}
-import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
+import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule}
 import domain.automaton.Cell.*
 import domain.base.Position
 import domain.simulations.briansbrain.BriansBrain.CellState
+import domain.simulations.gameoflife.GameOfLifeEnvironment.initialState
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -26,7 +25,7 @@ object BriansBrainEnvironment:
     require(side > 0)
     require(cellularAutomata != null)
 
-    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(initialCell)
+    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(initialState)
 
     initialise()
     override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
@@ -63,7 +62,7 @@ object BriansBrain:
     case OFF
     case DYING
 
-  private case class BriansBrainImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapRules2D:
+  private case class BriansBrainImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapSingleRules[TwoDimensionalSpace]:
     var ruleCollection: Rules = Map()
 
     override def applyRule(cell: Cell[TwoDimensionalSpace], neighbours: Neighbour[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
@@ -74,6 +73,6 @@ object BriansBrain:
     override def rules: Rules = ruleCollection
 
     override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
-      ruleCollection = ruleCollection + (neighborRule.matchingState.get -> neighborRule)
+      ruleCollection = ruleCollection + (neighborRule.matcher.get -> neighborRule)
 
 
