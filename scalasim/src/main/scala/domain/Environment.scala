@@ -88,13 +88,31 @@ object Environment:
     trait CubicEnvironment extends Environment[ThreeDimensionalSpace]:
         def edge: Int
         override def dimension = (edge, edge, edge)
-    /**
+   /**
       * This trait represent a Rectangular Environment 2D.
       */
     trait RectangularEnvironment extends Environment[TwoDimensionalSpace]:
         def width: Int
         def heigth: Int
         override def dimension = (heigth, width)
+    /**
+      * This trait represent a Toroid Environment 2D.
+      */
+    trait ToroidEnvironmnt extends RectangularEnvironment:
+      /**
+        * Extension method for create a new custom mod operation.
+        */
+      extension (dividend: Int)
+        /**
+          * Mod operation that is able to manage negative numbers.
+          * @param divisor: Number to which the dividend is divided. (a mod b) b is the divisor.
+          * @return the mod of the operation (dividend mod divisor)
+          */
+        infix def /%/(divisor: Int): Int = 
+          val result = dividend % divisor
+          result match
+            case value if value < 0 => result + divisor
+            case _ => result
     /**
       * Environment D-dimensional where the matrix is defined as a [[TrieMap]]. This can be used in case It will be necessary
       * to use thread-safe data structures.
@@ -132,7 +150,7 @@ object Environment:
     /**
       * This trait represent a Toroid Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
-    trait ArrayToroidEnvironment extends RectangularEnvironment with ArrayEnvironment2D:
+    trait ArrayToroidEnvironment extends ToroidEnvironmnt with ArrayEnvironment2D:
       override protected def saveCell(cells: Cell[TwoDimensionalSpace]*) = 
         cells.foreach(cell => 
           val x = cell.position.coordinates.head
@@ -147,22 +165,7 @@ object Environment:
             })
             .filter(pos => pos.size == MAX_SIZE)
             .map(cor => matrix(cor.head)(cor.last))
-            
-      /**
-        * Extension method for create a new custom mod operation.
-        */
-      extension (dividend: Int)
-        /**
-          * Mod operation that is able to manage negative numbers.
-          * @param divisor: Number to which the dividend is divided. (a mod b) b is the divisor.
-          * @return the mod of the operation (dividend mod divisor)
-          */
-        infix def /%/(divisor: Int): Int = 
-          val result = dividend % divisor
-          result match
-            case value if value < 0 => result + divisor
-            case _ => result
-      /**
+     /**
         * Extension methods for initialize the Space.
         */
       extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
