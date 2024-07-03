@@ -86,6 +86,7 @@ object CellularAutomaton:
           case Some(rules) => rules.map(_.applyTransformation(neighbors)).find(_ != cell) match
             case Some(Cell(p, s)) => Cell(p, s)
             case _ => cell
+
     /**
       * Trait that represent a Multiple Rule Cellular Automaton were mapped on a single Cell's state there will be multiple rules to apply.
       */
@@ -104,4 +105,20 @@ object CellularAutomaton:
           ruleCollection.get(cellState) match
             case Some(rulez) => ruleCollection = ruleCollection + (cellState -> (rulez + rule))
             case None => ruleCollection = ruleCollection + (cellState -> Set(rule))
+
+
+    object MutliOutputCellularAutomaton:
+      def apply[D <: Dimension](): ComplexCellularAutomaton[D] = MutliOutputCellularAutomatonImpl()
+
+      private class MutliOutputCellularAutomatonImpl[D <: Dimension] extends ComplexCellularAutomaton[D]:
+
+        private var rules: Map[State, MultipleOutputNeighbourRule[D]] = Map()
+
+        override def addRule(rule: MultipleOutputNeighbourRule[D]): Unit =
+          rules = rules + (rule.matcher.getOrElse(AnyState) -> rule)
+
+        override def applyRule(neighbors: Neighbour[D]): Iterable[Cell[D]] =
+          rules.get(neighbors.center.state) match
+            case None => Iterable(neighbors.center)
+            case Some(rule) => rule.applyTransformation(neighbors)
           
