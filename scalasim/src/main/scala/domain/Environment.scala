@@ -4,10 +4,13 @@ import scala.collection.mutable.ArrayBuffer
 import domain.base.Dimensions.*
 import domain.automaton.CellularAutomaton.*
 import domain.automaton.Cell.*
+
 import scala.util.Random
 import automaton.Cell
 import base.Position
 import automaton.Neighbour
+import domain.utils.ViewBag.ViewBag
+
 import scala.collection.concurrent.TrieMap
 import java.awt.Color
 
@@ -78,7 +81,7 @@ object Environment:
         * @return a collection of all the available cell with existing position inside the matrix.
         */
       protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
-    trait Environment[D <: Dimension] extends Space[D] with SimpleEnvironment[D]
+    trait Environment[D <: Dimension] extends Space[D] with SimpleEnvironment[D] with ViewBag
     trait CEnvironment[D <: Dimension] extends Space[D] with ComplexEnvironment[D]
     /**
       * This trait represent a Square Environment 2D.
