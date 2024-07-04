@@ -11,11 +11,11 @@ import org.jcodec.api.awt.AWTSequenceEncoder
 
 import java.awt.Color
 import java.awt.image.BufferedImage
-trait MatrixToImageConverter[D <: Dimension, M, S <: State] {
-  def convert(matrix: M, cellSize: Int, stateColorMap: Map[S, Color]): BufferedImage
+trait MatrixToImageConverter[D <: Dimension, M] {
+  def convert(matrix: M, cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage
 }
 
-object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]], State] {
+object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]] {
   def convert(matrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]], cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage = {
     val rows = matrix.size
     val cols = matrix.head.size
@@ -65,9 +65,9 @@ object JCodecVideoGenerator extends VideoGenerator {
 }
 
 object Exporter {
-  def exportMatrix[D <: Dimension, M, S <: State](engine: Engine[D, M], converter: MatrixToImageConverter[D, M, S], videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double, stateColorMap: Map[S, Color]): Unit = {
+  def exportMatrix[D <: Dimension, M, S <: State](engine: Engine[D, M], converter: MatrixToImageConverter[D, M], videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double): Unit = {
     val images = engine.history.zipWithIndex.map { case (matrix, _) =>
-      converter.convert(matrix, cellSize, stateColorMap)
+      converter.convert(matrix, cellSize, engine.env.colors)
     }.toList
 
     videoGenerator.generate(videoFilename, images, secondsPerImage)
