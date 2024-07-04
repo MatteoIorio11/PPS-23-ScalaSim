@@ -29,3 +29,20 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
       g.fillRect(pos.coordinates.head * ps, pos.coordinates.last * ps, ps, ps)
     )
 
+@main def main(): Unit =
+  val frame = JFrame("Real Time Pixel Display")
+  val button = JButton("Stop")
+  val env = BriansBrainEnvironment(100)
+  val pixelPanel = Gui((100, 100), env.colors)
+  val guiE = GUIEngine2D(env, pixelPanel)
+  frame.add(pixelPanel)
+  frame.setSize(800, 600)
+  frame.setDefaultCloseOperation(3)
+  frame.setVisible(true)
+  guiE.startEngine
+  @volatile var exit = true
+  button.addActionListener(e =>
+    guiE.stopEngine
+    exit = false
+    frame.dispose())
+  frame.add(button)
