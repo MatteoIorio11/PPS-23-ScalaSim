@@ -3,13 +3,16 @@ package domain.gui
 import domain.automaton.Cell
 import domain.automaton.CellularAutomaton.State
 import domain.base.Dimensions.TwoDimensionalSpace
-import domain.engine.Engine.EngineView
+import domain.engine.Engine.{EngineView, GUIEngine2D}
 import domain.engine.GUIEngine2D
-import domain.simulations.briansbrain.BriansBrain.CellState
 import domain.simulations.briansbrain.BriansBrainEnvironment
+import domain.simulations.gameoflife.GameOfLifeEnvironment
 
 import java.awt.{Color, Graphics}
 import javax.swing.{JButton, JFrame, JPanel}
+import java.awt.{Color, Graphics}
+import javax.swing.{JButton, JComboBox, JFrame, JPanel}
+import scala.collection.immutable.LazyList
 
 class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JPanel with EngineView[TwoDimensionalSpace]:
   private var pixels: LazyList[Cell[TwoDimensionalSpace]] = LazyList()
@@ -23,7 +26,6 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     super.paintComponent(g)
     pixels.foreach(cell =>
       val color = colors.getOrElse(cell.state, Color.WHITE)
-
       val pos = cell.position
       g.setColor(color)
       g.fillRect(pos.coordinates.head * ps, pos.coordinates.last * ps, ps, ps)
@@ -31,18 +33,54 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
 
 @main def main(): Unit =
   val frame = JFrame("Real Time Pixel Display")
-  val button = JButton("Stop")
-  val env = BriansBrainEnvironment(100)
-  val pixelPanel = Gui((100, 100), env.colors)
-  val guiE = GUIEngine2D(env, pixelPanel)
-  frame.add(pixelPanel)
+  val startButton = JButton("Start")
+  val stopButton = JButton("Stop")
+  val automatonOptions = Array("Brian's Brain", "Game of Life")
+  val comboBox = JComboBox(automatonOptions)
+
+  frame.setLayout(null)
+  comboBox.setBounds(50, 50, 200, 30)
+  startButton.setBounds(50, 100, 100, 30)
+  stopButton.setBounds(150, 100, 100, 30)
+
+  frame.add(comboBox)
+  frame.add(startButton)
+  frame.add(stopButton)
+
   frame.setSize(800, 600)
   frame.setDefaultCloseOperation(3)
   frame.setVisible(true)
-  guiE.startEngine
+
+  @volatile var guiE: GUIEngine2D = null
+  @volatile var currentPanel: Gui = null
   @volatile var exit = true
-  button.addActionListener(e =>
-    guiE.stopEngine
-    exit = false
-    frame.dispose())
-  frame.add(button)
+
+  startButton.addActionListener(e =>
+    if (guiE != null) then guiE.stopEngine
+    if (currentPanel != null) then frame.remove(currentPanel)
+
+    val selected = comboBox.getSelectedItem.toString
+    val env = selected match
+      case "Brian's Brain" => BriansBrainEnvironment(100)
+      case "Game of Life"  => GameOfLifeEnvironment(100)
+
+    val pixelPanel = Gui((100, 100), env.colors)
+    guiE = GUIEngine2D(env, pixelPanel)
+    currentPanel = pixelPanel
+
+    pixelPanel.setBounds(300, 50, 500, 500)
+    frame.add(pixelPanel)
+    frame.revalidate()
+    frame.repaint()
+    guiE.startEngine
+  )
+
+  stopButton.addActionListener(e =>
+    if (guiE != null) then
+      guiE.stopEngine
+      if (currentPanel != null) then
+        frame.remove(currentPanel)
+        currentPanel = null
+      frame.revalidate()
+      frame.repaint()
+  )
