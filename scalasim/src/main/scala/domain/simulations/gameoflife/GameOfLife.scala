@@ -9,7 +9,9 @@ import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
 import domain.automaton.Cell.*
 import domain.base.Position
 import domain.simulations.gameoflife.GameOfLife.CellState
+import domain.utils.ViewBag.ViewBag
 
+import java.awt.Color
 import scala.util.Random
 import scala.collection.mutable.ArrayBuffer
 
@@ -37,6 +39,12 @@ object GameOfLifeEnvironment:
         override protected def initialise(): Unit =
             val initialCell = Cell(Position(-1, -1), CellState.DEAD)
             matrix.spawnCells(side*side/3)(CellState.ALIVE)
+
+        override def colors: Map[State, Color] = Map(
+            GameOfLife.CellState.ALIVE -> Color.GREEN,
+            GameOfLife.CellState.DEAD -> Color.BLACK
+        )
+
 
 object GameOfLife:
     def apply(): CellularAutomaton[TwoDimensionalSpace] =
