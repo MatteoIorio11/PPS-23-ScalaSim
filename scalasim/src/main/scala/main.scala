@@ -11,26 +11,12 @@ import domain.simulations.gameoflife.GameOfLifeEnvironment
 import java.awt.Color
 
 @main def main(): Unit =
-  //val engine = Engine2D(GameOfLifeEnvironment(100),5)
-  val engine = Engine2D(BriansBrainEnvironment(100), 5)
+  val engine = Engine2D(GameOfLifeEnvironment(100),5)
+  //val engine = Engine2D(BriansBrainEnvironment(100), 5)
 
   engine.startEngine
   Thread.sleep(2000)
   engine.stopEngine
-
-
-  val stateColorMap: Map[State, Color] = Map(
-    CellState.ON -> Color.BLACK,
-    CellState.OFF -> Color.WHITE,
-    CellState.DYING -> Color.BLUE
-  )
-
-/*
-  val stateColorMap: Map[State, Color] = Map(
-    GameOfLifeState.ALIVE -> Color.BLUE,
-    GameOfLifeState.DEAD -> Color.WHITE
-  )
- */
 
   Exporter.exportMatrix(
     engine = engine,
@@ -38,8 +24,7 @@ import java.awt.Color
     videoGenerator = JCodecVideoGenerator,
     cellSize = 10,
     videoFilename = "output.mp4",
-    secondsPerImage = 0.1,
-    stateColorMap = stateColorMap
+    secondsPerImage = 0.1
   )
 
 
