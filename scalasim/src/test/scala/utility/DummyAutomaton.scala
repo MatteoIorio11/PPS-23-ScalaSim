@@ -46,7 +46,7 @@ object DummyToroidEnv:
       extends Environment[TwoDimensionalSpace] with ArrayToroidEnvironment:
     require(width > 0)
     require(heigth > 0)
-    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(Cell(Position(-1, -1), DummyState.DEAD))
+    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(DummyState.DEAD)
     initialise()
     override protected def initialise() = matrix = matrix.spawnCell(DummyState.DEAD)(DummyState.ALIVE)
     override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
