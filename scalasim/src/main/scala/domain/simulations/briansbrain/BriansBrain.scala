@@ -10,6 +10,7 @@ import domain.automaton.Cell.*
 import domain.base.Position
 import domain.simulations.briansbrain.BriansBrain.CellState
 
+import java.awt.Color
 import scala.collection.mutable.ArrayBuffer
 
 object BriansBrainEnvironment:
@@ -36,6 +37,12 @@ object BriansBrainEnvironment:
     override protected def initialise(): Unit =
       val initialCell = Cell(Position(-1, -1), CellState.OFF)
       matrix.spawnCells(side*side/3)(CellState.ON)
+
+    override def colors: Map[State, Color] = Map(
+      CellState.ON -> Color.BLACK,
+      CellState.OFF -> Color.WHITE,
+      CellState.DYING -> Color.GRAY
+    )
 
 object BriansBrain:
   def apply(): CellularAutomaton[TwoDimensionalSpace] =
