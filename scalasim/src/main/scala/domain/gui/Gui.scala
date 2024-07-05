@@ -35,6 +35,7 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
   val frame = JFrame("Real Time Pixel Display")
   val startButton = JButton("Start")
   val stopButton = JButton("Stop")
+  val exitButton = JButton("Exit")
   val automatonOptions = Array("Brian's Brain", "Game of Life")
   val comboBox = JComboBox(automatonOptions)
 
@@ -42,22 +43,25 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
   comboBox.setBounds(50, 50, 200, 30)
   startButton.setBounds(50, 100, 100, 30)
   stopButton.setBounds(150, 100, 100, 30)
+  exitButton.setBounds(50, 300, 100, 30)
+
 
   frame.add(comboBox)
   frame.add(startButton)
   frame.add(stopButton)
+  frame.add(exitButton)
 
   frame.setSize(800, 600)
   frame.setDefaultCloseOperation(3)
   frame.setVisible(true)
 
-  @volatile var guiE: GUIEngine2D = null
-  @volatile var currentPanel: Gui = null
+  @volatile var guiE: Option[GUIEngine2D] = None
+  @volatile var currentPanel: Option[Gui] = None
   @volatile var exit = true
 
   startButton.addActionListener(e =>
-    if (guiE != null) then guiE.stopEngine
-    if (currentPanel != null) then frame.remove(currentPanel)
+    guiE.foreach(guiEngine => guiEngine.stopEngine)
+    currentPanel.foreach(panel => frame.remove(panel))
 
     val selected = comboBox.getSelectedItem.toString
     val env = selected match
@@ -65,22 +69,24 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
       case "Game of Life"  => GameOfLifeEnvironment(100)
 
     val pixelPanel = Gui((100, 100), env.colors)
-    guiE = GUIEngine2D(env, pixelPanel)
-    currentPanel = pixelPanel
+    guiE = Some(GUIEngine2D(env, pixelPanel))
+    currentPanel = Some(pixelPanel)
 
     pixelPanel.setBounds(300, 50, 500, 500)
     frame.add(pixelPanel)
     frame.revalidate()
     frame.repaint()
-    guiE.startEngine
+    guiE.foreach(engine => engine.startEngine)
   )
 
   stopButton.addActionListener(e =>
-    if (guiE != null) then
-      guiE.stopEngine
-      if (currentPanel != null) then
-        frame.remove(currentPanel)
-        currentPanel = null
-      frame.revalidate()
-      frame.repaint()
+    guiE.foreach(guiEngine => guiEngine.stopEngine)
+    currentPanel.foreach(panel => frame.remove(panel))
+    currentPanel = None
+    frame.revalidate()
+    frame.repaint()
   )
+  exitButton.addActionListener(e => 
+    guiE.foreach(guiEngine => guiEngine.stopEngine)
+    currentPanel.foreach(panel => frame.remove(panel))
+    frame.dispose())
