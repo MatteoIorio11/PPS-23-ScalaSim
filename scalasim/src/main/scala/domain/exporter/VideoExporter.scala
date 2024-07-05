@@ -65,9 +65,9 @@ object JCodecVideoGenerator extends VideoGenerator {
 }
 
 object Exporter {
-  def exportMatrix[D <: Dimension, M, S <: State](engine: Engine[D, M], converter: MatrixToImageConverter[D, M], videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double): Unit = {
+  def exportMatrix[D <: Dimension, M, S <: State](engine: Engine[D, M], colors: Map[State, Color], converter: MatrixToImageConverter[D, M], videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double): Unit = {
     val images = engine.history.zipWithIndex.map { case (matrix, _) =>
-      converter.convert(matrix, cellSize, engine.env.colors)
+      converter.convert(matrix, cellSize, colors)
     }.toList
 
     videoGenerator.generate(videoFilename, images, secondsPerImage)

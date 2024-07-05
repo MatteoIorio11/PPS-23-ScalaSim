@@ -20,6 +20,7 @@ import java.awt.Color
 
   Exporter.exportMatrix(
     engine = engine,
+    GameOfLifeEnvironment.colors,
     converter = SimpleMatrixToImageConverter,
     videoGenerator = JCodecVideoGenerator,
     cellSize = 10,
