@@ -141,18 +141,18 @@ object NeighborRuleUtility:
 
    enum RelativePositions(x: Int, y: Int):
       case TopLeft      extends RelativePositions(-1, -1)
-      case TopCenter    extends RelativePositions(-1, 0)
+      case North        extends RelativePositions(-1, 0)
       case TopRight     extends RelativePositions(-1, 1)
-      case CenterLeft   extends RelativePositions(0, -1)
+      case West         extends RelativePositions(0, -1)
       case Center       extends RelativePositions(0, 0)
-      case CenterRight  extends RelativePositions(0, 1)
+      case East         extends RelativePositions(0, 1)
       case BottomLeft   extends RelativePositions(1, -1)
-      case BottomCenter extends RelativePositions(1, 0)
+      case South        extends RelativePositions(1, 0)
       case BottomRight  extends RelativePositions(1, 1)
 
       def coordinates: List[Int] = List(x, y)
 
-      def toPosition = Position(coordinates.toArray*)
+      def toPosition[D <: Dimension]: Position[D] = Position(coordinates.toArray*).asInstanceOf[Position[D]]
 
    /**
      * Utility for configuring a certain neighbourhood placement inside a [[D]] dimensional space.
@@ -213,6 +213,22 @@ object NeighborRuleUtility:
            */
          def -(n: Int): Position[D] = Position(p.coordinates.map(_ - n).toArray*)
 
+         /**
+           * Compute the sum between this position and an instance of [[RelativePositions]]
+           *
+           * @param rp the relative position.
+           * @return the sum.
+           */
+         def +(rp: RelativePositions): Position[D] = p + rp.toPosition[D]
+
+         /**
+           * Compute the subtraction between this position and an instance of [[RelativePositions]]
+           *
+           * @param rp the relative position.
+           * @return the subtraction.
+           */
+         def -(rp: RelativePositions): Position[D] = p - rp.toPosition[D]
+
    /**
      * [[NeighbourhoodLocator]] in a two dimensional space representing a full circle of radius one
      * starting from a central position.
@@ -222,12 +238,12 @@ object NeighborRuleUtility:
          import RelativePositions.*
          List(
             TopLeft,
-            TopCenter,
+            North,
             TopRight,
-            CenterLeft,
-            CenterRight,
+            West,
+            East,
             BottomLeft,
-            BottomCenter,
+            South,
             BottomRight,
             ).map(p => Position(p.coordinates.toArray*))
 
