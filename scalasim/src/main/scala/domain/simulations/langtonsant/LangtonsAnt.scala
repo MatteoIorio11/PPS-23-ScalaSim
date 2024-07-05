@@ -21,11 +21,13 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 object LangtonsAntEnvironment extends ViewBag:
-  import LangtonsAntAutomaton.LangstonAntStates.*
+  import LangtonsAntAutomaton.CellState.*
+  import LangtonsAntAutomaton.LangstonAntState.ANT
 
   override def colors: Map[State, Color] = 
     Map(
-      ANT(AnyState) -> Color.RED,
+      ANT(WHITE) -> Color.RED,
+      ANT(BLACK) -> Color.BLUE,
       WHITE -> Color.WHITE,
       BLACK -> Color.BLACK,
     )
@@ -49,36 +51,34 @@ object LangtonsAntEnvironment extends ViewBag:
 object LangtonsAntAutomaton:
   import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
   import domain.automaton.NeighborRuleUtility.RelativePositions.*
-  import LangstonAntStates.*
+  import CellState.*
+  import LangstonAntState.ANT
 
-  enum LangstonAntStates extends State:
+  enum CellState extends State:
     case WHITE
     case BLACK
-    case ANT(cellColor: State = AnyState)
+    def invert: CellState = if this == WHITE then BLACK else WHITE
 
-    def invert: LangstonAntStates = this match
-      case ANT(x) => ANT(x)
-      case c => if c == WHITE then BLACK else WHITE
+  enum LangstonAntState extends State:
+    case ANT(cellColor: CellState)
+
 
   def apply(): ComplexCellularAutomaton[TwoDimensionalSpace] =
-    val ca = LangtonsAntAutomatonImpl()
-
-    val antRule = MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(ANT())): n =>
-      val updates = n.center.state.asInstanceOf[ANT].cellColor.asInstanceOf[LangstonAntStates] match
-        case WHITE => (BLACK, East)
-        case BLACK => (WHITE, West)
-        case _ => throw IllegalStateException("Ant cannot have another ant under it")
-
-      val newPosition = n.center.position.moveTo(updates._2)
-      val newPositionState = n.neighbourhood.find(_.position == newPosition).get.state
+    def antRule(n: Neighbour[TwoDimensionalSpace], moveCenterTo: RelativePositions): Iterable[Cell[TwoDimensionalSpace]] =
+      val newPosition = n.center.position.moveTo(moveCenterTo)
+      val newPositionState = n.neighbourhood.find(_.position == newPosition).get.state.asInstanceOf[CellState]
+      val oldPositionState = n.center.state.asInstanceOf[CellState].invert
 
       Iterable(
-        Cell(n.center.position, updates._1),
-        Cell(newPosition, newPositionState)
+        Cell(n.center.position, oldPositionState),
+        Cell(newPosition, ANT(newPositionState))
       )
 
+    val ca = LangtonsAntAutomatonImpl()
+
     Iterable(
-      antRule,
+      MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(ANT(WHITE)))(n => antRule(n, East)),
+      MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(ANT(BLACK)))(n => antRule(n, West)),
       MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(WHITE))(n => List.empty),
       MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(BLACK))(n => List.empty),
     ) foreach ca.addRule
