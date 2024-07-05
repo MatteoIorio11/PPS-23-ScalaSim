@@ -1,27 +1,34 @@
 package domain.simulations.langtonsant
 
-import domain.utils.ViewBag.ViewBag
-import domain.automaton.CellularAutomaton.CellularAutomaton
-import domain.base.Dimensions.TwoDimensionalSpace
 import domain.Environment.Environment
 import domain.Environment.SquareArrayEnvironment2D
-import java.awt.Color
-import domain.automaton.CellularAutomaton.State
 import domain.automaton.Cell
-import scala.collection.mutable
+import domain.automaton.CellularAutomaton.AnyState
+import domain.automaton.CellularAutomaton.CellularAutomaton
 import domain.automaton.CellularAutomaton.ComplexCellularAutomaton
+import domain.automaton.CellularAutomaton.State
 import domain.automaton.MultipleOutputNeighbourRule
-import domain.automaton.Neighbour
-import domain.base.Position
 import domain.automaton.NeighborRuleUtility.RelativePositions
 import domain.automaton.NeighborRuleUtility.circleNeighbourhoodLocator
+import domain.automaton.Neighbour
 import domain.base.Dimensions.Dimension
+import domain.base.Dimensions.TwoDimensionalSpace
+import domain.base.Position
+import domain.utils.ViewBag.ViewBag
+
+import java.awt.Color
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import domain.automaton.CellularAutomaton.AnyState
 
 object LangtonsAntEnvironment extends ViewBag:
+  import LangtonsAntAutomaton.LangstonAntStates.*
 
-  override def colors: Map[State, Color] = Map()
+  override def colors: Map[State, Color] = 
+    Map(
+      ANT(AnyState) -> Color.RED,
+      WHITE -> Color.WHITE,
+      BLACK -> Color.BLACK,
+    )
 
   class LangtonsAntEnvironmentImpl(val side: Int, val ca: CellularAutomaton[TwoDimensionalSpace])
     extends Environment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
@@ -36,7 +43,6 @@ object LangtonsAntEnvironment extends ViewBag:
       availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
     override protected def initialise(): Unit =
-      import LangtonsAntAutomaton.LangstonAntStates.*
       matrix = matrix.spawnCell(WHITE)(WHITE)
       matrix(side/2)(side/2) = Cell(Position[TwoDimensionalSpace](side/2, side/2), ANT(WHITE))
 
