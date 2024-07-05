@@ -20,11 +20,14 @@ import org.scalatest.tools.ColorBar
 import java.awt.Color
 import domain.Environment.SquareArrayEnvironment2D
 import domain.Environment.ArrayToroidEnvironment
+import domain.utils.ViewBag.ViewBag
 
 /**
   * 
   */
-object DummyAutomatonEnvironment:
+object DummyAutomatonEnvironment extends ViewBag:
+  override def colors: Map[State, Color] = Map((DummyState.DEAD -> Color.BLACK), (DummyState.ALIVE -> Color.WHITE))
+
     def apply(dimension: Int): Environment[TwoDimensionalSpace] =
         DummyAutomatonEnvironmentImpl(dimension, DummyAutomaton())
 
@@ -38,7 +41,7 @@ object DummyAutomatonEnvironment:
       override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
           import domain.automaton.NeighborRuleUtility.given
           availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
-object DummyToroidEnv:
+object DummyToroidEnv extends ViewBag:
   def apply(w: Int, h: Int): Environment[TwoDimensionalSpace] =
         DummyToroidEnvironmentImpl(w, h, DummyAutomaton())
 
@@ -52,6 +55,7 @@ object DummyToroidEnv:
     override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
       import domain.automaton.NeighborRuleUtility.given
         availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
+  override def colors: Map[State, Color] = Map((DummyState.DEAD -> Color.BLACK), (DummyState.ALIVE -> Color.WHITE))
 
 
 /**
