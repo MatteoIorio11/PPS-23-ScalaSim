@@ -39,9 +39,9 @@ object BriansBrainEnvironment:
       matrix.spawnCells(side*side/3)(CellState.ON)
 
     override def colors: Map[State, Color] = Map(
-      CellState.ON -> Color.BLACK,
-      CellState.OFF -> Color.WHITE,
-      CellState.DYING -> Color.GRAY
+      CellState.ON -> Color.WHITE,
+      CellState.OFF -> Color.BLACK,
+      CellState.DYING -> Color.BLUE
     )
 
 object BriansBrain:

@@ -41,7 +41,7 @@ object GameOfLifeEnvironment:
             matrix.spawnCells(side*side/3)(CellState.ALIVE)
 
         override def colors: Map[State, Color] = Map(
-            GameOfLife.CellState.ALIVE -> Color.GREEN,
+            GameOfLife.CellState.ALIVE -> Color.WHITE,
             GameOfLife.CellState.DEAD -> Color.BLACK
         )
 
