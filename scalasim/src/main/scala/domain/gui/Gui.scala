@@ -55,9 +55,8 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
   frame.setDefaultCloseOperation(3)
   frame.setVisible(true)
 
-  @volatile var guiE: Option[GUIEngine2D] = None
-  @volatile var currentPanel: Option[Gui] = None
-  @volatile var exit = true
+  var guiE: Option[GUIEngine2D] = None
+  var currentPanel: Option[Gui] = None
 
   startButton.addActionListener(e =>
     guiE.foreach(guiEngine => guiEngine.stopEngine)
