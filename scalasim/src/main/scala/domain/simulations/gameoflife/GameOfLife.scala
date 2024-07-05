@@ -15,7 +15,7 @@ import java.awt.Color
 import scala.util.Random
 import scala.collection.mutable.ArrayBuffer
 
-object GameOfLifeEnvironment:
+object GameOfLifeEnvironment extends ViewBag:
     var maxCellsToSpawn = 0
     val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.DEAD)
 
@@ -40,10 +40,10 @@ object GameOfLifeEnvironment:
             val initialCell = Cell(Position(-1, -1), CellState.DEAD)
             matrix.spawnCells(side*side/3)(CellState.ALIVE)
 
-        override def colors: Map[State, Color] = Map(
-            GameOfLife.CellState.ALIVE -> Color.WHITE,
-            GameOfLife.CellState.DEAD -> Color.BLACK
-        )
+    override def colors: Map[State, Color] = Map(
+        GameOfLife.CellState.ALIVE -> Color.WHITE,
+        GameOfLife.CellState.DEAD -> Color.BLACK
+    )
 
 
 object GameOfLife:

@@ -12,8 +12,9 @@ import domain.simulations.briansbrain.BriansBrain.CellState
 
 import java.awt.Color
 import scala.collection.mutable.ArrayBuffer
+import domain.utils.ViewBag.ViewBag
 
-object BriansBrainEnvironment:
+object BriansBrainEnvironment extends ViewBag:
   var maxCellsToSpawn = 0
   val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.OFF)
 
@@ -38,11 +39,11 @@ object BriansBrainEnvironment:
       val initialCell = Cell(Position(-1, -1), CellState.OFF)
       matrix.spawnCells(side*side/3)(CellState.ON)
 
-    override def colors: Map[State, Color] = Map(
-      CellState.ON -> Color.WHITE,
-      CellState.OFF -> Color.BLACK,
-      CellState.DYING -> Color.BLUE
-    )
+  override def colors: Map[State, Color] = Map(
+    CellState.ON -> Color.WHITE,
+    CellState.OFF -> Color.BLACK,
+    CellState.DYING -> Color.BLUE
+  )
 
 object BriansBrain:
   def apply(): CellularAutomaton[TwoDimensionalSpace] =
