@@ -64,12 +64,12 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     currentPanel.foreach(panel => frame.remove(panel))
 
     val selected = comboBox.getSelectedItem.toString
-    val env = selected match
+    val (env, colors) = selected match
       case "Brian's Brain" => (BriansBrainEnvironment(100), BriansBrainEnvironment.colors)
       case "Game of Life"  => (GameOfLifeEnvironment(100), GameOfLifeEnvironment.colors)
 
-    val pixelPanel = Gui((100, 100), env._2)
-    guiE = Some(GUIEngine2D(env._1, pixelPanel))
+    val pixelPanel = Gui((100, 100), colors)
+    guiE = Some(GUIEngine2D(env, pixelPanel))
     currentPanel = Some(pixelPanel)
 
     pixelPanel.setBounds(300, 50, 500, 500)
