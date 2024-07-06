@@ -1,6 +1,6 @@
 package domain.engine
 
-import domain.Environment.{Environment, ArrayEnvironment2D}
+import domain.Environment.{ArrayEnvironment2D}
 import domain.Environment.*
 import domain.base.Position
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
@@ -18,8 +18,9 @@ object Engine:
       * simulation It will be possible to get the simulation's history. The Engine has another generic which is [[R]] and It defines
       * the type of the Matrix that will be used for the matrix representation.
       */
-  trait GeneralEngine[D <: Dimension, R, E <: GenericEnvironment[D, ?]]:
-    def env: E
+  trait GeneralEngine[D <: Dimension, R]:
+    def env: GenericEnvironment[D, ?]
+    protected def environment(): GenericEnvironment[D, ?]
     var running: Boolean
     var history: LazyList[R]
     protected def nextIteration: Unit
@@ -37,14 +38,14 @@ object Engine:
       * Stop the Engine. If the Engine is already stopped nothing is done.
       */
     def stopEngine: Unit
-  trait SimpleEngine[D <: Dimension, R] extends GeneralEngine[D, R, Environment[D]]:
-    override def env: Environment[D]
-    protected def environment(): Environment[D]
+  trait SimpleEngine[D <: Dimension, R] extends GeneralEngine[D, R]:
+    override def env: SimpleEnvironment[D]
+    override protected def environment(): SimpleEnvironment[D]
   /**
   * This trait represent a specific type of 2D engine where the matrix type is in the form:
   * [[Iterable(Iterable(Cell(TwoDimensionalSpace)))]].
   */
-  trait IterableEngine2D extends SimpleEngine[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]]:
+  trait IterableEngine2D extends GeneralEngine[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]]:
     var history: LazyList[Iterable[Iterable[Cell[TwoDimensionalSpace]]]] = LazyList()
     override def currentMatrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]] = 
         environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
@@ -58,7 +59,7 @@ object Engine:
     */
   trait IterableThreadEngine2D extends Thread with IterableEngine2D:
     @volatile var running = false
-    override protected def environment(): Environment[TwoDimensionalSpace] = 
+    override protected def environment(): GenericEnvironment[TwoDimensionalSpace, ?] = 
         this.synchronized:
           env
     override def stopEngine = running = false
@@ -88,12 +89,9 @@ object Engine:
                 currentTimer = currentTimer + 1
                 Thread.sleep(ONE_SECOND)
             stopEngine
-  trait ComplexEngine[D <: Dimension, R] extends GeneralEngine[D, R, CEnvironment[D]]:
-    override def env: CEnvironment[D]
-    protected def environment(): CEnvironment[D]
-
-
-    
+  trait ComplexEngine[D <: Dimension, R] extends GeneralEngine[D, R]:
+    override def env: ComplexEnvironment[D]
+    protected def environment(): ComplexEnvironment[D]
 
    /**
       * Trait that represent a general View that will be attached to the engine. The view is defined in [[Dimension]].
@@ -115,14 +113,15 @@ object Engine:
 /**
   * Basic Engine 2D for Cellular Automaton Environment execution.
   */
-object SimpleEngine2D:
+object Engine2D:
     import Engine.*
-    def apply(environment: Environment[TwoDimensionalSpace],
+    def apply(environment: GenericEnvironment[TwoDimensionalSpace, ?],
         tick: Int):
          IterableThreadEngine2D =
         SimulationEngine2D(environment, tick)
 
-    private case class SimulationEngine2D(val env: Environment[TwoDimensionalSpace], private val tick: Int) extends IterableThreadEngine2D:
+    private case class SimulationEngine2D(val env: GenericEnvironment[TwoDimensionalSpace, ?],
+     private val tick: Int) extends IterableThreadEngine2D:
         require(tick >= 5)
         override def run() = 
             saveInHistory
@@ -134,9 +133,9 @@ object SimpleEngine2D:
   */
 object TimerEngine2D:
     import Engine.*
-    def apply(env: Environment[TwoDimensionalSpace], timer: Int): IterableThreadEngine2D =
+    def apply(env: GenericEnvironment[TwoDimensionalSpace, ?], timer: Int): IterableThreadEngine2D =
          TimerEngine2D(env, timer)
-    private case class TimerEngine2D(val env: Environment[TwoDimensionalSpace], val timer: Int) 
+    private case class TimerEngine2D(val env: GenericEnvironment[TwoDimensionalSpace, ?], val timer: Int) 
     extends IterableThreadEngine2D with IterableTimerEngine2D:
       require(timer >= 0)
       override def run() = startTimer
@@ -149,11 +148,9 @@ object GUIEngine2D:
   private val maxSize = Runtime.getRuntime().availableProcessors() + 1
   import Engine.* 
   def apply(env: GenericEnvironment[TwoDimensionalSpace, ?], view: EngineView[TwoDimensionalSpace]): GUIEngine2D = 
-    env match
-      case simple if simple.isInstanceOf[Environment[TwoDimensionalSpace]] => 
-        GUISimpleEngine2DImpl(simple.asInstanceOf[Environment[TwoDimensionalSpace]], view)
+    GUIEngine2DImpl(env, view)
     
-  private case class GUISimpleEngine2DImpl(val env: Environment[TwoDimensionalSpace], val view: EngineView[TwoDimensionalSpace]) 
+  private case class GUIEngine2DImpl(val env: GenericEnvironment[TwoDimensionalSpace, ?], val view: EngineView[TwoDimensionalSpace]) 
     extends IterableThreadEngine2D with GUIEngine2D:
     override def updateView = 
       view.updateView(environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]].flatMap(it => it.map(cell => cell)))
