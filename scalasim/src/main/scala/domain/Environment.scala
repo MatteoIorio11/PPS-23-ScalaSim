@@ -14,7 +14,7 @@ import scala.collection.concurrent.TrieMap
 import java.awt.Color
 
 object Environment:
-    trait GenericEnvironment[D <: Dimension, R]:
+    trait GenericEnvironment[D <: Dimension, R] extends Space[D]:
       protected def saveCell(cells: Cell[D]*): Unit
       def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): R
 
@@ -80,27 +80,25 @@ object Environment:
         * @return a collection of all the available cell with existing position inside the matrix.
         */
       protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
-    trait Environment[D <: Dimension] extends Space[D] with SimpleEnvironment[D]
-    trait CEnvironment[D <: Dimension] extends Space[D] with ComplexEnvironment[D]
-    trait ComplexSquareEnvironment extends CEnvironment[TwoDimensionalSpace]:
+    trait ComplexSquareEnvironment extends ComplexEnvironment[TwoDimensionalSpace]:
       def side: Int
       override def dimension: Tuple = (side, side)
     /**
       * This trait represent a Square Environment 2D.
       */
-    trait SquareEnvironment extends Environment[TwoDimensionalSpace]:
+    trait SquareEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
         def side: Int
         override def dimension = (side, side)
     /**
       * This trait represent a Cubic Environment 3D. 
       */
-    trait CubicEnvironment extends Environment[ThreeDimensionalSpace]:
+    trait CubicEnvironment extends GenericEnvironment[ThreeDimensionalSpace, ?]:
         def edge: Int
         override def dimension = (edge, edge, edge)
    /**
       * This trait represent a Rectangular Environment 2D.
       */
-    trait RectangularEnvironment extends Environment[TwoDimensionalSpace]:
+    trait RectangularEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
         def width: Int
         def heigth: Int
         override def dimension = (heigth, width)
@@ -126,7 +124,7 @@ object Environment:
       * Environment D-dimensional where the matrix is defined as a [[TrieMap]]. This can be used in case It will be necessary
       * to use thread-safe data structures.
       */
-    trait TrieMapEnvironment[D <: Dimension] extends Environment[D]:
+    trait TrieMapEnvironment[D <: Dimension] extends GenericEnvironment[D, ?]:
       override type Matrix = TrieMap[Position[D], Cell[D]]
       override def currentMatrix: TrieMap[Position[D], Cell[D]]
       override def matrix: TrieMap[Position[D], Cell[D]]
@@ -134,7 +132,7 @@ object Environment:
     * Environment 2D, where the matrix is defined as an [[ArrayBuffer(ArrayBuffer)]]. This type of matrix can be 
     * very efficient because it allows us to have an O(1) random time access.
     */
-    trait ArrayEnvironment2D extends Environment[TwoDimensionalSpace]:
+    trait ArrayEnvironment2D extends GenericEnvironment[TwoDimensionalSpace, ?]:
       protected val MAX_SIZE = 2
       override type Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]
       override def matrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]
@@ -342,35 +340,4 @@ object Environment:
             .filter(pos => pos.coordinates.head >= 0 && pos.coordinates.last < heigth &&
                             pos.coordinates.last >= 0 && pos.coordinates.last < width)
             .map(pos => matrix(pos.coordinates.head)(pos.coordinates.last))
-    trait SquareComplexArrayEnvironment2D extends ComplexSquareEnvironment with ComplexArrayEnvironment2D:
-      override protected def availableCells(positions: Iterable[Position[TwoDimensionalSpace]]): Iterable[Cell[TwoDimensionalSpace]] =
-        positions.filter(pos => pos.coordinates.forall(c => c >= 0 && c < side))
-          .map(pos => pos.coordinates.toList)
-          .filter(cor => cor.size == MAX_SIZE)
-          .map(cor => matrix(cor.head)(cor.last))
-      extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-          /**
-            * This extension method initialize the toroid space using the input initial cell, the initial cell
-            * will be used only for the input state, all the coordinates will be fixed automatically.
-            * @param initialCell: initial cell to use for initialize the space.
-            * @return a new Matrix initialized with the input initial cell.
-            */
-          def initializeSpace(initialCell: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            val cell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), initialCell)
-            val array = ArrayBuffer.fill(side, side)(cell)
-            for (y <- 0 until side)
-                for (x <- 0 until side)
-                    array(x)(y) = (Cell(Position(x, y), initialCell))
-            array
-          def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), initialState)
-            val array = ArrayBuffer.fill(side, side)(initialCell)
-            for (y <- 0 until side)
-              for (x <- 0 until side)
-                  val probability = Random().nextBoolean()
-                  val state = probability match
-                      case spawn if spawn => spawnState
-                      case _ => array(x)(y).state
-                  array(x)(y) = Cell(Position(x, y), state)
-            array(0)(0) = Cell(Position(0, 0), spawnState)
-            array
+    

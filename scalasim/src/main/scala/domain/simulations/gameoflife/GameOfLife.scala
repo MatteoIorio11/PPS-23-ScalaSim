@@ -1,7 +1,6 @@
 package domain.simulations.gameoflife
 
 import domain.Environment
-import domain.Environment.Environment
 import domain.automaton.CellularAutomaton.*
 import domain.base.Dimensions.*
 import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule, Rule}
@@ -25,7 +24,7 @@ object GameOfLifeEnvironment extends ViewBag:
 
     import Environment.*
     class GameOfLifeEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
-        extends Environment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
+        extends SimpleEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
         require(side > 0)
         require(cellularAutomata != null)
 

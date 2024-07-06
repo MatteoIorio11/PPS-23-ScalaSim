@@ -1,7 +1,6 @@
 package domain.simulations.briansbrain
 
 import domain.Environment
-import domain.Environment.Environment
 import domain.automaton.CellularAutomaton.*
 import domain.base.Dimensions.*
 import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule, Rule}
@@ -24,7 +23,7 @@ object BriansBrainEnvironment extends ViewBag:
 
   import Environment.*
   class BriansBrainEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
-    extends Environment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
+    extends SimpleEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
     require(side > 0)
     require(cellularAutomata != null)
 
