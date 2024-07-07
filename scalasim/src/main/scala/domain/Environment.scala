@@ -12,6 +12,7 @@ import automaton.Neighbour
 
 import scala.collection.concurrent.TrieMap
 import java.awt.Color
+import scala.annotation.init
 
 object Environment:
     trait GenericEnvironment[D <: Dimension, R] extends Space[D]:
@@ -82,13 +83,13 @@ object Environment:
       protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
     trait ComplexSquareEnvironment extends ComplexEnvironment[TwoDimensionalSpace]:
       def side: Int
-      override def dimension: Tuple = (side, side)
+      override def dimension: Tuple2[Int, Int] = (side, side)
     /**
       * This trait represent a Square Environment 2D.
       */
     trait SquareEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
         def side: Int
-        override def dimension = (side, side)
+        override def dimension: Tuple2[Int, Int] = (side, side)
     /**
       * This trait represent a Cubic Environment 3D. 
       */
@@ -101,7 +102,7 @@ object Environment:
     trait RectangularEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
         def width: Int
         def heigth: Int
-        override def dimension = (heigth, width)
+        override def dimension: Tuple2[Int, Int] = (heigth, width)
     /**
       * This trait represent a Toroid Environment 2D.
       */
@@ -155,32 +156,60 @@ object Environment:
             */
           def deepCopy: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
               matrix.map(row => row.map(cell => Cell(Position(cell.position.coordinates.toArray*), cell.state)))
-    /**
-      * 
-      */
-    trait ComplexArrayEnvironment2D extends ComplexSquareEnvironment:
-      protected val MAX_SIZE = 2
-      override type Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]
-      override def matrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]
-      override protected def saveCell(cells: Cell[TwoDimensionalSpace]*): Unit = 
-        cells
-          .filter(cell => cell.position.coordinates.size == MAX_SIZE)
-          .foreach(cell => 
-            val x = cell.position.coordinates.head
-            val y = cell.position.coordinates.last
-            matrix(x)(y) = cell)
-      override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-        matrix.deepCopy
-        /**
-          * Extension method for the deep copy of the matrix.
-          */
-      extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-        /**
-          * This extension method creates a deep copy of the current matrix.
-          * @return a copy of the caller.
-          */
-        def deepCopy: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            matrix.map(row => row.map(cell => Cell(Position(cell.position.coordinates.toArray*), cell.state)))
+          /**
+            * This extension method initialize the toroid space using the input initial cell, the initial cell
+            * will be used only for the input state, all the coordinates will be fixed automatically.
+            * @param initialCell: initial cell to use for initialize the space.
+            * @return a new Matrix initialized with the input initial cell.
+            */
+          protected def generalInitialization(dimension: Tuple2[Int, Int])(initialState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+            val cell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), initialState)
+            val array = ArrayBuffer.fill(dimension._1, dimension._2)(cell)
+            for (y <- 0 until dimension._2)
+                for (x <- 0 until dimension._1)
+                    array(x)(y) = (Cell(Position(x, y), initialState))
+            array
+          /**
+            * This extension method returns a new Matrix in which there can be X cells with the inputState
+            * otherwise the cell has It's initial state. The selected state is choosen by using a random value
+            * where if the random value is True then It is selected the inputState otherwise the original state.
+            * @param initialState state used for the matrix initialization.
+            * @param spawnState Input state to use If the probability returned from the random value is True.
+            * @return a new Matrix in which there can be spawned a number of cell with the input state.
+            */
+          protected def generalSpawn(dimension: Tuple2[Int, Int])(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), initialState)
+            val array = ArrayBuffer.fill(dimension._1, dimension._2)(initialCell)
+            for (y <- 0 until dimension._2)
+              for (x <- 0 until dimension._1)
+                  val probability = Random().nextBoolean()
+                  val state = probability match
+                      case x if x => spawnState
+                      case _ => array(x)(y).state
+                  array(x)(y) = Cell(Position(x, y), state)
+            array(0)(0) = Cell(Position(0, 0), spawnState)
+            array
+          /**
+            * This extension method returns a new Matrix in which there a #nCells cells with the input state.
+            * @param nCells: number of cells to spawn 
+            * @param state: input state to use inside the spawned cells.
+            * @return a new Matrix where there are #nCells with the input state.
+            */
+          protected def generalMultipleSpawn(dimension: Tuple2[Int, Int])(nCells: Int*)(states: State*): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            if (nCells.size != states.size)
+              array
+            else
+              nCells.zipWithIndex.foreach((nCell, index) => 
+                var spawnedCells = 0
+                while (spawnedCells < nCell)
+                  val x = Random.nextInt(dimension._1)
+                  val y = Random.nextInt(dimension._2)
+                  val position = Position[TwoDimensionalSpace](x, y)
+                  if (states.forall(state => state != array(x)(y).state))
+                    array(x)(y) = (Cell(position, states(index)))
+                    spawnedCells = spawnedCells + 1
+                )
+            array
 
     /**
       * This trait represent a Toroid Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
@@ -204,55 +233,14 @@ object Environment:
         * Extension methods for initialize the Space.
         */
       extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-          /**
-            * This extension method initialize the toroid space using the input initial cell, the initial cell
-            * will be used only for the input state, all the coordinates will be fixed automatically.
-            * @param initialCell: initial cell to use for initialize the space.
-            * @return a new Matrix initialized with the input initial cell.
-            */
-          def initializeSpace(initialCell: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            val cell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), initialCell)
-            val array = ArrayBuffer.fill(heigth, width)(cell)
-            for (y <- 0 until width)
-                for (x <- 0 until heigth)
-                    array(x)(y) = (Cell(Position(x, y), initialCell))
-            array
-          /**
-            * This extension method returns a new Matrix in which there a #nCells cells with the input state.
-            * @param nCells: number of cells to spawn 
-            * @param state: input state to use inside the spawned cells.
-            * @return a new Matrix where there are #nCells with the input state.
-            */
-          def spawnCells(nCells: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            var spawnedCells = 0
-            while (spawnedCells < nCells)
-                val x = Random.nextInt(heigth) % width
-                val y = Random.nextInt(width) % heigth
-                val position = Position[TwoDimensionalSpace](x, y)
-                if (array(x)(y).state != state)
-                    array(x)(y) = (Cell(position, state))
-                    spawnedCells = spawnedCells + 1
-            array
-          /**
-            * This extension method returns a new Matrix in which there can be X cells with the inputState
-            * otherwise the cell has It's initial state. The selected state is choosen by using a random value
-            * where if the random value is True then It is selected the inputState otherwise the original state.
-            * @param initialState state used for the matrix initialization.
-            * @param spawnState Input state to use If the probability returned from the random value is True.
-            * @return a new Matrix in which there can be spawned a number of cell with the input state.
-            */
+          def initializeSpace(initialState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            array.generalInitialization(dimension = dimension)(initialState = initialState)
+
+          def spawnCells(nCells: Int*)(states: State*): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            array.generalMultipleSpawn(dimension)(nCells*)(states*)
+
           def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), initialState)
-            val array = ArrayBuffer.fill(heigth, width)(initialCell)
-            for (y <- 0 until width)
-              for (x <- 0 until heigth)
-                  val probability = Random().nextBoolean()
-                  val state = probability match
-                      case x if x => spawnState
-                      case _ => array(x)(y).state
-                  array(x)(y) = Cell(Position(x, y), state)
-            array(0)(0) = Cell(Position(0, 0), spawnState)
-            array
+            array.generalSpawn(dimension)(initialState)(spawnState)
     /**
       * Square Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
@@ -266,71 +254,13 @@ object Environment:
           * Utilities methods.
           */
         extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-            /**
-              * This extension method can be used for initialize the entire matrix with an initial type of cell,
-              * every cell will be placed inside the right coordinates and every cell will have the correct position.
-              * @param initialCell initial state of matrix, where all cell are off.
-              * @return a new Matrix filled with cells.
-              */
-            def initializeSpace(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-              val cell: Cell[TwoDimensionalSpace] = Cell(Position(-1,-1), state)
-              val array = ArrayBuffer.fill(side, side)(cell)
-                for (y <- 0 until side)
-                  for (x <- 0 until side)
-                    array(x)(y) = (Cell(Position(x, y), state))
-              array
-            /**
-              * This extension method can be used for spawn a fixed number of cell inside the Matrix with the input
-              * state.
-              * @param nCells: number of cells to spawn inside the matrix.
-              * @param state: state that will be used inside the spawned cells.
-              * @return a new Matrix where there are #nCells with the input state.
-              */
-            def spawnCells(nCells: Int)(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-                var spawnedCells = 0
-                while (spawnedCells < nCells)
-                    val x = Random.nextInt(side)
-                    val y = Random.nextInt(side)
-                    val position = Position[TwoDimensionalSpace](x, y)
-                    if (array(x)(y).state != state)
-                        array(x)(y) = (Cell(position, state))
-                        spawnedCells = spawnedCells + 1
-                array
-            /**
-              * This extension method can be used for spawn a random number of cell inside the Matrix with the input state.
-              * @param initialState initial state that will be used for the matrix initialization.
-              * @param spawnState specific state to set on cells.
-              * @return a new Matrix where there are a number of random cells with the input state.
-              */
-            def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-              val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), initialState)
-              val array = ArrayBuffer.fill(side, side)(initialCell)
-              for (y <- 0 until side)
-                for (x <- 0 until side)
-                    val probability = Random().nextBoolean()
-                    val state = probability match
-                        case spawn if spawn => spawnState
-                        case _ => array(x)(y).state
-                    array(x)(y) = Cell(Position(x, y), state)
-              array(0)(0) = Cell(Position(0, 0), spawnState)
-              array
-            /**
-              * 
-              * @param nCells
-              * @param states
-              * @return
-              */
-            def spawnCell(nCells: Int)(states: State*): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-                var spawnedCells = 0
-                while (spawnedCells < nCells)
-                    val x = Random.nextInt(side)
-                    val y = Random.nextInt(side)
-                    val position = Position[TwoDimensionalSpace](x, y)
-                    if (!states.contains(array(x)(y).state))
-                      array(x)(y) = (Cell(position, states(Random.nextInt(states.size))))
-                      spawnedCells = spawnedCells + 1
-                array
-    /**
+          def initializeSpace(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+            array.generalInitialization(dimension)(state)
+          def spawnCells(nCells: Int*)(states: State*): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
+            array.generalMultipleSpawn(dimension)(nCells*)(states*)
+          def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
+            array.generalSpawn(dimension)(initialState)(spawnState)
+      /**
       * Rectangula Environment2D where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
     trait RectangularArrayEnvironment2D extends RectangularEnvironment with ArrayEnvironment2D:
