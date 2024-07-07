@@ -20,6 +20,7 @@ lazy val root = project
       libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.18" % Test,
       libraryDependencies += "com.github.sbt" % "junit-interface" % "0.13.3" % Test,
 
-      scalacOptions ++= Seq("-deprecation")
+      scalacOptions ++= Seq("-deprecation"),
+      javaOptions ++= Seq("--enable-preview")
   )
 
