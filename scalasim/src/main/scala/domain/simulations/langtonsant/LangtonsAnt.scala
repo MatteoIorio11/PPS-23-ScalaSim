@@ -1,6 +1,5 @@
 package domain.simulations.langtonsant
 
-import domain.Environment.Environment
 import domain.Environment.SquareArrayEnvironment2D
 import domain.automaton.Cell
 import domain.automaton.CellularAutomaton.AnyState
@@ -19,6 +18,7 @@ import domain.utils.ViewBag.ViewBag
 import java.awt.Color
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import domain.Environment.ComplexEnvironment
 
 object LangtonsAntEnvironment extends ViewBag:
   import LangtonsAntAutomaton.CellState.*
@@ -33,13 +33,13 @@ object LangtonsAntEnvironment extends ViewBag:
     )
 
   class LangtonsAntEnvironmentImpl(val side: Int, val ca: CellularAutomaton[TwoDimensionalSpace])
-    extends Environment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
+    extends ComplexEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
 
     var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
     
     initialise()
 
-    override def cellularAutomata: CellularAutomaton[TwoDimensionalSpace] = ???
+    override def cellularAutomata: ComplexCellularAutomaton[TwoDimensionalSpace] = LangtonsAntAutomaton()
 
     override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
       availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
@@ -61,7 +61,6 @@ object LangtonsAntAutomaton:
 
   enum LangstonAntState extends State:
     case ANT(cellColor: CellState)
-
 
   def apply(): ComplexCellularAutomaton[TwoDimensionalSpace] =
     def antRule(n: Neighbour[TwoDimensionalSpace], moveCenterTo: RelativePositions): Iterable[Cell[TwoDimensionalSpace]] =
