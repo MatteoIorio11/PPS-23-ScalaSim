@@ -24,6 +24,8 @@ object LangtonsAntEnvironment extends ViewBag:
   import LangtonsAntAutomaton.CellState.*
   import LangtonsAntAutomaton.LangstonAntState.ANT
 
+  def apply(dimension: Int): LangtonsAntEnvironmentImpl =
+    LangtonsAntEnvironmentImpl(dimension, LangtonsAntAutomaton())
   override def colors: Map[State, Color] = 
     Map(
       ANT(WHITE) -> Color.RED,
@@ -32,7 +34,7 @@ object LangtonsAntEnvironment extends ViewBag:
       BLACK -> Color.BLACK,
     )
 
-  class LangtonsAntEnvironmentImpl(val side: Int, val ca: CellularAutomaton[TwoDimensionalSpace])
+  class LangtonsAntEnvironmentImpl(val side: Int, val ca: ComplexCellularAutomaton[TwoDimensionalSpace])
     extends ComplexEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
 
     var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
@@ -66,7 +68,7 @@ object LangtonsAntAutomaton:
     def antRule(n: Neighbour[TwoDimensionalSpace], moveCenterTo: RelativePositions): Iterable[Cell[TwoDimensionalSpace]] =
       val newPosition = n.center.position.moveTo(moveCenterTo)
       val newPositionState = n.neighbourhood.find(_.position == newPosition).get.state.asInstanceOf[CellState]
-      val oldPositionState = n.center.state.asInstanceOf[CellState].invert
+      val oldPositionState = n.center.state.asInstanceOf[LangstonAntState.ANT].cellColor.invert
 
       Iterable(
         Cell(n.center.position, oldPositionState),
