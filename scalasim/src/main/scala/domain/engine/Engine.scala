@@ -156,6 +156,7 @@ object GUIEngine2D:
       view.updateView(environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]].flatMap(it => it.map(cell => cell)))
     override def run() = 
       saveInHistory
+      guiThreads = guiThreads.::(Thread.ofVirtual().start(() => updateView))
       while (running)
         nextIteration
         guiThreads = guiThreads.::(Thread.ofVirtual().start(() => updateView))
