@@ -4,7 +4,6 @@ import domain.automaton.CellularAutomaton.CellularAutomaton
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Neighbour
 import domain.automaton.Cell
-import domain.Environment.Environment
 import domain.automaton.CellularAutomaton.*
 import domain.base.Position
 import domain.base.Position.*
@@ -21,6 +20,7 @@ import java.awt.Color
 import domain.Environment.SquareArrayEnvironment2D
 import domain.Environment.ArrayToroidEnvironment
 import domain.utils.ViewBag.ViewBag
+import domain.Environment.SimpleEnvironment
 
 /**
   * 
@@ -28,11 +28,11 @@ import domain.utils.ViewBag.ViewBag
 object DummyAutomatonEnvironment extends ViewBag:
   override def colors: Map[State, Color] = Map((DummyState.DEAD -> Color.BLACK), (DummyState.ALIVE -> Color.WHITE))
 
-    def apply(dimension: Int): Environment[TwoDimensionalSpace] =
+    def apply(dimension: Int): SimpleEnvironment[TwoDimensionalSpace] =
         DummyAutomatonEnvironmentImpl(dimension, DummyAutomaton())
 
     private case class DummyAutomatonEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace]) 
-        extends Environment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
+        extends SimpleEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
       require(side > 0)
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
       initialise()
@@ -42,11 +42,11 @@ object DummyAutomatonEnvironment extends ViewBag:
           import domain.automaton.NeighborRuleUtility.given
           availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 object DummyToroidEnv extends ViewBag:
-  def apply(w: Int, h: Int): Environment[TwoDimensionalSpace] =
+  def apply(w: Int, h: Int): SimpleEnvironment[TwoDimensionalSpace] =
         DummyToroidEnvironmentImpl(w, h, DummyAutomaton())
 
   private case class DummyToroidEnvironmentImpl(val width: Int, val heigth: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace]) 
-      extends Environment[TwoDimensionalSpace] with ArrayToroidEnvironment:
+      extends SimpleEnvironment[TwoDimensionalSpace] with ArrayToroidEnvironment:
     require(width > 0)
     require(heigth > 0)
     var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(DummyState.DEAD)
