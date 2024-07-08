@@ -1,5 +1,6 @@
 package domain.gui
 
+import domain.Environment.Environment
 import domain.automaton.Cell
 import domain.automaton.CellularAutomaton.State
 import domain.base.Dimensions.TwoDimensionalSpace
@@ -9,8 +10,16 @@ import domain.simulations.briansbrain.BriansBrainEnvironment
 import domain.simulations.gameoflife.GameOfLifeEnvironment
 
 import java.awt.{Color, Graphics}
-import javax.swing.{JButton, JFrame, JPanel, JComboBox, JSlider, WindowConstants}
+import javax.swing.{JButton, JComboBox, JFrame, JPanel, JSlider, WindowConstants}
 import scala.collection.immutable.LazyList
+
+case class EnvironmentOption(name: String, createEnvironment: Int => Environment[TwoDimensionalSpace], colors: Map[State, Color])
+
+object EnvironmentOption:
+  val options = List(
+    EnvironmentOption("Brian's Brain", BriansBrainEnvironment.apply, BriansBrainEnvironment.colors),
+    EnvironmentOption("Game of Life", GameOfLifeEnvironment.apply(_, 30), GameOfLifeEnvironment.colors)
+  )
 
 class Gui(val dimension: (Int, Int), colors: Map[State, Color]) extends JPanel with EngineView[TwoDimensionalSpace]:
   private var pixels: LazyList[Cell[TwoDimensionalSpace]] = LazyList()
@@ -39,8 +48,7 @@ class Gui(val dimension: (Int, Int), colors: Map[State, Color]) extends JPanel w
   val startButton = JButton("Start")
   val stopButton = JButton("Stop")
   val exitButton = JButton("Exit")
-  val automatonOptions = Array("Brian's Brain", "Game of Life")
-  val comboBox = JComboBox(automatonOptions)
+  val comboBox = JComboBox(EnvironmentOption.options.map(_.name).toArray)
   val sizeSlider = JSlider(10, 200, 100)
 
   frame.setLayout(null)
@@ -67,11 +75,12 @@ class Gui(val dimension: (Int, Int), colors: Map[State, Color]) extends JPanel w
     guiE.foreach(guiEngine => guiEngine.stopEngine)
     currentPanel.foreach(panel => frame.remove(panel))
 
-    val selected = comboBox.getSelectedItem.toString
+    val selectedOption = comboBox.getSelectedItem.toString
     val size = sizeSlider.getValue()
-    val (env, colors) = selected match
-      case "Brian's Brain" => (BriansBrainEnvironment(size), BriansBrainEnvironment.colors)
-      case "Game of Life" => (GameOfLifeEnvironment(size), GameOfLifeEnvironment.colors)
+
+    val environmentOption = EnvironmentOption.options.find(_.name == selectedOption).get
+    val env = environmentOption.createEnvironment(size)
+    val colors = environmentOption.colors
 
     val pixelPanel = Gui((size, size), colors)
     val panelSize = 500
