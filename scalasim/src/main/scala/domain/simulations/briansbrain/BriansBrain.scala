@@ -19,6 +19,9 @@ import scala.collection.mutable.ArrayBuffer
 
 import Environment.*
 
+/**
+  * TODO: write how this CA work.
+  */
 trait BriansBrainEnvironment extends SimpleEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D
 
 object BriansBrainEnvironment extends ViewBag:

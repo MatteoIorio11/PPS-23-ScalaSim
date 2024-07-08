@@ -21,18 +21,27 @@ import java.util.Random
 import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.CustomNeighbourhoodDSL.neighbour
 import domain.Environment.ArrayToroidEnvironment
 
+/**
+  * TODO dire come funzio
+  */
 object WaTorEnvironment extends ViewBag:
     import WaTor.*
-    override def colors: Map[State, Color] = Map((FISH() -> Color.apply(0, 100, 0)), 
-    (SHARK() -> Color.RED),
-    (EMPTY() -> Color.CYAN))
+    override def colors: Map[State, Color] = Map(
+        (FISH() -> Color.apply(0, 100, 0)), 
+        (SHARK() -> Color.RED),
+        (EMPTY() -> Color.CYAN),
+    )
+
     def apply(w: Int, h: Int): ComplexEnvironment[TwoDimensionalSpace] = 
         WaTorEnvironmentImpl(w, h, WaTor())
 
     private case class WaTorEnvironmentImpl(val width: Int, val heigth: Int, val cellularAutomata: ComplexCellularAutomaton[TwoDimensionalSpace]) 
         extends ComplexEnvironment[TwoDimensionalSpace] with ArrayToroidEnvironment:
+
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(EMPTY())
+
       initialise()
+
       override protected def initialise() = 
         matrix = matrix.spawnCells(1000, 500)(SHARK(), FISH())
     
@@ -46,6 +55,7 @@ object WaTor:
         size match
             case x if x > 0 => Some(positions(Random().nextInt(size)))
             case _ => None
+
     def apply(): ComplexCellularAutomaton[TwoDimensionalSpace] = 
         val wator = WaTor()
         val fishRule = MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(FISH())): neighborus => 
@@ -91,7 +101,7 @@ object WaTor:
         wator.addRule(sharkRule)
         wator
     
-    case class WaTorState(var value: Int = 10, protected val name: String) extends ValuedState[Int]:
+    abstract case class WaTorState(var value: Int = 10, protected val name: String) extends ValuedState[Int]:
         def burnEnergy: Unit = 
             value = value match
                 case x if x > 0 => value - 1
@@ -100,24 +110,28 @@ object WaTor:
             x match
                 case state: WaTorState => state.name.equals(name)
                 case _ => false
-    class FISH() extends WaTorState(value = 1000, "FISH"):
+
+        def canReproduce: Boolean
+
+    class FISH extends WaTorState(value = 1000, "FISH"):
         val threshold = value / 2
         def canReproduce: Boolean = value == threshold
+
     class SHARK(initialEnergy: Int = 100) extends WaTorState(initialEnergy, "SHARK"):
         val threshold = value / 2
         def eatFish: Unit = value = value + 100
         def reproduce: Unit = value = value / 2
         def canReproduce: Boolean = value == threshold
-    class EMPTY() extends  WaTorState(0, "EMPTY")
-        
+
+    class EMPTY extends  WaTorState(0, "EMPTY"):
+      override def canReproduce: Boolean = false
+
     private case class WaTor() extends ComplexCellularAutomaton[TwoDimensionalSpace]:
-        type Rules = Map[State, MultipleOutputNeighbourRule[TwoDimensionalSpace]]
-        var ruleCollection: Rules = Map()
-        val rules: Rules = ruleCollection
+        protected var rules: Map[State, MultipleOutputNeighbourRule[TwoDimensionalSpace]] = Map()
         override def applyRule(neighbors: Neighbour[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] = 
             val cell = neighbors.center
-            ruleCollection.get(cell.state) match
+            rules.get(cell.state) match
                 case Some(rule) => rule.applyTransformation(neighbors)
                 case None => List()
         override def addRule(neighborRule: MultipleOutputNeighbourRule[TwoDimensionalSpace]) =
-            ruleCollection = ruleCollection + (neighborRule.matcher.get -> neighborRule)
+            rules = rules + (neighborRule.matcher.get -> neighborRule)

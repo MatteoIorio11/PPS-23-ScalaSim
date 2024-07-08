@@ -15,16 +15,31 @@ import java.awt.Color
 import scala.annotation.init
 
 object Environment:
+    /**
+      * TODO
+      * 
+      * @param D
+      * @param R
+      */
     trait GenericEnvironment[D <: Dimension, R] extends Space[D]:
       protected def saveCell(cells: Cell[D]*): Unit
       def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): R
 
+    /**
+      * TODO
+      * 
+      * @param D
+      */
     trait SimpleEnvironment[D <: Dimension] extends GenericEnvironment[D, Cell[D]]:
       def cellularAutomata: CellularAutomaton[D]
       def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
         val newCell = cellularAutomata.applyRule(Neighbour(cell, neighbors))
         saveCell(newCell)
         newCell
+
+    /**
+      * TODO
+      */
     trait ComplexEnvironment[D <: Dimension] extends GenericEnvironment[D, Iterable[Cell[D]]]:
       def cellularAutomata: ComplexCellularAutomaton[D]
       override def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Iterable[Cell[D]] = 
@@ -33,11 +48,7 @@ object Environment:
           newCell
       
     /**
-      * An Environment has inside It a Cellular Automaton [[CellularAutomaton]] and also a Matrix [[Matrix]],
-      * that can be defined when this trait is implemented, by doing this the user is able to decide which
-      * logic to use for the matrix abstraction. The Environment is responsible for managing all the cell [[Cell]]
-      * that are stored inside the matrix, and for each cell, the Environment apply the right Cellular Automaton rule,
-      * based on the input cell and all Its neighbours [[Iterable[Cell[D]]]].
+      * TODO
       */
     trait Space[D <: Dimension]:
       /**
@@ -81,21 +92,21 @@ object Environment:
         * @return a collection of all the available cell with existing position inside the matrix.
         */
       protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
-    trait ComplexSquareEnvironment extends ComplexEnvironment[TwoDimensionalSpace]:
-      def side: Int
-      override def dimension: Tuple2[Int, Int] = (side, side)
+    
     /**
       * This trait represent a Square Environment 2D.
       */
     trait SquareEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
         def side: Int
         override def dimension: Tuple2[Int, Int] = (side, side)
+
     /**
       * This trait represent a Cubic Environment 3D. 
       */
     trait CubicEnvironment extends GenericEnvironment[ThreeDimensionalSpace, ?]:
         def edge: Int
         override def dimension = (edge, edge, edge)
+
    /**
       * This trait represent a Rectangular Environment 2D.
       */
@@ -103,10 +114,13 @@ object Environment:
         def width: Int
         def heigth: Int
         override def dimension: Tuple2[Int, Int] = (heigth, width)
+
     /**
       * This trait represent a Toroid Environment 2D.
+      * TODO
       */
     trait ToroidEnvironmnt extends RectangularEnvironment:
+
       /**
         * Extension method for create a new custom mod operation.
         */
@@ -129,6 +143,7 @@ object Environment:
       override type Matrix = TrieMap[Position[D], Cell[D]]
       override def currentMatrix: TrieMap[Position[D], Cell[D]]
       override def matrix: TrieMap[Position[D], Cell[D]]
+
     /**
     * Environment 2D, where the matrix is defined as an [[ArrayBuffer(ArrayBuffer)]]. This type of matrix can be 
     * very efficient because it allows us to have an O(1) random time access.
@@ -144,9 +159,12 @@ object Environment:
             val x = cell.position.coordinates.head
             val y = cell.position.coordinates.last
             matrix(x)(y) = cell)
+
       override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
           matrix.deepCopy
+
       /**
+        * TODO
         * Extension method for the deep copy of the matrix.
         */
       extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
@@ -229,9 +247,10 @@ object Environment:
             })
             .filter(pos => pos.size == MAX_SIZE)
             .map(cor => matrix(cor.head)(cor.last))
+
      /**
-        * Extension methods for initialize the Space.
-        */
+       * Extension methods for initialize the Space.
+       */
       extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
           def initializeSpace(initialState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
             array.generalInitialization(dimension = dimension)(initialState = initialState)
@@ -241,6 +260,7 @@ object Environment:
 
           def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
             array.generalSpawn(dimension)(initialState)(spawnState)
+
     /**
       * Square Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
@@ -250,6 +270,7 @@ object Environment:
             .map(pos => pos.coordinates.toList)
             .filter(cor => cor.size == MAX_SIZE)
             .map(cor => matrix(cor.head)(cor.last))
+
         /**
           * Utilities methods.
           */
@@ -260,6 +281,7 @@ object Environment:
             array.generalMultipleSpawn(dimension)(nCells*)(states*)
           def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
             array.generalSpawn(dimension)(initialState)(spawnState)
+
       /**
       * Rectangula Environment2D where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */

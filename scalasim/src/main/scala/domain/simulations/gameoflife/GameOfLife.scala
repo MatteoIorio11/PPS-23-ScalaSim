@@ -20,6 +20,9 @@ import scala.util.Random
 
 import Environment.*
 
+/**
+  * TODO: write how this CA work.
+  */ 
 trait GameOfLifeEnvironment extends SimpleEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D
 
 object GameOfLifeEnvironment extends ViewBag:

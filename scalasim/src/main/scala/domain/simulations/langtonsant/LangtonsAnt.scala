@@ -50,6 +50,9 @@ object LangtonsAntEnvironment extends ViewBag:
       matrix = matrix.spawnCell(WHITE)(WHITE)
       matrix(side/2)(side/2) = Cell(Position[TwoDimensionalSpace](side/2, side/2), ANT(WHITE))
 
+/**
+  * TODO: write how this CA work.
+  */
 trait LangtonsAntAutomaton extends ComplexCellularAutomaton[TwoDimensionalSpace]
 
 object LangtonsAntAutomaton:
