@@ -19,14 +19,13 @@ object GameOfLifeEnvironment extends ViewBag:
     var maxCellsToSpawn = 0
     val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.DEAD)
 
-    def apply(dimension: Int): GameOfLifeEnvironmentImpl =
-        maxCellsToSpawn = (dimension / 2) + 1
-        GameOfLifeEnvironmentImpl(dimension, cellularAutomata = GameOfLife())
+    def apply(height: Int, width: Int): GameOfLifeEnvironmentImpl =
+        GameOfLifeEnvironmentImpl(height, width, cellularAutomata = GameOfLife())
 
     import Environment.*
-    class GameOfLifeEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
-        extends Environment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
-        require(side > 0)
+    class GameOfLifeEnvironmentImpl(val heigth: Int, val width: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
+        extends Environment[TwoDimensionalSpace] with ArrayToroidEnvironment:
+        require(heigth > 0, width > 0)
         require(cellularAutomata != null)
 
         var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(CellState.DEAD)
@@ -38,7 +37,7 @@ object GameOfLifeEnvironment extends ViewBag:
 
         override protected def initialise(): Unit =
             val initialCell = Cell(Position(-1, -1), CellState.DEAD)
-            matrix.spawnCells(side*side/3)(CellState.ALIVE)
+            matrix.spawnCells(heigth*width/3)(CellState.ALIVE)
 
     override def colors: Map[State, Color] = Map(
         GameOfLife.CellState.ALIVE -> Color.WHITE,
