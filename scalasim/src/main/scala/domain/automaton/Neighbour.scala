@@ -18,6 +18,13 @@ trait Neighbour[D <: Dimension]:
     def center: Cell[D]
 
 object Neighbour:
+    /**
+     * TODO
+     * @param center
+     * @param neighbors
+     * @tparam D
+     * @return
+     */
     def apply[D <: Dimension](center: Cell[D], neighbors: Iterable[Cell[D]]): Neighbour[D] = NeighbourImpl(center, neighbors.toList)
 
     private case class NeighbourImpl[D <: Dimension](override val center: Cell[D], override val neighbourhood: List[Cell[D]]) extends Neighbour[D]

@@ -116,13 +116,7 @@ object LangtonsAntAutomaton:
       case _ => rp
 
   private class LangtonsAntAutomatonImpl extends LangtonsAntAutomaton:
-    private var rules: Map[State, MultipleOutputNeighbourRule[TwoDimensionalSpace]] = Map()
+    protected var rules: Map[State, MultipleOutputNeighbourRule[TwoDimensionalSpace]] = Map()
 
     override def addRule(rule: MultipleOutputNeighbourRule[TwoDimensionalSpace]): Unit =
       rules = rules + (rule.matcher.get -> rule)
-
-    override def applyRule(neighbors: Neighbour[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
-      rules.get(neighbors.center.state) match
-        case None => Iterable(neighbors.center)
-        case Some(r) => r.applyTransformation(neighbors)
-      

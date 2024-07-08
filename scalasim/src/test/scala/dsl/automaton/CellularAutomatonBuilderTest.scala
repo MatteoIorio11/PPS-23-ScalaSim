@@ -2,7 +2,7 @@ package dsl.automaton
 
 import domain.automaton.Cell
 import domain.automaton.CellularAutomaton.CellularAutomaton
-import domain.automaton.CellularAutomaton.MutlipleRulesCellularAutomaton
+import domain.automaton.CellularAutomaton.MultipleRulesCellularAutomaton
 import domain.automaton.Neighbour
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position
@@ -25,7 +25,7 @@ class CellularAutomatonBuilderTest extends AnyFunSuite:
       alive when surroundedBy(2) withState alive whenCenterIs(alive)
     }.build
 
-    val ca = MutlipleRulesCellularAutomaton[TwoDimensionalSpace]()
+    val ca = MultipleRulesCellularAutomaton[TwoDimensionalSpace]()
     rules foreach ca.addRule
     testCa(ca)
 

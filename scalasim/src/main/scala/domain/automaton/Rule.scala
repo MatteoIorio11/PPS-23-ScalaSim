@@ -7,6 +7,8 @@ import domain.automaton.Cell
 import domain.automaton.Neighbour
 import CellularAutomaton.State
 
+import scala.annotation.targetName
+
 /**
   * A generic rule for specifying the behaviour of a [[CellularAutomaton]].
   * A rule is defined by a generic transformation function and an
@@ -96,7 +98,15 @@ object NeighbourRule:
    def apply[D <: Dimension](state: Option[State])(f: Neighbour[D] => Cell[D]): NeighbourRule[D] = new NeighbourRule[D]:
       override def tFunc(n: Neighbour[D]): Cell[D] = f(n)
       override def matcher: Option[State] = state
+
 object MultipleOutputNeighbourRule:
+   /**
+    * TODO
+    * @param s
+    * @param f
+    * @tparam D
+    * @return
+    */
   def apply[D <: Dimension](s: Option[State])(f: Neighbour[D] => Iterable[Cell[D]]): MultipleOutputNeighbourRule[D] =
     new MultipleOutputNeighbourRule[D]:
       override def tFunc(n: Neighbour[D]): Iterable[Cell[D]] = f(n)
@@ -157,6 +167,7 @@ object NeighborRuleUtility:
            * @param other the other position to apply elementiwise sum.
            * @return a new position representing the application of elementwise sum.
            */
+         @targetName("positionsPlus")
          def +(other: Position[D]): Position[D] = elementWiseFunc(other)(_ + _)
 
          /**
@@ -165,6 +176,7 @@ object NeighborRuleUtility:
            * @param other the other position to apply elementiwise minus.
            * @return a new position representing the application of elementwise minus.
            */
+         @targetName("positionMinus")
          def -(other: Position[D]): Position[D] = elementWiseFunc(other)(_ - _)
 
          /**
@@ -173,6 +185,7 @@ object NeighborRuleUtility:
            * @param n the integer used for applying an elementwise sum with this position.
            * @return a new position representing the application of elementwise sum with an integer.
            */
+         @targetName("scalarPlus")
          def +(n: Int): Position[D] = Position(p.coordinates.map(_ + n).toArray*)
 
          /**
@@ -181,6 +194,7 @@ object NeighborRuleUtility:
            * @param n the integer used for applying an elementwise minus with this position.
            * @return a new position representing the application of elementwise minus with an integer.
            */
+         @targetName("scalarMinus")
          def -(n: Int): Position[D] = Position(p.coordinates.map(_ - n).toArray*)
 
          /**
@@ -189,6 +203,7 @@ object NeighborRuleUtility:
            * @param rp the relative position.
            * @return the sum.
            */
+         @targetName("positionPlusRelative")
          def +(rp: RelativePositions): Position[D] = p + rp.toPosition[D]
 
          /**
@@ -197,6 +212,7 @@ object NeighborRuleUtility:
            * @param rp the relative position.
            * @return the subtraction.
            */
+         @targetName("positionMinusRelative")
          def -(rp: RelativePositions): Position[D] = p - rp.toPosition[D]
 
    /**
