@@ -17,10 +17,12 @@ import scala.collection.mutable.ArrayBuffer
 import domain.Environment.ComplexEnvironment
 import domain.Environment.SquareArrayEnvironment2D
 import scala.annotation.varargs
+import java.util.Random
+import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.CustomNeighbourhoodDSL.neighbour
 
 object WaTorEnvironment extends ViewBag:
     import WaTor.*
-    override def colors: Map[State, Color] = Map((FISH() -> Color.GREEN), 
+    override def colors: Map[State, Color] = Map((FISH() -> Color.apply(0, 100, 0)), 
     (SHARK() -> Color.RED),
     (EMPTY() -> Color.CYAN))
     def apply(dimension: Int): ComplexEnvironment[TwoDimensionalSpace] = 
@@ -32,56 +34,59 @@ object WaTorEnvironment extends ViewBag:
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(EMPTY())
       initialise()
       override protected def initialise() = 
-        matrix = matrix.spawnCell(100)(SHARK()).spawnCell(1000)(FISH())
+        matrix = matrix.spawnCells(1000, 500)(SHARK(), FISH())
     
       override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
           import domain.automaton.NeighborRuleUtility.given
           availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
 object WaTor:
+    protected def findRandom(positions: List[Cell[TwoDimensionalSpace]]): Option[Cell[TwoDimensionalSpace]] = 
+        val size = positions.size
+        size match
+            case x if x > 0 => Some(positions(Random().nextInt(size)))
+            case _ => None
     def apply(): ComplexCellularAutomaton[TwoDimensionalSpace] = 
         val wator = WaTor()
-        val fishRule: MultipleOutputNeighbourRule[TwoDimensionalSpace] = MultipleOutputNeighbourRule(Some(FISH())): n =>
-            val cell = n.neighbourhood.find(cell => cell.state == EMPTY())
-            val output = cell match
-                case Some(emptyCell) => 
-                    n.center.state.asInstanceOf[FISH].value match
-                        case x if x > 4 => 
-                            n.center.state.asInstanceOf[WaTorState].burnEnergy
-                            List(Cell(emptyCell.position, n.center.state),
-                            Cell(n.center.position, FISH()))
-                        case _ => List(Cell(emptyCell.position, n.center.state),
-                        Cell(n.center.position, EMPTY()))
-                case None => List(n.center)
-            output
-        val sharkRule: MultipleOutputNeighbourRule[TwoDimensionalSpace] = MultipleOutputNeighbourRule(Some(SHARK())): n =>
-            n.center.state.asInstanceOf[WaTorState].burnEnergy
-            if (n.center.state.asInstanceOf[WaTorState].value == 0)
-                List(Cell(n.center.position, EMPTY()))
-            else
-                val possibleCell = n.neighbourhood.find(cell => cell.state == EMPTY() || cell.state == FISH())
-                val output = possibleCell match
-                    case Some(fishCell) if fishCell.state == FISH() => 
-                        n.center.state.asInstanceOf[SHARK].eatFish
-                        var o = List()
-                        o.appendedAll(n.center.state.asInstanceOf[WaTorState].value match
-                            case energy if energy >= 4 => 
-                                n.center.state.asInstanceOf[SHARK].reproduce
-                                val energy = n.center.state.asInstanceOf[WaTorState].value
-                                List(Cell(n.center.position, SHARK(energy)), Cell(fishCell.position, SHARK(energy)))
+        val fishRule = MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(FISH())): neighborus => 
+            val emptyCell = findRandom(neighborus.neighbourhood.filter(cell => cell.state.equals(EMPTY())))
+            neighborus.center.state match
+                case s: FISH => s.burnEnergy
+                case _ => 
+                emptyCell match
+                    case Some(cell) =>
+                        neighborus.center.state.asInstanceOf[FISH].canReproduce match
+                            case can if can => 
+                                Iterable(
+                                    Cell(cell.position, FISH()), 
+                                    Cell(neighborus.center.position, FISH()))
                             case _ => 
-                                List(Cell(n.center.position, EMPTY()), Cell(fishCell.position, n.center.state)))
-                    case Some(emptyCell) => 
-                        n.center.state.asInstanceOf[WaTorState].value match
-                            case energy if energy >= 4 => 
-                                n.center.state.asInstanceOf[SHARK].reproduce
-                                val energy = n.center.state.asInstanceOf[WaTorState].value
-                                List(Cell(n.center.position, SHARK(energy)), Cell(emptyCell.position, SHARK(energy)))
-                            case _ => 
-                                List(Cell(n.center.position, EMPTY()), Cell(emptyCell.position, n.center.state))
-                    case None => 
-                        List(n.center)
-                output
+                                Iterable(
+                                    Cell(cell.position, neighborus.center.state), 
+                                    Cell(neighborus.center.position, EMPTY()))
+                    case _ => Iterable(neighborus.center)
+        val sharkRule = MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(SHARK())): neighborus => 
+            val emptyCell = findRandom(neighborus.neighbourhood
+                .filter(cell => cell.state.equals(EMPTY()) ||
+                   cell.state.equals(FISH())))
+            neighborus.center.state match
+                case s: SHARK => s.burnEnergy
+                case _ => 
+            neighborus.center.state match
+                case s: SHARK if s.value == 0 => Iterable(Cell(neighborus.center.position, EMPTY()))
+                case _ =>  emptyCell match
+                            case Some(cell) => cell.state match
+                                case fish: FISH =>  
+                                    neighborus.center.state.asInstanceOf[SHARK].eatFish
+                                case _ =>
+                                val possibleChild = neighborus.center.state.asInstanceOf[SHARK].canReproduce match
+                                    case can if can => 
+                                        Cell(neighborus.center.position, SHARK(neighborus.center.state.asInstanceOf[SHARK].value))
+                                    case _ =>  Cell(neighborus.center.position, EMPTY())
+                                Iterable(
+                                    possibleChild,
+                                    Cell(cell.position, neighborus.center.state))
+                            case _ => Iterable(neighborus.center)
         wator.addRule(fishRule)
         wator.addRule(sharkRule)
         wator
@@ -91,15 +96,18 @@ object WaTor:
             value = value match
                 case x if x > 0 => value - 1
                 case _ => value
-            
         override def equals(x: Any): Boolean = 
-            val otherName = x.asInstanceOf[WaTorState].name
-            return this.name == otherName
-    class FISH() extends WaTorState(value = 10, "FISH")
-    class SHARK(value: Int = 10) extends WaTorState(value, "SHARK"):
-        def eatFish: Unit = value = value + 3
+            x match
+                case state: WaTorState => state.name.equals(name)
+                case _ => false
+    class FISH() extends WaTorState(value = 1000, "FISH"):
+        val threshold = value / 2
+        def canReproduce: Boolean = value == threshold
+    class SHARK(initialEnergy: Int = 100) extends WaTorState(initialEnergy, "SHARK"):
+        val threshold = value / 2
+        def eatFish: Unit = value = value + 100
         def reproduce: Unit = value = value / 2
-        def canReproduce: Boolean = value >= 4
+        def canReproduce: Boolean = value == threshold
     class EMPTY() extends  WaTorState(0, "EMPTY")
         
     private case class WaTor() extends ComplexCellularAutomaton[TwoDimensionalSpace]:
