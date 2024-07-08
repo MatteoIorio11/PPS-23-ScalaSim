@@ -50,6 +50,8 @@ object LangtonsAntEnvironment extends ViewBag:
       matrix = matrix.spawnCell(WHITE)(WHITE)
       matrix(side/2)(side/2) = Cell(Position[TwoDimensionalSpace](side/2, side/2), ANT(WHITE))
 
+trait LangtonsAntAutomaton extends ComplexCellularAutomaton[TwoDimensionalSpace]
+
 object LangtonsAntAutomaton:
   import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
   import domain.automaton.NeighborRuleUtility.RelativePositions.*
@@ -67,7 +69,7 @@ object LangtonsAntAutomaton:
     override def equals(x: Any): Boolean =
       this.isInstanceOf[ANT] && x.isInstanceOf[ANT] && this.asInstanceOf[ANT].cellColor == x.asInstanceOf[ANT].cellColor
 
-  def apply(): ComplexCellularAutomaton[TwoDimensionalSpace] =
+  def apply(): LangtonsAntAutomaton =
     def antRule(n: Neighbour[TwoDimensionalSpace], moveCenterTo: RelativePositions): Iterable[Cell[TwoDimensionalSpace]] =
       val oldPositionState = n.center.state.asInstanceOf[ANT].cellColor.invert
 
@@ -113,7 +115,7 @@ object LangtonsAntAutomaton:
       case East => North
       case _ => rp
 
-  private class LangtonsAntAutomatonImpl extends ComplexCellularAutomaton[TwoDimensionalSpace]:
+  private class LangtonsAntAutomatonImpl extends LangtonsAntAutomaton:
     private var rules: Map[State, MultipleOutputNeighbourRule[TwoDimensionalSpace]] = Map()
 
     override def addRule(rule: MultipleOutputNeighbourRule[TwoDimensionalSpace]): Unit =
