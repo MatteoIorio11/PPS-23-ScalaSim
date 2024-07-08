@@ -68,7 +68,7 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     val (env, colors) = selected match
       case "Brian's Brain" => (BriansBrainEnvironment(100), BriansBrainEnvironment.colors)
       case "Game of Life"  => (GameOfLifeEnvironment(100), GameOfLifeEnvironment.colors)
-      case "Wa Tor"        => (WaTorEnvironment(100), WaTorEnvironment.colors)
+      case "Wa Tor"        => (WaTorEnvironment(100, 200), WaTorEnvironment.colors)
       case "Langton's Ant" => (LangtonsAntEnvironment(100), LangtonsAntEnvironment.colors)
 
     val pixelPanel = Gui((100, 100), colors)

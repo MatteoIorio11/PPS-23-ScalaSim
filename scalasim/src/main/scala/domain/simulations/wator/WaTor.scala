@@ -19,18 +19,18 @@ import domain.Environment.SquareArrayEnvironment2D
 import scala.annotation.varargs
 import java.util.Random
 import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.CustomNeighbourhoodDSL.neighbour
+import domain.Environment.ArrayToroidEnvironment
 
 object WaTorEnvironment extends ViewBag:
     import WaTor.*
     override def colors: Map[State, Color] = Map((FISH() -> Color.apply(0, 100, 0)), 
     (SHARK() -> Color.RED),
     (EMPTY() -> Color.CYAN))
-    def apply(dimension: Int): ComplexEnvironment[TwoDimensionalSpace] = 
-        WaTorEnvironmentImpl(dimension, WaTor())
+    def apply(w: Int, h: Int): ComplexEnvironment[TwoDimensionalSpace] = 
+        WaTorEnvironmentImpl(w, h, WaTor())
 
-    private case class WaTorEnvironmentImpl(val side: Int, val cellularAutomata: ComplexCellularAutomaton[TwoDimensionalSpace]) 
-        extends ComplexEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
-      require(side > 0)
+    private case class WaTorEnvironmentImpl(val width: Int, val heigth: Int, val cellularAutomata: ComplexCellularAutomaton[TwoDimensionalSpace]) 
+        extends ComplexEnvironment[TwoDimensionalSpace] with ArrayToroidEnvironment:
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(EMPTY())
       initialise()
       override protected def initialise() = 
