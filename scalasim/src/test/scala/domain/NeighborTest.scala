@@ -9,9 +9,7 @@ import domain.automaton.CellularAutomaton.State
 import domain.automaton.CellularAutomaton.CellularAutomaton
 import domain.base.Position
 import domain.automaton.NeighborRuleUtility.getCircularNeighbourhoodPositions
-import domain.automaton.ParametricCell
 import domain.automaton.CellularAutomaton.ValuedState
-import domain.automaton.ParametricNeighbour
 
 class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
     test("A two dimensional neighborhood should be mapped correctly"):
@@ -26,20 +24,6 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
 
       n.center shouldBe c0
       n.neighbourhood shouldBe others
-
-    test("A parametric neighbourh should behave as expected"):
-      val state = new ValuedState[Int] { override def value: Int = 1 }
-      val neighbours =  List(
-            ParametricCell[TwoDimensionalSpace, Int](Position(1, 0), state),
-            ParametricCell[TwoDimensionalSpace, Int](Position(2, 0), state),
-            ParametricCell[TwoDimensionalSpace, Int](Position(3, 0), state),
-        )
-      val center = ParametricCell[TwoDimensionalSpace, Int](Position(0, 0), state)
-
-      val n: ParametricNeighbour[TwoDimensionalSpace, Int] = ParametricNeighbour(center, neighbours)
-
-      n.center shouldBe center
-      n.neighbourhood shouldBe neighbours
 
     test("A Neighborhood Locator should behave as expected"):
       val positions: List[Position[TwoDimensionalSpace]] = List(Position(0, -1), Position(0, 1))
