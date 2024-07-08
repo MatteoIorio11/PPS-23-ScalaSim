@@ -1,30 +1,36 @@
 package domain.simulations.gameoflife
 
 import domain.Environment
-import domain.automaton.CellularAutomaton.*
-import domain.base.Dimensions.*
-import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule, Rule}
-import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
+import domain.automaton.Cell
 import domain.automaton.Cell.*
+import domain.automaton.CellularAutomaton.*
+import domain.automaton.NeighborRuleUtility
+import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
+import domain.automaton.Neighbour
+import domain.automaton.NeighbourRule
+import domain.automaton.Rule
+import domain.base.Dimensions.*
 import domain.base.Position
 import domain.simulations.gameoflife.GameOfLife.CellState
 import domain.utils.ViewBag.ViewBag
 
 import java.awt.Color
-import scala.util.Random
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
+
+import Environment.*
+
+trait GameOfLifeEnvironment extends SimpleEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D
 
 object GameOfLifeEnvironment extends ViewBag:
-    var maxCellsToSpawn = 0
-    val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.DEAD)
+    private val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.DEAD)
 
-    def apply(dimension: Int): GameOfLifeEnvironmentImpl =
-        maxCellsToSpawn = (dimension / 2) + 1
+    def apply(dimension: Int): GameOfLifeEnvironment =
         GameOfLifeEnvironmentImpl(dimension, cellularAutomata = GameOfLife())
 
-    import Environment.*
-    class GameOfLifeEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
-        extends SimpleEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
+    private class GameOfLifeEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
+        extends GameOfLifeEnvironment:
+
         require(side > 0)
         require(cellularAutomata != null)
 

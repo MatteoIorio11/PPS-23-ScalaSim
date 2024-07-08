@@ -1,41 +1,47 @@
 package domain.simulations.briansbrain
 
 import domain.Environment
-import domain.automaton.CellularAutomaton.*
-import domain.base.Dimensions.*
-import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule, Rule}
-import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
+import domain.automaton.Cell
 import domain.automaton.Cell.*
+import domain.automaton.CellularAutomaton.*
+import domain.automaton.NeighborRuleUtility
+import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
+import domain.automaton.Neighbour
+import domain.automaton.NeighbourRule
+import domain.automaton.Rule
+import domain.base.Dimensions.*
 import domain.base.Position
 import domain.simulations.briansbrain.BriansBrain.CellState
+import domain.utils.ViewBag.ViewBag
 
 import java.awt.Color
 import scala.collection.mutable.ArrayBuffer
-import domain.utils.ViewBag.ViewBag
+
+import Environment.*
+
+trait BriansBrainEnvironment extends SimpleEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D
 
 object BriansBrainEnvironment extends ViewBag:
-  var maxCellsToSpawn = 0
-  val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.OFF)
+  private val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.OFF)
 
-  def apply(dimension: Int): BriansBrainEnvironmentImpl =
-    maxCellsToSpawn = (dimension / 2) + 1
+  def apply(dimension: Int): BriansBrainEnvironment =
     BriansBrainEnvironmentImpl(dimension, cellularAutomata = BriansBrain())
 
-  import Environment.*
-  class BriansBrainEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
-    extends SimpleEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
+  private class BriansBrainEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
+    extends BriansBrainEnvironment:
+
     require(side > 0)
     require(cellularAutomata != null)
 
     var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(CellState.OFF)
 
     initialise()
+
     override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
       import domain.automaton.NeighborRuleUtility.given
       availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
     override protected def initialise(): Unit =
-      val initialCell = Cell(Position(-1, -1), CellState.OFF)
       matrix.spawnCells(side*side/3)(CellState.ON)
 
   override def colors: Map[State, Color] = Map(
@@ -47,18 +53,16 @@ object BriansBrainEnvironment extends ViewBag:
 object BriansBrain:
   def apply(): CellularAutomaton[TwoDimensionalSpace] =
     val briansBrain = BriansBrainImpl()
-    val onRule = NeighbourRule(Some(CellState.ON)) { (x: Neighbour[TwoDimensionalSpace]) =>
+    val onRule = NeighbourRule(Some(CellState.ON)): (x: Neighbour[TwoDimensionalSpace]) =>
       Cell(x.center.position, CellState.DYING)
-    }
 
     val offRule = NeighbourRule(Some(CellState.OFF)): (x: Neighbour[TwoDimensionalSpace]) =>
       NeighborRuleUtility.getNeighboursWithState(CellState.ON, x).length match
         case 2 => Cell(x.center.position, CellState.ON)
         case _ => Cell(x.center.position, CellState.OFF)
 
-    val dyingRule = NeighbourRule(Some(CellState.DYING)) { (x: Neighbour[TwoDimensionalSpace]) =>
+    val dyingRule = NeighbourRule(Some(CellState.DYING)): (x: Neighbour[TwoDimensionalSpace]) =>
       Cell(x.center.position, CellState.OFF)
-    }
 
     briansBrain.addRule(onRule)
     briansBrain.addRule(offRule)
@@ -78,5 +82,3 @@ object BriansBrain:
       neighborRule.matcher  match
         case Some(state) =>  ruleCollection = ruleCollection + (state -> neighborRule)
         case None => ruleCollection
-
-
