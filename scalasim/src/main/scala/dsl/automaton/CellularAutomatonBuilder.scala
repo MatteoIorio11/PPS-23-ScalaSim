@@ -2,8 +2,7 @@ package dsl.automaton
 
 import domain.automaton.Cell
 import domain.automaton.CellularAutomaton.CellularAutomaton
-import domain.automaton.CellularAutomaton.MultipleRuleCellularAutomaton
-import domain.automaton.CellularAutomaton.MutlipleRulesCellularAutomaton
+import domain.automaton.CellularAutomaton.MultipleRulesCellularAutomaton
 import domain.automaton.CellularAutomaton.State
 import domain.automaton.Neighbour
 import domain.automaton.NeighbourRule
@@ -68,7 +67,7 @@ object CellularAutomatonBuilder:
 
   private class CellularAutomatonBuilder2DImpl() extends CellularAutomatonBuilder[TwoDimensionalSpace]:
 
-    private val ca: CellularAutomaton[TwoDimensionalSpace] = MutlipleRulesCellularAutomaton[TwoDimensionalSpace]()
+    private val ca: CellularAutomaton[TwoDimensionalSpace] = MultipleRulesCellularAutomaton[TwoDimensionalSpace]()
 
     override def setRules(rules: Iterable[NeighbourRule[TwoDimensionalSpace]]): this.type =
       rules foreach ca.addRule

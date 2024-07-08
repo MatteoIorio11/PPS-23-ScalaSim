@@ -1,7 +1,7 @@
 package domain.gui
 
-import domain.Environment.Environment
 import domain.automaton.Cell
+import domain.Environment.SimpleEnvironment
 import domain.automaton.CellularAutomaton.State
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.engine.Engine.{EngineView, GUIEngine2D}
@@ -11,20 +11,25 @@ import domain.simulations.gameoflife.GameOfLifeEnvironment
 
 import java.awt.{Color, Graphics}
 import javax.swing.{JButton, JComboBox, JFrame, JPanel, JSlider, WindowConstants}
+import javax.swing.{JButton, JFrame, JPanel}
+import java.awt.{Color, Graphics}
+import javax.swing.{JButton, JComboBox, JFrame, JPanel}
 import scala.collection.immutable.LazyList
+import domain.simulations.wator.WaTorEnvironment
+import domain.simulations.langtonsant.LangtonsAntEnvironment
 
-case class EnvironmentOption(name: String, createEnvironment: Int => Environment[TwoDimensionalSpace], colors: Map[State, Color])
+case class EnvironmentOption(name: String, createEnvironment: Int => SimpleEnvironment[TwoDimensionalSpace], colors: Map[State, Color])
 
 object EnvironmentOption:
   val options = List(
     EnvironmentOption("Brian's Brain", BriansBrainEnvironment.apply, BriansBrainEnvironment.colors),
     EnvironmentOption("Game of Life", GameOfLifeEnvironment.apply(_, 30), GameOfLifeEnvironment.colors)
   )
-
-class Gui(val dimension: (Int, Int), colors: Map[State, Color]) extends JPanel with EngineView[TwoDimensionalSpace]:
+  
+class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JPanel with EngineView[TwoDimensionalSpace]:
   private var pixels: LazyList[Cell[TwoDimensionalSpace]] = LazyList()
-  private var h = dimension._1
-  private var w = dimension._2
+  private var h = dimension(0)
+  private var w = dimension(1)
   private var ps = 5
 
   def setPixelSize(newSize: Int): Unit =
@@ -54,9 +59,10 @@ class Gui(val dimension: (Int, Int), colors: Map[State, Color]) extends JPanel w
   frame.setLayout(null)
   comboBox.setBounds(50, 50, 200, 30)
   sizeSlider.setBounds(50, 150, 200, 50)
-  startButton.setBounds(50, 250, 100, 30)
-  stopButton.setBounds(150, 250, 100, 30)
-  exitButton.setBounds(50, 350, 100, 30)
+  startButton.setBounds(50, 100, 100, 30)
+  stopButton.setBounds(150, 100, 100, 30)
+  exitButton.setBounds(50, 300, 100, 30)
+
 
   frame.add(comboBox)
   frame.add(sizeSlider)
@@ -65,7 +71,7 @@ class Gui(val dimension: (Int, Int), colors: Map[State, Color]) extends JPanel w
   frame.add(exitButton)
 
   frame.setSize(800, 600)
-  frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
+  frame.setDefaultCloseOperation(3)
   frame.setVisible(true)
 
   var guiE: Option[GUIEngine2D] = None
@@ -104,9 +110,7 @@ class Gui(val dimension: (Int, Int), colors: Map[State, Color]) extends JPanel w
     frame.revalidate()
     frame.repaint()
   )
-
-  exitButton.addActionListener(e =>
+  exitButton.addActionListener(e => 
     guiE.foreach(guiEngine => guiEngine.stopEngine)
     currentPanel.foreach(panel => frame.remove(panel))
-    frame.dispose()
-  )
+    frame.dispose())

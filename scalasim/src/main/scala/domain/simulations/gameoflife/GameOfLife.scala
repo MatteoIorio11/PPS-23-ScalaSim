@@ -1,7 +1,6 @@
 package domain.simulations.gameoflife
 
 import domain.Environment
-import domain.Environment.Environment
 import domain.automaton.CellularAutomaton.*
 import domain.base.Dimensions.*
 import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule, Rule}
@@ -14,17 +13,24 @@ import domain.utils.ViewBag.ViewBag
 import java.awt.Color
 import scala.util.Random
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
+
+import Environment.*
+
+/**
+  * TODO: write how this CA work.
+  */
+trait GameOfLifeEnvironment extends SimpleEnvironment[TwoDimensionalSpace] with ArrayToroidEnvironment
 
 object GameOfLifeEnvironment extends ViewBag:
-    var maxCellsToSpawn = 0
-    val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.DEAD)
+    private val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.DEAD)
 
-    def apply(height: Int, width: Int): GameOfLifeEnvironmentImpl =
+    def apply(height: Int, width: Int): GameOfLifeEnvironment =
         GameOfLifeEnvironmentImpl(height, width, cellularAutomata = GameOfLife())
 
-    import Environment.*
-    class GameOfLifeEnvironmentImpl(val heigth: Int, val width: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
-        extends Environment[TwoDimensionalSpace] with ArrayToroidEnvironment:
+    private class GameOfLifeEnvironmentImpl(val heigth: Int, val width: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
+        extends GameOfLifeEnvironment:
+
         require(heigth > 0, width > 0)
         require(cellularAutomata != null)
 

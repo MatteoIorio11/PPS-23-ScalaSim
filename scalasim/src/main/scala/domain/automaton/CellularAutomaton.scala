@@ -10,7 +10,7 @@ import domain.automaton.NeighbourRule
 
 object CellularAutomaton:
     /**
-      * Trait that incapsulate the different state of the Cellular Automaton
+      * Trait that encapsulate the different state of the Cellular Automaton
       */
     trait State
 
@@ -33,10 +33,16 @@ object CellularAutomaton:
      */
     object AnyState extends State
 
+   /**
+    * TODO
+    * @tparam D
+    * @tparam I
+    * @tparam O
+    * @tparam R
+    */
     trait GenericCellularAutomaton[D <: Dimension, I, O, R <: Rule[I, O, State]]:
       def applyRule(input: I): O
       def addRule(rule: R): Unit
-
 
     /**
      * Cellular automaton trait. It defines all the information about a general automaton.
@@ -59,8 +65,19 @@ object CellularAutomaton:
           * @return the collection of all the Cellular Automaton's rules.
           */
         def rules: Rules
+
+    /**
+     * TODO
+     * @tparam D
+     */
     trait ComplexCellularAutomaton[D <: Dimension] extends GenericCellularAutomaton[D, Neighbour[D], Iterable[Cell[D]], MultipleOutputNeighbourRule[D]]:
-      override def applyRule(neighbors: Neighbour[D]): Iterable[Cell[D]]
+      protected def rules: Map[State, MultipleOutputNeighbourRule[D]]
+
+      override def applyRule(neighbors: Neighbour[D]): Iterable[Cell[D]] =
+        rules.get(neighbors.center.state) match
+          case None => Iterable(neighbors.center)
+          case Some(r) => r.applyTransformation(neighbors)
+
       override def addRule(rule: MultipleOutputNeighbourRule[D]): Unit
 
     /**
@@ -68,7 +85,7 @@ object CellularAutomaton:
       */
     trait MapSingleRules[D <: Dimension] extends CellularAutomaton[D]:
       override type Rules = Map[State, NeighbourRule[D]]
-      override def applyRule(neighbors: Neighbour[D]) = 
+      override def applyRule(neighbors: Neighbour[D]): Cell[D] =
         val cell = neighbors.center
         ruleCollection.get(cell.state) match
           case Some(rule) => rule.applyTransformation(neighbors)
@@ -95,10 +112,10 @@ object CellularAutomaton:
     /**
       * Factory for Multiple Rules Cellular Automaton.
       */
-    object MutlipleRulesCellularAutomaton:
-      def apply[D <: Dimension](): MultipleRuleCellularAutomaton[D] = MutlipleRulesCellularAutomatonImpl()
+    object MultipleRulesCellularAutomaton:
+      def apply[D <: Dimension](): MultipleRuleCellularAutomaton[D] = MultipleRulesCellularAutomatonImpl()
 
-      private class MutlipleRulesCellularAutomatonImpl[D <: Dimension] extends MultipleRuleCellularAutomaton[D]:
+      private class MultipleRulesCellularAutomatonImpl[D <: Dimension] extends MultipleRuleCellularAutomaton[D]:
         protected var ruleCollection: Rules = Map()
         override def addRule(rule: NeighbourRule[D]): Unit =
           val cellState = rule.matcher.getOrElse(AnyState)
@@ -107,18 +124,12 @@ object CellularAutomaton:
             case None => ruleCollection = ruleCollection + (cellState -> Set(rule))
 
 
-    object MutliOutputCellularAutomaton:
-      def apply[D <: Dimension](): ComplexCellularAutomaton[D] = MutliOutputCellularAutomatonImpl()
+    object MultiOutputCellularAutomaton:
+      def apply[D <: Dimension](): ComplexCellularAutomaton[D] = MultiOutputCellularAutomatonImpl()
 
-      private class MutliOutputCellularAutomatonImpl[D <: Dimension] extends ComplexCellularAutomaton[D]:
+      private class MultiOutputCellularAutomatonImpl[D <: Dimension] extends ComplexCellularAutomaton[D]:
 
-        private var rules: Map[State, MultipleOutputNeighbourRule[D]] = Map()
+        protected var rules: Map[State, MultipleOutputNeighbourRule[D]] = Map()
 
         override def addRule(rule: MultipleOutputNeighbourRule[D]): Unit =
           rules = rules + (rule.matcher.getOrElse(AnyState) -> rule)
-
-        override def applyRule(neighbors: Neighbour[D]): Iterable[Cell[D]] =
-          rules.get(neighbors.center.state) match
-            case None => Iterable(neighbors.center)
-            case Some(rule) => rule.applyTransformation(neighbors)
-          

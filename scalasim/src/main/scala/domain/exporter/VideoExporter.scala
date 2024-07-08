@@ -3,13 +3,15 @@ package domain.exporter
 import domain.automaton.Cell
 import domain.automaton.CellularAutomaton.State
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
-import domain.engine.Engine.SimpleEngine
+import domain.engine.Engine.GeneralEngine
+import domain.simulations.gameoflife.GameOfLife.CellState
 import org.jcodec.common.io.{NIOUtils, SeekableByteChannel}
 import org.jcodec.common.model.Rational
 import org.jcodec.api.awt.AWTSequenceEncoder
 
 import java.awt.Color
 import java.awt.image.BufferedImage
+import domain.engine.Engine.GeneralEngine
 trait MatrixToImageConverter[D <: Dimension, M] {
   def convert(matrix: M, cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage
 }
@@ -64,7 +66,7 @@ object JCodecVideoGenerator extends VideoGenerator {
 }
 
 object Exporter {
-  def exportMatrix[D <: Dimension, M, S <: State](engine: SimpleEngine[D, M], colors: Map[State, Color], converter: MatrixToImageConverter[D, M], videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double): Unit = {
+  def exportMatrix[D <: Dimension, M, S <: State](engine: GeneralEngine[D, M], colors: Map[State, Color], converter: MatrixToImageConverter[D, M], videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double): Unit = {
     val images = engine.history.zipWithIndex.map { case (matrix, _) =>
       converter.convert(matrix, cellSize, colors)
     }.toList
