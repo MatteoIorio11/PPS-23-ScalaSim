@@ -1,9 +1,9 @@
 package domain.gui
 
 import domain.automaton.Cell
-import domain.Environment.SimpleEnvironment
+import domain.Environment.{GenericEnvironment, SimpleEnvironment}
 import domain.automaton.CellularAutomaton.State
-import domain.base.Dimensions.TwoDimensionalSpace
+import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
 import domain.engine.Engine.{EngineView, GUIEngine2D}
 import domain.engine.GUIEngine2D
 import domain.simulations.briansbrain.BriansBrainEnvironment
@@ -18,14 +18,16 @@ import scala.collection.immutable.LazyList
 import domain.simulations.wator.WaTorEnvironment
 import domain.simulations.langtonsant.LangtonsAntEnvironment
 
-case class EnvironmentOption(name: String, createEnvironment: Int => SimpleEnvironment[TwoDimensionalSpace], colors: Map[State, Color])
+case class EnvironmentOption[D <: Dimension, R](name: String, createEnvironment: Int => GenericEnvironment[D,R], colors: Map[State, Color])
 
 object EnvironmentOption:
   val options = List(
     EnvironmentOption("Brian's Brain", BriansBrainEnvironment.apply, BriansBrainEnvironment.colors),
-    EnvironmentOption("Game of Life", GameOfLifeEnvironment.apply(_, 30), GameOfLifeEnvironment.colors)
+    EnvironmentOption("Game of Life", GameOfLifeEnvironment.apply(_, 30), GameOfLifeEnvironment.colors),
+    EnvironmentOption("Wa Tor", WaTorEnvironment.apply(_, 10), WaTorEnvironment.colors),
+    EnvironmentOption("Langton's Ant", LangtonsAntEnvironment.apply, LangtonsAntEnvironment.colors)
   )
-  
+
 class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JPanel with EngineView[TwoDimensionalSpace]:
   private var pixels: LazyList[Cell[TwoDimensionalSpace]] = LazyList()
   private var h = dimension(0)
@@ -110,7 +112,7 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     frame.revalidate()
     frame.repaint()
   )
-  exitButton.addActionListener(e => 
+  exitButton.addActionListener(e =>
     guiE.foreach(guiEngine => guiEngine.stopEngine)
     currentPanel.foreach(panel => frame.remove(panel))
     frame.dispose())
