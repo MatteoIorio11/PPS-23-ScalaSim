@@ -28,8 +28,8 @@ object LangtonsAntEnvironment extends ViewBag:
     LangtonsAntEnvironmentImpl(dimension, LangtonsAntAutomaton())
   override def colors: Map[State, Color] = 
     Map(
-      ANT(WHITE) -> Color.LIGHT_GRAY,
-      ANT(BLACK) -> Color.DARK_GRAY,
+      ANT(WHITE) -> Color.RED,
+      ANT(BLACK) -> Color.RED,
       WHITE -> Color.WHITE,
       BLACK -> Color.BLACK,
     )
