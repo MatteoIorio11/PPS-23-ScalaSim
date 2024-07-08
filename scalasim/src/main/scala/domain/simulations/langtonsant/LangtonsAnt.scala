@@ -28,8 +28,8 @@ object LangtonsAntEnvironment extends ViewBag:
     LangtonsAntEnvironmentImpl(dimension, LangtonsAntAutomaton())
   override def colors: Map[State, Color] = 
     Map(
-      ANT(WHITE) -> Color.RED,
-      ANT(BLACK) -> Color.BLUE,
+      ANT(WHITE) -> Color.LIGHT_GRAY,
+      ANT(BLACK) -> Color.DARK_GRAY,
       WHITE -> Color.WHITE,
       BLACK -> Color.BLACK,
     )
@@ -62,17 +62,26 @@ object LangtonsAntAutomaton:
     def invert: CellState = if this == WHITE then BLACK else WHITE
 
   enum LangstonAntState extends State:
-    case ANT(cellColor: CellState)
+    case ANT(cellColor: CellState, direction: RelativePositions = South)
+
+    override def equals(x: Any): Boolean =
+      this.isInstanceOf[ANT] && x.isInstanceOf[ANT] && this.asInstanceOf[ANT].cellColor == x.asInstanceOf[ANT].cellColor
 
   def apply(): ComplexCellularAutomaton[TwoDimensionalSpace] =
     def antRule(n: Neighbour[TwoDimensionalSpace], moveCenterTo: RelativePositions): Iterable[Cell[TwoDimensionalSpace]] =
-      val newPosition = n.center.position.moveTo(moveCenterTo)
+      val oldPositionState = n.center.state.asInstanceOf[ANT].cellColor.invert
+
+      val direction = oldPositionState.invert match
+        case WHITE => n.center.state.asInstanceOf[ANT].direction.clockWiseRotate
+        case BLACK => n.center.state.asInstanceOf[ANT].direction.counterClockWiseRotate
+      
+      val newPosition = n.center.position.moveTo(direction)
       val newPositionState = n.neighbourhood.find(_.position == newPosition).get.state.asInstanceOf[CellState]
-      val oldPositionState = n.center.state.asInstanceOf[LangstonAntState.ANT].cellColor.invert
+
 
       Iterable(
         Cell(n.center.position, oldPositionState),
-        Cell(newPosition, ANT(newPositionState))
+        Cell(newPosition, ANT(newPositionState, direction))
       )
 
     val ca = LangtonsAntAutomatonImpl()
@@ -88,6 +97,21 @@ object LangtonsAntAutomaton:
   
   extension[D <: Dimension] (p: Position[D])
     private def moveTo(rp: RelativePositions): Position[D] = p + rp
+
+  extension (rp: RelativePositions)
+    private def clockWiseRotate: RelativePositions = rp match
+      case North => East
+      case East => South
+      case South => West
+      case West => North
+      case _ => rp
+
+    private def counterClockWiseRotate: RelativePositions = rp match
+      case North => West
+      case West => South
+      case South => East
+      case East => North
+      case _ => rp
 
   private class LangtonsAntAutomatonImpl extends ComplexCellularAutomaton[TwoDimensionalSpace]:
     private var rules: Map[State, MultipleOutputNeighbourRule[TwoDimensionalSpace]] = Map()

@@ -14,6 +14,7 @@ import java.awt.{Color, Graphics}
 import javax.swing.{JButton, JComboBox, JFrame, JPanel}
 import scala.collection.immutable.LazyList
 import domain.simulations.wator.WaTorEnvironment
+import domain.simulations.langtonsant.LangtonsAntEnvironment
 
 class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JPanel with EngineView[TwoDimensionalSpace]:
   private var pixels: LazyList[Cell[TwoDimensionalSpace]] = LazyList()
@@ -37,7 +38,7 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
   val startButton = JButton("Start")
   val stopButton = JButton("Stop")
   val exitButton = JButton("Exit")
-  val automatonOptions = Array("Brian's Brain", "Game of Life", "Wa Tor")
+  val automatonOptions = Array("Brian's Brain", "Game of Life", "Wa Tor", "Langton's Ant")
   val comboBox = JComboBox(automatonOptions)
 
   frame.setLayout(null)
@@ -67,7 +68,8 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     val (env, colors) = selected match
       case "Brian's Brain" => (BriansBrainEnvironment(100), BriansBrainEnvironment.colors)
       case "Game of Life"  => (GameOfLifeEnvironment(100), GameOfLifeEnvironment.colors)
-      case "Wa Tor" => (WaTorEnvironment(100), WaTorEnvironment.colors)
+      case "Wa Tor"        => (WaTorEnvironment(100), WaTorEnvironment.colors)
+      case "Langton's Ant" => (LangtonsAntEnvironment(100), LangtonsAntEnvironment.colors)
 
     val pixelPanel = Gui((100, 100), colors)
     guiE = Some(GUIEngine2D(env, pixelPanel))
