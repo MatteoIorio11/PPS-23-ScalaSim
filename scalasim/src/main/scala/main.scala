@@ -11,7 +11,7 @@ import domain.simulations.gameoflife.GameOfLifeEnvironment
 import java.awt.Color
 
 @main def main(): Unit =
-  val engine = Engine2D(GameOfLifeEnvironment(100),5)
+  val engine = Engine2D(GameOfLifeEnvironment(100, 100),5)
   //val engine = Engine2D(BriansBrainEnvironment(100), 5)
 
   engine.startEngine
