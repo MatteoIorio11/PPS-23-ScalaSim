@@ -1,7 +1,7 @@
 package domain.gui
 
 import domain.automaton.Cell
-import domain.Environment.{GenericEnvironment, SimpleEnvironment}
+import domain.Environment.GenericEnvironment
 import domain.automaton.CellularAutomaton.State
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
 import domain.engine.Engine.{EngineView, GUIEngine2D}
@@ -10,10 +10,7 @@ import domain.simulations.briansbrain.BriansBrainEnvironment
 import domain.simulations.gameoflife.GameOfLifeEnvironment
 
 import java.awt.{Color, Graphics}
-import javax.swing.{JButton, JComboBox, JFrame, JPanel, JSlider, WindowConstants}
-import javax.swing.{JButton, JFrame, JPanel}
-import java.awt.{Color, Graphics}
-import javax.swing.{JButton, JComboBox, JFrame, JPanel}
+import javax.swing.{JButton, JComboBox, JFrame, JPanel, JSlider}
 import scala.collection.immutable.LazyList
 import domain.simulations.wator.WaTorEnvironment
 import domain.simulations.langtonsant.LangtonsAntEnvironment
