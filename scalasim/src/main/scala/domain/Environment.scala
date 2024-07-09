@@ -21,16 +21,24 @@ object Environment:
       * on a specific cell by using a specific neighbourhood. The specific rule that will be used is decided by the
       * Cellular Automata by checking the input cell's state and It's neighbours. Also, by using this trait It will be
       * possible to save the new cell into the space where all the cells are stored.
-      * @param D Cellular Automata's space dimension.
+      * @param D Cellular Automaton's space dimension.
       * @param R apply rule return type.
       */
     trait GenericEnvironment[D <: Dimension, R] extends Space[D]:
       protected def saveCell(cells: Cell[D]*): Unit
+      /**
+        * Apply a specific Cellular Automaton's rule by using the input cell and the neighbors. 
+        * @param cell input cell where It is necessary to apply the rule.
+        * @param neighbors neighbors of the input cell.
+        * @return the result cell/cells after applying the rule.
+        */
       def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): R
 
     /**
-      * 
-      * @param D
+      * This trait It specify a particular type of Environment in which It is used a Cellular Environment where
+      * as return type for the Apply Rule method It has a single output Cell. This trait extends from the Generic Environment
+      * by specifying in the generic value [[R]] the class [[Cell]].
+      * @param D Cellular Automaton's space dimension.
       */
     trait SimpleEnvironment[D <: Dimension] extends GenericEnvironment[D, Cell[D]]:
       def cellularAutomata: CellularAutomaton[D]
