@@ -20,11 +20,13 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import domain.Environment.ComplexEnvironment
 
+trait LangtonsAntEnvironment extends ComplexEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D
+
 object LangtonsAntEnvironment extends ViewBag:
   import LangtonsAntAutomaton.CellState.*
   import LangtonsAntAutomaton.LangstonAntState.ANT
 
-  def apply(dimension: Int): LangtonsAntEnvironmentImpl =
+  def apply(dimension: Int): LangtonsAntEnvironment =
     LangtonsAntEnvironmentImpl(dimension, LangtonsAntAutomaton())
   override def colors: Map[State, Color] = 
     Map(
@@ -34,14 +36,14 @@ object LangtonsAntEnvironment extends ViewBag:
       BLACK -> Color.BLACK,
     )
 
-  class LangtonsAntEnvironmentImpl(val side: Int, val ca: ComplexCellularAutomaton[TwoDimensionalSpace])
-    extends ComplexEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
+  private class LangtonsAntEnvironmentImpl(
+      override val side: Int,
+      override val cellularAutomata: ComplexCellularAutomaton[TwoDimensionalSpace],
+    ) extends LangtonsAntEnvironment:
 
     var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
     
     initialise()
-
-    override def cellularAutomata: ComplexCellularAutomaton[TwoDimensionalSpace] = LangtonsAntAutomaton()
 
     override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
       availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
