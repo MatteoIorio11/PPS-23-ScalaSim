@@ -35,12 +35,15 @@ object Environment:
       def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): R
 
     /**
-      * This trait It specify a particular type of Environment in which It is used a Cellular Environment where
+      * This trait represents a particular type of Environment in which It is used a Cellular Automaton where
       * as return type for the Apply Rule method It has a single output Cell. This trait extends from the Generic Environment
-      * by specifying in the generic value [[R]] the class [[Cell]].
+      * by specifying in the generic value [[R]] the type [[Cell]].
       * @param D Cellular Automaton's space dimension.
       */
     trait SimpleEnvironment[D <: Dimension] extends GenericEnvironment[D, Cell[D]]:
+      /**
+        * Cellular Automaton that will be used inside this environment.
+        */
       def cellularAutomata: CellularAutomaton[D]
       def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
         val newCell = cellularAutomata.applyRule(Neighbour(cell, neighbors))
@@ -48,9 +51,14 @@ object Environment:
         newCell
 
     /**
-      * TODO
+      * This trait represents a particular type of Environment in which It is used a Complex Cellular Automaton
+      * where It returns after applying the rule an Iterable of Cell. This trait extends from the Generic Environment
+      * by specifying in the generic type [[R]] the type [[Iterable]].
       */
     trait ComplexEnvironment[D <: Dimension] extends GenericEnvironment[D, Iterable[Cell[D]]]:
+      /**
+        * Cellular Automaton that will be used inside this environment.
+        */
       def cellularAutomata: ComplexCellularAutomaton[D]
       override def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Iterable[Cell[D]] = 
           val newCell = cellularAutomata.applyRule(Neighbour(cell, neighbors))
