@@ -66,7 +66,11 @@ object Environment:
           newCell
       
     /**
-      * TODO
+      * This trait It is used for representing the Space where all the cells will be stored during the simulation.
+      * For this trait It is necessary to specify how to represent the Matrix by definying the type Matrix. This decision
+      * allows the user to decied how to represent the space by using the best class for storing and modelling all the
+      * cells.
+      * @param D dimension in which the space is defined.
       */
     trait Space[D <: Dimension]:
       /**
@@ -79,11 +83,6 @@ object Environment:
         * @return the current matrix that is stored in the Environment.
         */
       def currentMatrix: Matrix
-      /**
-        * The cellular automaton that will be used in this Environment, the Cellular Automaton works in the same dimension
-        * of the Environment, which is D: [[Dimension]].
-        */
-      def cellularAutomata: GenericCellularAutomaton[D, ?, ?, ?]
       /**
         * Data strucuture that will be used for manage the Matrix.
         */
@@ -112,21 +111,27 @@ object Environment:
       protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
     
     /**
-      * This trait represent a Square Environment 2D.
+      * This trait represent a Square Environment 2D. A Square is defined by using one single component: the side.
+      * By extending this trait It will be necessary to specify the Square's side. This informations
+      * will be used for interact with the used Matrix.
       */
     trait SquareEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
         def side: Int
         override def dimension: Tuple2[Int, Int] = (side, side)
 
     /**
-      * This trait represent a Cubic Environment 3D. 
+      * This trait represent a Cubic Environment 3D. A Cubic, in solid geometry is defined by using one single component: the
+      * edge. By extending this trait It will be necessary to specify the Cubic's edge. This informations
+      * will be used for interact with the used Matrix.
       */
     trait CubicEnvironment extends GenericEnvironment[ThreeDimensionalSpace, ?]:
         def edge: Int
         override def dimension = (edge, edge, edge)
 
    /**
-      * This trait represent a Rectangular Environment 2D.
+      * This trait represent a Rectangular Environment 2D. A Rectangle is defined by two different component: the width and the heigth.
+      * In fact by extending this method It will be necessary to specify the Rectangle's informations. This informations
+      * will be used for interact with the used Matrix.
       */
     trait RectangularEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
         def width: Int
@@ -134,8 +139,9 @@ object Environment:
         override def dimension: Tuple2[Int, Int] = (heigth, width)
 
     /**
-      * This trait represent a Toroid Environment 2D.
-      * TODO
+      * This trait represent a Toroid Environment 2D. A Toroid is a surface of revolution with a hole in the middle.
+      * The axis of revolution passes through the hole and so does not intersect the surface. The Toroid can be represented in a 2D
+      * space by using a more simpler gemoetry figure, the Rectangle.
       */
     trait ToroidEnvironmnt extends RectangularEnvironment:
 
@@ -182,7 +188,6 @@ object Environment:
           matrix.deepCopy
 
       /**
-        * TODO
         * Extension method for the deep copy of the matrix.
         */
       extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
@@ -193,10 +198,10 @@ object Environment:
           def deepCopy: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
               matrix.map(row => row.map(cell => Cell(Position(cell.position.coordinates.toArray*), cell.state)))
           /**
-            * This extension method initialize the toroid space using the input initial cell, the initial cell
-            * will be used only for the input state, all the coordinates will be fixed automatically.
-            * @param initialCell: initial cell to use for initialize the space.
-            * @return a new Matrix initialized with the input initial cell.
+            * This initial matrix by using the input initial state. This method is general and can be used for all type of geometry space.
+            * @param dimension a tuple where It are defined all the space's dimension.
+            * @param initialCell initial cell to use for initialize the space.
+            * @return a new Matrix initialized with the input initial state.
             */
           protected def generalInitialization(dimension: Tuple2[Int, Int])(initialState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
             val cell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), initialState)
@@ -206,11 +211,12 @@ object Environment:
                     array(x)(y) = (Cell(Position(x, y), initialState))
             array
           /**
-            * This extension method returns a new Matrix in which there can be X cells with the inputState
+            * This extension method returns a new Matrix in which there can be X cells with the spawnState
             * otherwise the cell has It's initial state. The selected state is choosen by using a random value
             * where if the random value is True then It is selected the inputState otherwise the original state.
+            * @param dimension 
             * @param initialState state used for the matrix initialization.
-            * @param spawnState Input state to use If the probability returned from the random value is True.
+            * @param spawnState state to use if in a specific cell is possible to use this state.
             * @return a new Matrix in which there can be spawned a number of cell with the input state.
             */
           protected def generalSpawn(dimension: Tuple2[Int, Int])(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
@@ -226,10 +232,11 @@ object Environment:
             array(0)(0) = Cell(Position(0, 0), spawnState)
             array
           /**
-            * This extension method returns a new Matrix in which there a #nCells cells with the input state.
-            * @param nCells: number of cells to spawn 
-            * @param state: input state to use inside the spawned cells.
-            * @return a new Matrix where there are #nCells with the input state.
+            * This extension method returns a new Matrix in which there are #cells for the specific input state.
+            * @param dimension a tuple where It are defined all the space's dimension.
+            * @param nCells: number of cells to spawn for each state, nCells[i] is linked to the states[i]
+            * @param state: input states that will be spawned inside the matrix.
+            * @return a new Matrix where are inserted inside the old matrix the new states.
             */
           protected def generalMultipleSpawn(dimension: Tuple2[Int, Int])(nCells: Int*)(states: State*): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
             if (nCells.size != states.size)
@@ -310,4 +317,3 @@ object Environment:
             .filter(pos => pos.coordinates.head >= 0 && pos.coordinates.last < heigth &&
                             pos.coordinates.last >= 0 && pos.coordinates.last < width)
             .map(pos => matrix(pos.coordinates.head)(pos.coordinates.last))
-    
