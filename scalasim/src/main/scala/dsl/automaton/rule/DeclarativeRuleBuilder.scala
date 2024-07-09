@@ -9,6 +9,7 @@ import domain.automaton.Neighbour
 import domain.automaton.NeighbourRule
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position
+import scala.languageFeature.reflectiveCalls
 
 /**
  * This trait represents a [[NeighbourRuleBuilder]] that supports building a [[NeighbourRule]]
@@ -84,6 +85,14 @@ trait DeclarativeRuleBuilder extends NeighbourRuleBuilder[TwoDimensionalSpace]:
    */
   def setNeighboursRadius(radius: Int): this.type
 
+  /**
+    * Set the state if the current rule does not match.
+    *
+    * @param s the state if the rule does not match.
+    * @return this builder.
+    */
+  def setOtherwiseState(s: State): this.type
+
 /**
  * Companion object of [[DeclarativeRuleBuilder]] trait.
  */
@@ -107,6 +116,7 @@ object DeclarativeRuleBuilder:
    * Domain Specific Language for configuring the rules in a declarative fashion.
    */
   object ExpressionRuleDSL:
+    export EndClause.*
 
     /**
      * Used when a needing to specify an **exact** amount of neighbours that must have the same state
@@ -156,8 +166,19 @@ object DeclarativeRuleBuilder:
        * @param s the initial state of the center.
        * @param b the implicit context (i.e. the builder).
        */
-      infix def whenCenterIs(s: State)(using b: DeclarativeRuleBuilder): Unit =
+      infix def whenCenterIs(s: State)(using b: DeclarativeRuleBuilder): EndClause =
         b.setInitialState(s)
+        CenterState
+
+      /**
+        * Optional configuration that sets the state if the neighbour center does not match this rule.
+        *
+        * @param s the state if the rule does not match.
+        * @param b the implicit context (i.e. the builder).
+        */
+      infix def otherwise(s: State)(using b: DeclarativeRuleBuilder): Unit =
+        if this != CenterState then throw IllegalStateException("Bad DSL syntax: you can set otherwise state onyt when primary state is set")
+        b.setOtherwiseState(s)
 
   /**
    * Extension methods used in combination with [[ExpressionRuleDSL]].
@@ -188,9 +209,8 @@ object DeclarativeRuleBuilder:
        * @return an [[EndClause]]
        */
       infix def withRadius(radius: Int)(using b: DeclarativeRuleBuilder): EndClause =
-        import EndClause.*
         builder.setNeighboursRadius(radius)
-        Radius
+        EndClause.Radius
 
       /**
        * Specify the state that the center must have in order for the rule to match.
@@ -198,8 +218,18 @@ object DeclarativeRuleBuilder:
        * @param s the initial state of the center.
        * @param b the implicit context (i.e. the builder).
        */
-      infix def whenCenterIs(s: State)(using b: DeclarativeRuleBuilder): Unit =
+      infix def whenCenterIs(s: State)(using b: DeclarativeRuleBuilder): EndClause =
         b.setInitialState(s)
+        EndClause.CenterState
+
+      /**
+        * Optional configuration that sets the state if the neighbour center does not match this rule.
+        *
+        * @param s the state if the rule does not match.
+        * @param b the implicit context (i.e. the builder).
+        */
+      infix def otherwise(s: State)(using b: DeclarativeRuleBuilder): Unit =
+        b.setOtherwiseState(s)
 
     extension (s: State)
 
@@ -241,6 +271,7 @@ object DeclarativeRuleBuilder:
       var finalState: Option[State] = Option.empty,
       var numNeighbours: Option[Int => Boolean] = Option.empty,
       var neighboursState: Option[State] = Option.empty,
+      var otherwiseState: Option[State] = Option.empty,
       var neighbourRadius: Int = 1,
   ):
     /**
@@ -290,6 +321,10 @@ object DeclarativeRuleBuilder:
       currentConfig = currentConfig.map(_.copy(neighbourRadius = radius))
       this
 
+    override def setOtherwiseState(s: State): this.type =
+      currentConfig = currentConfig.map(_.copy(otherwiseState = Some(s)))
+      this
+
     override def build: Iterable[NeighbourRule[TwoDimensionalSpace]] =
       buildNextRule()
       configureRules()
@@ -305,6 +340,8 @@ object DeclarativeRuleBuilder:
       _rules = _rules ++ neighbourRulesConfigs.map(config =>
           val locator = getCircularNeighbourhoodPositions(config.neighbourRadius)
           NeighbourRule(Some(config.initialState)): (n: Neighbour[TwoDimensionalSpace]) =>
+            val otherwiseCell = Cell(n.center.position, config.otherwiseState.getOrElse(n.center.state))
+
             n.center match
                 case x if x.state == config.initialState || config.initialState == AnyState =>
                   val expectedNeighbourhood = locator.absoluteNeighboursLocations(n.center.position).toList
@@ -312,9 +349,9 @@ object DeclarativeRuleBuilder:
                   then
                     getNeighboursWithState(config.neighboursState.get, n).size match
                       case x if config.numNeighbours.get(x) => Cell(n.center.position, config.finalState.get)
-                      case _ => n.center
-                  else n.center
-                case _ => n.center
+                      case _ => otherwiseCell
+                  else otherwiseCell
+                case _ => otherwiseCell
       )
 
     private def buildNextRule(): Unit =
