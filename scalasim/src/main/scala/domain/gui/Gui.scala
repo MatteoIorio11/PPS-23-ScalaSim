@@ -10,7 +10,7 @@ import domain.simulations.briansbrain.BriansBrainEnvironment
 import domain.simulations.gameoflife.GameOfLifeEnvironment
 
 import java.awt.{Color, Graphics}
-import javax.swing.{JButton, JComboBox, JFrame, JPanel, JSlider}
+import javax.swing.{JButton, JComboBox, JFrame, JPanel, JLabel, JSlider}
 import scala.collection.immutable.LazyList
 import domain.simulations.wator.WaTorEnvironment
 import domain.simulations.langtonsant.LangtonsAntEnvironment
@@ -55,11 +55,15 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
   val comboBox = JComboBox(EnvironmentOption.options.map(_.name).toArray)
   val widthSlider = JSlider(10, 200, 100)
   val heightSlider = JSlider(10, 200, 100)
+  val widthLabel = JLabel(s"Width: ${widthSlider.getValue}")
+  val heightLabel = JLabel(s"Height: ${heightSlider.getValue}")
 
   frame.setLayout(null)
   comboBox.setBounds(50, 50, 200, 30)
   widthSlider.setBounds(50, 150, 200, 50)
+  widthLabel.setBounds(260, 150, 100, 50)
   heightSlider.setBounds(50, 200, 200, 50)
+  heightLabel.setBounds(260, 200, 100, 50)
   startButton.setBounds(50, 100, 100, 30)
   stopButton.setBounds(150, 100, 100, 30)
   exitButton.setBounds(50, 300, 100, 30)
@@ -70,8 +74,9 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
   frame.add(stopButton)
   frame.add(exitButton)
   frame.add(widthSlider)
+  frame.add(widthLabel)
 
-  frame.setSize(800, 600)
+  frame.setSize(1000, 600)
   frame.setDefaultCloseOperation(3)
   frame.setVisible(true)
 
@@ -84,11 +89,21 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
 
     if environmentOption.isToroidal then
       frame.add(heightSlider)
+      frame.add(heightLabel)
     else
       frame.remove(heightSlider)
+      frame.remove(heightLabel)
 
     frame.revalidate()
     frame.repaint()
+  )
+
+  widthSlider.addChangeListener(_ =>
+    widthLabel.setText(s"Width: ${widthSlider.getValue}")
+  )
+
+  heightSlider.addChangeListener(_ =>
+    heightLabel.setText(s"Height: ${heightSlider.getValue}")
   )
 
   startButton.addActionListener(e =>
@@ -111,7 +126,7 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     guiE = Some(GUIEngine2D(env, pixelPanel))
     currentPanel = Some(pixelPanel)
 
-    pixelPanel.setBounds(300, 50, 500, 500)
+    pixelPanel.setBounds(400, 50, 500, 500)
     frame.add(pixelPanel)
     frame.revalidate()
     frame.repaint()
