@@ -22,7 +22,7 @@ object EnvironmentOption:
   val options = List(
     EnvironmentOption("Brian's Brain", (width, height) => BriansBrainEnvironment(width), BriansBrainEnvironment.colors, false),
     EnvironmentOption("Game of Life", GameOfLifeEnvironment.apply, GameOfLifeEnvironment.colors, true),
-    EnvironmentOption("Wa Tor", WaTorEnvironment.apply, WaTorEnvironment.colors, false),
+    EnvironmentOption("Wa Tor", WaTorEnvironment.apply, WaTorEnvironment.colors, true),
     EnvironmentOption("Langton's Ant", (width, height) => LangtonsAntEnvironment(width), LangtonsAntEnvironment.colors, true)
   )
 
