@@ -149,3 +149,21 @@ class DeclarativeNeighbourRuleBuilderTest extends AnyFunSuite:
 
     val rule = builder.build.head
     rule.applyTransformation(neighbourhood) shouldBe Cell(Position(1, 1), dead)
+
+  test("State specified with `otherwise` should be applied if rule doesn't match"):
+    val builder = DeclarativeRuleBuilder.configureRules:
+      dead when fewerThan(3) withState(alive) otherwise(alive)
+
+    val rule = builder.build.head
+
+    val n: Neighbour[TwoDimensionalSpace] = Neighbour(
+      Cell(Position(1, 1), dead),
+      List(
+        Cell(Position(0, 1), alive),
+        Cell(Position(0, 0), alive),
+        Cell(Position(1, 2), alive),
+        Cell(Position(1, 0), alive)
+      )
+    )
+
+    rule.applyTransformation(n).state shouldBe alive
