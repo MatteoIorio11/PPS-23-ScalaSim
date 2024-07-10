@@ -43,7 +43,7 @@ object WaTorEnvironment extends ViewBag:
       initialise()
 
       override protected def initialise() = 
-        matrix = matrix.spawnCells(1000, 500)(SHARK(), FISH())
+        matrix = matrix.spawnCells(100, 1000)(SHARK(), FISH())
     
       override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
           import domain.automaton.NeighborRuleUtility.given
@@ -118,10 +118,9 @@ object WaTor:
         def canReproduce: Boolean = value == threshold
 
     class SHARK(initialEnergy: Int = 100) extends WaTorState(initialEnergy, "SHARK"):
-        val threshold = value / 2
         def eatFish: Unit = value = value + 100
         def reproduce: Unit = value = value / 2
-        def canReproduce: Boolean = value == threshold
+        def canReproduce: Boolean = value == 50
 
     class EMPTY extends  WaTorState(0, "EMPTY"):
       override def canReproduce: Boolean = false
