@@ -5,7 +5,7 @@ import domain.Environment.{ArrayToroidEnvironment, GenericEnvironment}
 import domain.automaton.CellularAutomaton.State
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
 import domain.engine.Engine.{EngineView, GUIEngine2D}
-import domain.engine.{GUIEngine2D, Engine2D}
+import domain.engine.{Engine2D, GUIEngine2D}
 import domain.exporter.{Exporter, JCodecVideoGenerator, SimpleMatrixToImageConverter}
 import domain.simulations.briansbrain.BriansBrainEnvironment
 import domain.simulations.gameoflife.GameOfLifeEnvironment
@@ -13,7 +13,7 @@ import domain.simulations.wator.WaTorEnvironment
 import domain.simulations.langtonsant.LangtonsAntEnvironment
 
 import java.awt.{Color, Graphics}
-import javax.swing.{JButton, JComboBox, JFrame, JLabel, JPanel, JSlider}
+import javax.swing.{JButton, JComboBox, JFrame, JLabel, JOptionPane, JPanel, JSlider}
 import scala.collection.immutable.LazyList
 
 case class EnvironmentOption[D <: Dimension, R](name: String, createEnvironment: (Int, Int) => GenericEnvironment[D, R], colors: Map[State, Color], isToroidal: Boolean)
@@ -144,11 +144,11 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     frame.repaint()
   )
 
-  exportButton.addActionListener(e =>
+  exportButton.addActionListener(e => {
     val selectedOption = comboBox.getSelectedItem.toString
     val environmentOption = EnvironmentOption.options.find(_.name == selectedOption).get
     val width = widthSlider.getValue()
-    val height = if environmentOption.isToroidal then heightSlider.getValue() else width
+    val height = if (environmentOption.isToroidal) heightSlider.getValue() else width
 
     val env = environmentOption.createEnvironment(width, height)
     val engine = Engine2D(env, 5)
@@ -165,9 +165,9 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
       videoFilename = "output.mp4",
       secondsPerImage = 0.1
     )
-    println("Video exported as output.mp4")
 
-  )
+    JOptionPane.showMessageDialog(frame, "Video exported as output.mp4")
+  })
 
   exitButton.addActionListener(e =>
     guiE.foreach(guiEngine => guiEngine.stopEngine)
