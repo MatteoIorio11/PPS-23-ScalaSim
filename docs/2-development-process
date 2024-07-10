@@ -38,4 +38,11 @@ Nella metodologia di sviluppo scrum vengono identificate diversi ruoli tra i com
 
 All'interno del nostro progetto, abbiamo scelto di adottare la metodologia di sviluppo TDD (_Test Driven Development_). Questa scelta permette al sistema di garantire una maggiore qualita del codice, identificare e correggere i bug in anticipo e di migliorare la manutenibilita complessiva del sistema software. Il TDD si compone di due fasi realizzative: 
 1. Definizione dei test: la prima fase di sviluppo con questa modalita prevede la definizione dei test;
-2. Scrittura del codice: sviluppo del codice necessario affinche i test definiti nella fase precedente eseguano con esito positivo senza fallire.
+2. Scrittura del codice di produzione: sviluppo del codice necessario affinche i test definiti nella fase precedente eseguano con esito positivo senza fallire.
+
+La fase preliminare alla scrittura del codice e quella di _Red Green Refactor_, che e composto dalle tre seguenti fasi: 
+1. __Fase Red__: scrivere un test che fallisca per una determinata funzionalita;
+2. __Fase Green__: scrivere il codice di produzione che soddisfi il test definito della fase precedente;
+3. __Refactor__: ristrutturare il codice di testing e sia quello di produzione.
+
+[Index](./index.md) / [Capitolo Precedente](./1-introduction.md) / [Capitolo Successivo](./3-analysis.md)
