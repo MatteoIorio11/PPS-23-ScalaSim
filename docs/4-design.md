@@ -39,4 +39,9 @@ Il secondo macro concetto che e stato affrontato per il simulatore, e stato l'En
 
 ### Astrazione dello spazio
 
-Un aspetto molto importante riguardante l'_Environmen_ e la modalita con la quale rappresentare lo spazio in cui salvare le _Cell_. Per fare in modo di lasciare maggiore liberta allo user, nel definirsi la propria struttura dati con la quale rappresentare lo spazio si e deciso di sfruttare un meccanismo di Scala per risovere questo problema, ovvero i _type_ parameters.
+Un aspetto molto importante riguardante l'_Environment_ e la modalita con la quale rappresentare lo spazio in cui salvare le _Cell_. Per fare in modo di lasciare maggiore liberta allo user, nel definirsi la propria struttura dati con la quale rappresentare lo spazio si e deciso di sfruttare un meccanismo di Scala ovvero i _type_ parameters. Attraverso l'utilizzo di questo modalita sara possibile utilizzare qualsiasi tipo di struttura dati per modellare lo spazio in cui salvare le _Cell_ riguardanti la simulazione.
+
+### Configurazione tramite Mixin
+La modellazione dello spazio tramite il _type_ ha reso possibile l'utilizzo dei _Mixin_. La configurazione della struttura dati con la quale modellare lo spazio e definito tramite uno o piu trait che vanno a comporre il _Cake Pattern_, attraverso il quale vengono configurate le diverse informazioni dell'_Environment_.
+
+Questo meccanismo viene in oltre utilizzato per modellare la geometria dello spazio del _Cellular Automaton_. Ovvero ogni _Cellular Automaton_ ha la propria concezione di spazio, ad esempio un semplice rettangolo, o uno spazio piu complesso come quello toroidale. Anche per modellare questo comportamento dell'_Environment_ vengono utilizzati i _Mixin_ attraverso cui e possibile specificare i diversi comportamenti riguardanti lo spazio geometrico ed inoltre le varie modalita con la quale percepire lo spazio stesso.
