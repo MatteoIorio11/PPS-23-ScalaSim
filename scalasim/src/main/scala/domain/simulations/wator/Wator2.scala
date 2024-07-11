@@ -76,9 +76,10 @@ object WaTorCa:
         ca
 
     private def findRandomCellThat(cells: List[Cell[TwoDimensionalSpace]])(p: Cell[TwoDimensionalSpace] => Boolean): Option[Cell[TwoDimensionalSpace]] =
-        cells.filter(p) match
-            case h :: t => Some((h :: t)(Random().nextInt(t.size + 1)))
-            case Nil => None
+        val filteredcells = cells.filter(p)
+        filteredcells.size match
+            case 0 => None
+            case x => Some(filteredcells(Random.nextInt(x)))
 
     private def fishRule: MultipleOutputNeighbourRule[TwoDimensionalSpace] =
         def incrementChronon(fish: Cell[TwoDimensionalSpace], newPosition: Option[Position[TwoDimensionalSpace]] = None): Cell[TwoDimensionalSpace] = newPosition match
