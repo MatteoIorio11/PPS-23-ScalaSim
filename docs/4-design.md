@@ -35,4 +35,8 @@ L'aspetto piu importante, necessario in oltre, a modellare un Cellular Automaton
 
 ## Environment
 
-Il secondo macro concetto che e stato affrontato per il simulatore, e stato l'Environment. Come discusso in precedenza il _Cellular Automaton_ fa riferimento ad un insieme di _Cell_ le quali devono essere memorizzate in una qualche struttura dati, dal momento in cui lo user potrebbe voler modellare lo spazio in cui vengono salvate le _Cell_ con specifiche strutture dati. 
+Il secondo macro concetto che e stato affrontato per il simulatore, e stato l'Environment. L'_Environment_ fa sempre riferimento ad un singolo _Cellular Automaton_, in questo modo sara possibile fornire il _Neighbour_ appropriato dal momento in cui solo l'_Environment_ e a conoscenza della disposizione delle varie _Cell_ nello spazio.
+
+### Astrazione dello spazio
+
+Un aspetto molto importante riguardante l'_Environmen_ e la modalita con la quale rappresentare lo spazio in cui salvare le _Cell_. Per fare in modo di lasciare maggiore liberta allo user, nel definirsi la propria struttura dati con la quale rappresentare lo spazio si e deciso di sfruttare un meccanismo di Scala per risovere questo problema, ovvero i _type_ parameters.
