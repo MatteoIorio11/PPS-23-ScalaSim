@@ -32,3 +32,7 @@ Come accennato in precedenza, un concetto fondamentale nella modellazione degli 
 L'aspetto piu importante, necessario in oltre, a modellare un Cellular Automaton e il concetto di _Rule_, una regola permette di specificare il comportamento di un Cellular Automaton in un preciso istante, piu in particolare una specifica _Cell_ ed la sua _Neighbour_ e possibile calcolare il nuovo stato. Per la rappresentazione di questo concetto si e voluto sfruttare l'aspetto funzionale di Scala, andando a rappresentare la regola come una funzione con un Input ed un Output generico. Ogni regola in oltre fa riferimento ad uno specifico _State_ del Cellular Automaton. Grazie a questo tipo di modellazione e stato possibile rappresentare il concetto di modifica di piu _Cell_ contemporaneamente.
 
 [TODO: aggiungere il trait Rule]
+
+## Environment
+
+Il secondo macro concetto che e stato affrontato per il simulatore, e stato l'Environment. Come discusso in precedenza il _Cellular Automaton_ fa riferimento ad un insieme di _Cell_ le quali devono essere memorizzate in una qualche struttura dati, dal momento in cui lo user potrebbe voler modellare lo spazio in cui vengono salvate le _Cell_ con specifiche strutture dati. 
