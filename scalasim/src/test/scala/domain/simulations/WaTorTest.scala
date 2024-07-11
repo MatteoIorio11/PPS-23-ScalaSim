@@ -10,6 +10,7 @@ import domain.simulations.WaTorCa.WatorState.*
 import domain.simulations.WaTorCa.fishReproductionThreshold
 import domain.simulations.WaTorCa.sharkInitialEnergy
 import domain.simulations.WaTorCa.sharkReproductionThreshold
+import domain.simulations.WaTorCa.sharkEatFishEnergy
 
 class WaTorTest extends AnyFunSuite:
   private val waTorCa = WaTorCa()
@@ -104,3 +105,20 @@ class WaTorTest extends AnyFunSuite:
     )
 
     waTorCa.applyRule(n) should contain theSameElementsAs List(Cell(Position(1, 1), Water))
+
+  test("A shark should prefer a fish over an empty cell, and should gain energy when eating"):
+    val n: Neighbour[TwoDimensionalSpace] = Neighbour(
+      Cell(Position(1, 1), Shark()),
+      List(
+        Cell(Position(0, 1), Fish()),
+        Cell(Position(2, 1), Water),
+      )
+    )
+
+    val newShark = Cell(Position(0, 1), Shark(SharkInfo(1, sharkInitialEnergy - 1 + sharkEatFishEnergy)))
+
+    val res = waTorCa.applyRule(n)
+    res should contain theSameElementsAs List(newShark, Cell(Position(1, 1), Water))
+
+    res.find(_.position == newShark.position).get.state.asInstanceOf[Shark].value shouldBe newShark.state.asInstanceOf[Shark].value
+    

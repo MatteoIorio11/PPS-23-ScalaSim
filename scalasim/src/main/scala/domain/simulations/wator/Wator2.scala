@@ -116,7 +116,7 @@ object WaTorCa:
         MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(Shark())): n =>
             if n.center.state.asShark.value.energy == 0
             then Iterable(Cell[TwoDimensionalSpace](n.center.position, Water))
-            else findRandomCellThat(n.neighbourhood)(_.state == Fish) match
+            else findRandomCellThat(n.neighbourhood)(_.state == Fish()) match
                     case None => findRandomCellThat(n.neighbourhood)(_.state == Water) match
                         case None => Iterable(updateSharkInfoWhenStepDone(n.center))
                         case Some(freeCell) => getOutputCells(n.center, freeCell)
