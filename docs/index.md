@@ -1,10 +1,12 @@
 # PPS-23 ScalaSim
 
-- [Introduzione](./1-introduction.ms)
+- [Introduzione](./1-introduction.md)
 
-- [Analisi](./2-analysis.md)
+- [Development Process](./2-development-process.md)
 
-- [Design](./3-design.md)
+- [Analis](./3-analysis.md)
+
+- [Design](./4-design.md)
 
 - [Implementazione](./4-implementation.md)
 
