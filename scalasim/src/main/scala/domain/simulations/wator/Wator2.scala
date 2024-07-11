@@ -91,7 +91,7 @@ object WaTorCa:
                 case None => Iterable(incrementChronon(n.center))
                 case Some(freeCell) =>
                     n.center.state.asFish.value match
-                        case `fishReproductionThreshold` =>
+                        case fishReproductionThreshold =>
                             Iterable(
                                 Cell[TwoDimensionalSpace](freeCell.position, Fish(1)),
                                 Cell[TwoDimensionalSpace](n.center.position, Fish()),
@@ -110,7 +110,7 @@ object WaTorCa:
 
         def getOutputCells(center: Cell[TwoDimensionalSpace], freeCell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
             val oldCell = center.state.asShark.value.chrono match
-                case `sharkReproductionThreshold` => Cell[TwoDimensionalSpace](center.position, Shark())
+                case sharkReproductionThreshold => Cell[TwoDimensionalSpace](center.position, Shark())
                 case _                            => Cell[TwoDimensionalSpace](center.position, Water)
             Iterable(updateSharkInfoWhenStepDone(Cell(center.position, center.state.asShark.update(i => i.copy(chrono = 0))), Some(freeCell.position)), oldCell)
 
