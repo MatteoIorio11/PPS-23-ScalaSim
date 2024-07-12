@@ -28,14 +28,15 @@ trait GameOfLifeEnvironment extends SimpleEnvironment[TwoDimensionalSpace] with 
 object GameOfLifeEnvironment extends ViewBag:
     private val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.DEAD)
 
-    def apply(height: Int, width: Int): GameOfLifeEnvironment =
-        GameOfLifeEnvironmentImpl(height, width, cellularAutomata = GameOfLife())
+    def apply(height: Int, width: Int,  initialCells: Map[State, Int]): GameOfLifeEnvironment =
+        GameOfLifeEnvironmentImpl(height, width, initialCells, cellularAutomata = GameOfLife())
 
-    private class GameOfLifeEnvironmentImpl(val heigth: Int, val width: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
+    private class GameOfLifeEnvironmentImpl(val heigth: Int, val width: Int, val  initialCells: Map[State, Int], val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
         extends GameOfLifeEnvironment:
 
         require(heigth > 0, width > 0)
         require(cellularAutomata != null)
+        require(initialCells.values.sum < heigth*width)
 
         var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(CellState.DEAD)
 
@@ -45,8 +46,7 @@ object GameOfLifeEnvironment extends ViewBag:
             availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
         override protected def initialise(): Unit =
-            val initialCell = Cell(Position(-1, -1), CellState.DEAD)
-            matrix.spawnCells(heigth*width/3)(CellState.ALIVE)
+            initialCells.foreach((state, amount) => matrix.spawnCells(amount)(state))
 
     override def colors: Map[State, Color] = Map(
         GameOfLife.CellState.ALIVE -> Color.WHITE,
