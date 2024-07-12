@@ -48,6 +48,7 @@ Questo meccanismo viene in oltre utilizzato per modellare la geometria dello spa
 
 ## Engine
 
-L'ultimo componente necessario alla realizzazione dell'intero sistema e l'_Engine_, ovvero il motore attraverso il quale e possibile sviluppare l'intera simulazione, apportando modifiche all'_Environment_ e facendo evolvere lo stato della simulazione ad ogni nuova iterazione. Ogni _Engine_ al suo interno ha un _Environment_ in modo da far riferimento ad una sola simulazione alla volta.
+L'ultimo componente necessario alla realizzazione dell'intero sistema e l'_Engine_, ovvero il motore attraverso il quale e possibile sviluppare l'intera simulazione, apportando modifiche all'_Environment_ e facendo evolvere lo stato della simulazione ad ogni nuova iterazione. Ogni _Engine_ al suo interno deve fare riferimento ad un singolo _Environment_, cosi che si faccia riferimento sempre ad una sola simulazione.
 
-Per la strutturazione dell'_Engine_ abbiamo voluto fornire diverse modalita con la quale eseguire la simulazione stessa, anche in questo caso per ottenere tale risultato sono stati utilizzati i _Mixin.
+Dal momento in cui possono esserci diverse modalita con la quale voler eseguire la simulazione, ad esempio visualizzazione real time con GUI, simulazione con output finale un video etc etc, si e deciso di sviluppare le diverse modalita di esecuzione tramite l'utilizzo dei _Mixin_.
+
