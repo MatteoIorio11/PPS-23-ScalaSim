@@ -64,7 +64,11 @@ object Environment:
           val newCell = cellularAutomata.applyRule(Neighbour(cell, neighbors))
           saveCell(newCell.toSeq*)
           newCell
-      
+    /**
+      * TODO: 
+      */
+    trait SwitchEnvironment[D <: Dimension] extends GenericEnvironment[D, ?]:
+      def switchState: State
     /**
       * This trait It is used for representing the Space where all the cells will be stored during the simulation.
       * For this trait It is necessary to specify how to represent the Matrix by definying the type Matrix. This decision
