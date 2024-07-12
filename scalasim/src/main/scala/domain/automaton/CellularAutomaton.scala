@@ -75,7 +75,7 @@ object CellularAutomaton:
 
       override def applyRule(neighbors: Neighbour[D]): Iterable[Cell[D]] =
         rules.get(neighbors.center.state) match
-          case None => Iterable(neighbors.center)
+          case None => List()
           case Some(r) => r.applyTransformation(neighbors)
 
       override def addRule(rule: MultipleOutputNeighbourRule[D]): Unit

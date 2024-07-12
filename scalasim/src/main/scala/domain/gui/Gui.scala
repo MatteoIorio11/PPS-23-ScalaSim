@@ -15,7 +15,6 @@ import domain.simulations.langtonsant.LangtonsAntEnvironment
 import java.awt.{Color, Graphics}
 import javax.swing.{JButton, JComboBox, JFrame, JLabel, JPanel, JSlider}
 import scala.collection.immutable.LazyList
-import domain.simulations.wator.WaTorEnvironment
 
 case class EnvironmentOption[D <: Dimension, R](name: String, createEnvironment: (Int, Int) => GenericEnvironment[D, R], colors: Map[State, Color], isToroidal: Boolean)
 
@@ -24,7 +23,6 @@ object EnvironmentOption:
     EnvironmentOption("Brian's Brain", (width, height) => BriansBrainEnvironment(width), BriansBrainEnvironment.colors, false),
     EnvironmentOption("Game of Life", GameOfLifeEnvironment.apply, GameOfLifeEnvironment.colors, true),
     EnvironmentOption("Wa Tor", WaTorEnvironment.apply, WaTorEnvironment.colors, true), 
-    EnvironmentOption("Wa Tor 2", WaTorEnv.apply, WaTorEnv.colors, true), 
     EnvironmentOption("Langton's Ant", (width, height) => LangtonsAntEnvironment(width), LangtonsAntEnvironment.colors, true)
   )
 
