@@ -37,3 +37,10 @@ software in grado di eseguire e, potenzialmente mostrare o esportare il risultat
 della computazione.
 
 *Requisiti engine qui*
+## Requisiti Engine (da spostare in analisi)
+
+All'intero del sistema che si andra a sviluppare, oltre ai diversi tool con la quale modellare l'astrazione di un _Cellular Automaton_ e tutto cio che lo riguarda, sara necessario realizzare un ulteriore componente software il cui compito sara quello di svolgere l'intera simulazione. Questo componente, denominato _Engine_ dovra essere in grado di eseguire un qualsiasi tipo di simulazione in maniera del tutto indipendente dal tipo di ambiente utilizzato dal _Cellular Automaton_, in modo da far evolvere lo stato delle diverse _Cell_ memorizzate nello spazio.
+
+In parallelo all'esecuzione della simulazione dovra essere possibile visualizzarla, per fare cio l'_Engine_ dovra quindi permettere all'utente finale di visualizzare la sua simulazione in due specifiche modalita:
+1. Visualizzazione tramite GUI in real time;
+2. Visualizzazione tramite export video.
