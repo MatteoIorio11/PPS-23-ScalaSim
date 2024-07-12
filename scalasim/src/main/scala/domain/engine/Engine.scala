@@ -60,11 +60,23 @@ object Engine:
     var history: LazyList[Iterable[Iterable[Cell[TwoDimensionalSpace]]]] = LazyList()
     override def currentMatrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]] = 
         environment().currentMatrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
-    override def nextIteration: Unit = 
+    override def nextIteration: Unit =
         environment().matrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
                 .flatMap(_.map(cell => cell))
                 .map(cell => env.applyRule(cell, env.neighbours(cell)))
         saveInHistory
+  /**
+    * TODO: 
+    */
+  trait IterableSwitchEngine2D extends IterableEngine2D:
+    override def env: SwitchEnvironment[TwoDimensionalSpace]
+    override protected def environment(): SwitchEnvironment[TwoDimensionalSpace]
+    override def nextIteration: Unit = 
+      val newState = environment().switchState
+      environment().matrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
+        .flatMap(_.map(cell => cell).filter(cell => cell.state == newState))
+        .map(cell => env.applyRule(cell, env.neighbours(cell)))
+      saveInHistory
   /**
     * This trait represent a specific type of 2D engine that runs on a Virtual Thread.
     */
