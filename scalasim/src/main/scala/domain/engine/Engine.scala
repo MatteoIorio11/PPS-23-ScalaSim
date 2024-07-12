@@ -69,12 +69,13 @@ object Engine:
     * TODO: 
     */
   trait IterableSwitchEngine2D extends IterableEngine2D:
-    override def env: SwitchEnvironment[TwoDimensionalSpace]
-    override protected def environment(): SwitchEnvironment[TwoDimensionalSpace]
     override def nextIteration: Unit = 
-      val newState = environment().switchState
+      val optionState = environment() match
+        case senv: SwitchEnvironment[TwoDimensionalSpace] => Some(senv.switchState)
+        case _ => None
+      
       environment().matrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
-        .flatMap(_.map(cell => cell).filter(cell => cell.state == newState))
+        .flatMap(_.map(cell => cell).filter(cell => optionState.nonEmpty && optionState.get == cell.state))
         .map(cell => env.applyRule(cell, env.neighbours(cell)))
       saveInHistory
   /**
@@ -184,7 +185,9 @@ object GUIEngine2D:
   private val maxSize = Runtime.getRuntime().availableProcessors() + 1
 
   def apply(env: GenericEnvironment[TwoDimensionalSpace, ?], view: EngineView[TwoDimensionalSpace]): GUIEngine2D = 
-    GUIEngine2DImpl(env, view)
+    env match
+      case senv: SwitchEnvironment[TwoDimensionalSpace] => new GUIEngine2DImpl(env, view) with IterableSwitchEngine2D
+      case genv: GenericEnvironment[TwoDimensionalSpace, ?] => GUIEngine2DImpl(genv, view)
     
   private case class GUIEngine2DImpl(val env: GenericEnvironment[TwoDimensionalSpace, ?], val view: EngineView[TwoDimensionalSpace]) 
     extends IterableThreadEngine2D with GUIEngine2D:
