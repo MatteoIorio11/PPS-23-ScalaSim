@@ -9,27 +9,29 @@ import domain.engine.{Engine2D, GUIEngine2D}
 import domain.exporter.{Exporter, JCodecVideoGenerator, SimpleMatrixToImageConverter}
 import domain.simulations.briansbrain.BriansBrainEnvironment
 import domain.simulations.gameoflife.GameOfLifeEnvironment
-import domain.simulations.* 
+import domain.simulations.*
+import domain.simulations.WaTorCellularAutomaton.WatorState.{Fish, Shark}
+import domain.simulations.briansbrain.BriansBrain.CellState
+import domain.simulations.gameoflife.GameOfLife.CellState as GameOfLifeState
 import domain.simulations.langtonsant.LangtonsAntEnvironment
 
 import java.awt.{Color, Graphics}
-import javax.swing.{JButton, JComboBox, JFrame, JLabel, JOptionPane, JPanel, JSlider}
+import javax.swing.{JButton, JComboBox, JFrame, JLabel, JOptionPane, JPanel, JSlider, JTextField}
 import scala.collection.immutable.LazyList
-
-case class EnvironmentOption[D <: Dimension, R](name: String, createEnvironment: (Int, Int) => GenericEnvironment[D, R], colors: Map[State, Color], isToroidal: Boolean)
+case class EnvironmentOption[D <: Dimension, R](name: String, createEnvironment: (Int, Int, Map[State, Int]) => GenericEnvironment[D, R], colors: Map[State, Color], isToroidal: Boolean, states: List[State])
 
 object EnvironmentOption:
   val options = List(
-    EnvironmentOption("Brian's Brain", (width, height) => BriansBrainEnvironment(width), BriansBrainEnvironment.colors, false),
-    EnvironmentOption("Game of Life", GameOfLifeEnvironment.apply, GameOfLifeEnvironment.colors, true),
-    EnvironmentOption("Wa Tor", WaTorEnvironment.apply, WaTorEnvironment.colors, true), 
-    EnvironmentOption("Langton's Ant", (width, height) => LangtonsAntEnvironment(width), LangtonsAntEnvironment.colors, true)
+    EnvironmentOption("Brian's Brain", (width, height, initialCells) => BriansBrainEnvironment(width, initialCells), BriansBrainEnvironment.colors, false, List(CellState.ON, CellState.OFF, CellState.DYING)),
+    EnvironmentOption("Game of Life", (width, height, initialCells) => GameOfLifeEnvironment(width, height, initialCells), GameOfLifeEnvironment.colors, true, List(GameOfLifeState.ALIVE, GameOfLifeState.DEAD)),
+    EnvironmentOption("Wa Tor", (width, height, initialCells) => WaTorEnvironment(width, height, initialCells), WaTorEnvironment.colors, true, List(Fish(), Shark())),
+    EnvironmentOption("Langton's Ant", (width, height, initialCells) => LangtonsAntEnvironment(width), LangtonsAntEnvironment.colors, true, List())
   )
 
-class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JPanel with EngineView[TwoDimensionalSpace]:
+class Gui(val dimension: (Int, Int), colors: Map[State, Color]) extends JPanel with EngineView[TwoDimensionalSpace]:
   private var pixels: LazyList[Cell[TwoDimensionalSpace]] = LazyList()
-  private var h = dimension(0)
-  private var w = dimension(1)
+  private var h = dimension._1
+  private var w = dimension._2
   private var ps = 5
 
   def setPixelSize(newSize: Int): Unit =
@@ -85,6 +87,27 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
 
   var guiE: Option[GUIEngine2D] = None
   var currentPanel: Option[Gui] = None
+  var stateFields: Map[State, (JLabel, JTextField)] = Map()
+
+  def updateStateFields(environmentOption: EnvironmentOption[_, _]): Unit = {
+    stateFields.values.foreach { case (label, field) =>
+      frame.remove(label)
+      frame.remove(field)
+    }
+
+    stateFields = environmentOption.states.zipWithIndex.map { case (state, index) =>
+      val label = JLabel(s"$state:")
+      val field = JTextField("0")
+      label.setBounds(50, 350 + index * 40, 100, 30)
+      field.setBounds(150, 350 + index * 40, 100, 30)
+      frame.add(label)
+      frame.add(field)
+      (state, (label, field))
+    }.toMap
+
+    frame.revalidate()
+    frame.repaint()
+  }
 
   comboBox.addActionListener(_ =>
     val selectedOption = comboBox.getSelectedItem.toString
@@ -96,6 +119,8 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     else
       frame.remove(heightSlider)
       frame.remove(heightLabel)
+
+    updateStateFields(environmentOption)
 
     frame.revalidate()
     frame.repaint()
@@ -109,7 +134,7 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     heightLabel.setText(s"Height: ${heightSlider.getValue}")
   )
 
-  startButton.addActionListener(e =>
+  startButton.addActionListener(_ =>
     guiE.foreach(guiEngine => guiEngine.stopEngine)
     currentPanel.foreach(panel => frame.remove(panel))
 
@@ -118,7 +143,11 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     val width = widthSlider.getValue()
     val height = if environmentOption.isToroidal then heightSlider.getValue() else width
 
-    val env = environmentOption.createEnvironment(width, height)
+    val initialCells = stateFields.map { case (state, (_, field)) =>
+      state -> field.getText.toInt
+    }
+
+    val env = environmentOption.createEnvironment(width, height, initialCells)
     val colors = environmentOption.colors
 
     val pixelPanel = Gui((width, height), colors)
@@ -136,7 +165,7 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     guiE.foreach(engine => engine.startEngine)
   )
 
-  stopButton.addActionListener(e =>
+  stopButton.addActionListener(_ =>
     guiE.foreach(guiEngine => guiEngine.stopEngine)
     currentPanel.foreach(panel => frame.remove(panel))
     currentPanel = None
@@ -144,13 +173,17 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     frame.repaint()
   )
 
-  exportButton.addActionListener(e => {
+  exportButton.addActionListener(_ => {
     val selectedOption = comboBox.getSelectedItem.toString
     val environmentOption = EnvironmentOption.options.find(_.name == selectedOption).get
     val width = widthSlider.getValue()
-    val height = if (environmentOption.isToroidal) heightSlider.getValue() else width
+    val height = if environmentOption.isToroidal then heightSlider.getValue() else width
 
-    val env = environmentOption.createEnvironment(width, height)
+    val initialCells = stateFields.map { case (state, (_, field)) =>
+      state -> field.getText.toInt
+    }
+
+    val env = environmentOption.createEnvironment(width, height, initialCells)
     val engine = Engine2D(env, 5)
     engine.startEngine
     Thread.sleep(2000)
@@ -169,7 +202,7 @@ class Gui(val dimension: Tuple2[Int, Int], colors: Map[State, Color]) extends JP
     JOptionPane.showMessageDialog(frame, "Video exported as output.mp4")
   })
 
-  exitButton.addActionListener(e =>
+  exitButton.addActionListener(_ =>
     guiE.foreach(guiEngine => guiEngine.stopEngine)
     currentPanel.foreach(panel => frame.remove(panel))
     frame.dispose())
