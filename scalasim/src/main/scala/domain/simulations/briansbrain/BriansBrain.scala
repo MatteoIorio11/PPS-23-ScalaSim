@@ -33,6 +33,7 @@ object BriansBrainEnvironment extends ViewBag:
 
     require(side > 0)
     require(cellularAutomata != null)
+    require(initialCells.values.sum < side*side)
 
     var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(CellState.OFF)
 
