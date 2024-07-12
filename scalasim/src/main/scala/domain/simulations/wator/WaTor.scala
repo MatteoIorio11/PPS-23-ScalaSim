@@ -8,6 +8,7 @@ import domain.automaton.MultipleOutputNeighbourRule
 import domain.automaton.CellularAutomaton.ValuedState
 import domain.automaton.CellularAutomaton.State
 import domain.simulations.WaTorCellularAutomaton.WatorState.*
+import domain.simulations.WaTorCellularAutomaton.WatorState
 import domain.base.Position
 import domain.automaton.Neighbour
 import domain.automaton.CellularAutomaton.MultiOutputCellularAutomaton
@@ -26,17 +27,20 @@ object WaTorEnvironment extends ViewBag:
         Water -> Color.CYAN,
     )
 
-    def apply(w: Int, h: Int): ComplexEnvironment[TwoDimensionalSpace] = WaTorEnvironmentImpl(w, h, WaTorCellularAutomaton())
+    def apply(w: Int, h: Int, initialCells: Map[State , Int]): ComplexEnvironment[TwoDimensionalSpace] = WaTorEnvironmentImpl(w, h, initialCells, WaTorCellularAutomaton())
 
-    private class WaTorEnvironmentImpl(val width: Int, val heigth: Int, val cellularAutomata: ComplexCellularAutomaton[TwoDimensionalSpace])
+    private class WaTorEnvironmentImpl(val width: Int, val heigth: Int, val initialCells: Map[State , Int], val cellularAutomata: ComplexCellularAutomaton[TwoDimensionalSpace])
         extends ComplexEnvironment[TwoDimensionalSpace] with ArrayToroidEnvironment:
+
+        require(initialCells.values.sum < width * heigth)
 
         var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(Water)
 
         initialise()
 
         override protected def initialise(): Unit =
-            matrix = matrix.spawnCells(500, 1000)(Shark(), Fish())
+
+            initialCells.foreach((state, amount) => matrix = matrix.spawnCells(amount)(state))
 
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
             import domain.automaton.NeighborRuleUtility.given
