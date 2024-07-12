@@ -1,27 +1,29 @@
 # Design del Sistema
 
-Il design sviluppato per il sistema puo essere suddiviso in 3 componenti principali, ovvero:
+Il design architetturale dell'intero sistema puo essere suddiviso in 3 macro componenti, i quali a loro volta sono suddivisi e descritti in componenti piu semplici che incapsulano un unico argomento. Le tre macro categorie di concetti che compongono il sistema sono:
 1. _Engine_
 2. _Environment_
 3. _Cellular Automaton
 
-Nelle sezioni successive verrano elencate le diverse strategie utilizzate per sviluppare l'intero sistema, andando ad elencare le scelte effettuate al fine di realizzare un programma che sia altamente personalizzabile al fine di facilitare la creazione di simulazioni di automi cellulari.
+Nelle sezioni successive verrano elencate le diverse strategie utilizzate per sviluppare le diverse componenti, andando ad elencare le scelte effettuate nella  realizzazione delle diverse funzionalita per far sii che sia altamente personalizzabile, in modo da facilitare la creazione di simulazioni.
 
 ## Cellular Automaton
 
-Il Cellular Automaton, puo essere visto come un contenitore di regole che fanno riferimento ai diversi stati che compongono il Cellular Automaton Stesso. Per ogni _Cell_ che viene memorizzata all'interno dell'Environment verra scelta una regola specifica, in modo da calcolare correttamente lo stato sucessivo o gli stati successivi, a seconda del Cellular Automaton che si sta modellando fino a quel momento (WaTor coinvolge sempre la modifca dello stato di due celle contemporaneamente).
+Il _Cellular Automaton_, puo essere visto come un contenitore di regole che fanno riferimento ai diversi stati che compongono il Cellular Automaton stesso. Per ogni _Cell_ che viene memorizzata all'interno dell'_Environment_ verra scelta una regola specifica, in modo da calcolare correttamente lo stato sucessivo o gli stati successivi, a seconda del Cellular Automaton che si sta modellando fino a quel momento (WaTor coinvolge sempre la modifca dello stato di due celle contemporaneamente).
 
-Il design che riguarda il Cellular Automaton ha richiesto una serie di scelte importanti, affinche fosse possibile riuscire ad incapsulare la sua astrazione in una serie di diversi componenti.
+Dal momento in cui esistono diverse categorie di _Cellular Automaton_, tra cui una specifica categoria la quale per un singolo stato di una _Cell_ potrebbero venire applicate piu di una regola contemporaneamente, si e deciso di utilizzare un _type parameter_ per la definizione della struttura dati nella quale andare a memorizzare le diverse regole che compongono il _Cellular Automaton_. A supporto di questa funzionalita inoltre si e deciso di implementare, tramite l'utilizzo di _mixin_, diverse strutture dati gia funzionanti da utilizzare per memorizzare lavorare su tali regole.
+
+Il design che riguarda il _Cellular Automaton_ ha richiesto una serie di scelte importanti, affinche fosse possibile riuscire ad incapsulare la sua astrazione in una serie di diversi componenti.
 
 ### Cell
 
-Partendo dal concetto piu generale, ogni Cellular Automaton si compone di diversi stati, i quali vengono assunti dalle diverse celle che sono memorizzate all'interno del tensore dell' Environment. Ogni Cellula, si compone di una posizione nello spazio e di uno specifico Stato, il quale determinera assieme ai vicini della cella stessa il suo stato sucessivo.
+Partendo dal concetto piu generale, ogni Cellular Automaton si compone di diversi stati, i quali vengono assunti dalle diverse _Cell_ che sono memorizzate all'interno dell'_Environment_. Ogni _Cell_, si compone di una posizione nello spazio e di uno specifico Stato, il quale determinera assieme ai vicini della cella stessa il suo stato sucessivo. Uno degli aspetti piu importanti della _Cell_, come descritto in precedenza e lo _State_, il quale puo a sua volta essere piu o meno complesso (ad esempio uno stato potrebbe mantenere anche un qualche tipo di informazione). Per affrontare questa problematica si e voluto sviluppare un concetto che astraesse il concetto di _State_, in modo che questo poi possa a sua volta essere esteso con idee ed implementazioni molto piu complesse ed astratte.
 
 [TODO: aggiungere immagine trait Cell]
 
 ### Neighbour
 
-Come accennato in precedenza, un concetto fondamentale nella modellazione degli automi cellulari e il concetto di 'vicini'. Per la modellazione di questa idea e stato necessario sviluppare in maniera separata da _Cell_, il concetto di _Neighbour_, il quale viene modellato tramite due aspetti principali:
+Come accennato in precedenza, un aspetto fondamentale nell'applicazione delle regole nei _Cellular Automaton_ e il concetto di vicinato. Per la modellazione di questa idea e stato necessario sviluppare in maniera separata da _Cell_, il concetto di _Neighbour_, il quale presenta due componenti principali per la rappresentazione di tale aspetto:
 1. _center_: rappresenta la cella per il quale viene calcolato il vicinato;
 2. _neighbourhood_: rappresenta la collezione di celle che compone il vicinato della cella centrale, questa collezione non fa riferimento ad una specifica regola con la quale individuare i vicini, dal momento in cui diversi Cellular Automaton potrebbero utilizzare regole diverse per individuare il proprio vicinato.
 
@@ -34,6 +36,7 @@ L'aspetto piu importante, necessario in oltre, a modellare un Cellular Automaton
 [TODO: aggiungere il trait Rule]
 
 ## Environment
+
 
 Il secondo macro concetto che e stato affrontato per il simulatore, e stato l'Environment. L'_Environment_ fa sempre riferimento ad un singolo _Cellular Automaton_, in questo modo sara possibile fornire il _Neighbour_ appropriato dal momento in cui solo l'_Environment_ e a conoscenza della disposizione delle varie _Cell_ nello spazio.
 
