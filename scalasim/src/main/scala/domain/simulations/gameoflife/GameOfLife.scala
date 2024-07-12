@@ -1,17 +1,20 @@
 package domain.simulations.gameoflife
 
 import domain.Environment
-import domain.automaton.CellularAutomaton.*
-import domain.base.Dimensions.*
-import domain.automaton.{Cell, NeighborRuleUtility, Neighbour, NeighbourRule, Rule}
-import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
+import domain.automaton.Cell
 import domain.automaton.Cell.*
+import domain.automaton.CellularAutomaton.*
+import domain.automaton.NeighborRuleUtility
+import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
+import domain.automaton.Neighbour
+import domain.automaton.NeighbourRule
+import domain.automaton.Rule
+import domain.base.Dimensions.*
 import domain.base.Position
 import domain.simulations.gameoflife.GameOfLife.CellState
 import domain.utils.ViewBag.ViewBag
 
 import java.awt.Color
-import scala.util.Random
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
@@ -52,31 +55,23 @@ object GameOfLifeEnvironment extends ViewBag:
 
 
 object GameOfLife:
-    def apply(): CellularAutomaton[TwoDimensionalSpace] =
-        val gameOfLife = GameOfLifeImpl()
-
-        val liveRule = NeighbourRule(Some(CellState.ALIVE)): (x: Neighbour[TwoDimensionalSpace]) =>
-            NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x).length match 
-                case y if y < 2 || y > 3 => Cell(x.center.position, CellState.DEAD)
-                case _ => Cell(x.center.position, CellState.ALIVE)
-        
-        val deadRule = NeighbourRule(Some(CellState.DEAD)): (x: Neighbour[TwoDimensionalSpace]) =>
-            NeighborRuleUtility.getNeighboursWithState(CellState.ALIVE, x).length match 
-                case 3 => Cell(x.center.position, CellState.ALIVE)
-                case _ => Cell(x.center.position, CellState.DEAD)
-
-        gameOfLife.addRule(liveRule)
-        gameOfLife.addRule(deadRule)
-        gameOfLife
+    import CellState.*
+    import dsl.automaton.rule.DeclarativeRuleBuilder.*
+    import dsl.automaton.rule.DeclarativeRuleBuilder.DSLExtensions.*
+    import dsl.automaton.CellularAutomatonBuilder
+    import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.CustomNeighbourhoodDSL.*
+    import dsl.automaton.rule.DeclarativeRuleBuilder
 
     enum CellState extends State:
         case ALIVE
         case DEAD
-    private case class GameOfLifeImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapSingleRules[TwoDimensionalSpace]:
-        var ruleCollection: Rules = Map()
-        override def rules: Rules = ruleCollection
-        override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
-            neighborRule.matcher  match
-                case Some(state) =>  ruleCollection = ruleCollection + (state -> neighborRule)
-                case None => ruleCollection
 
+    def apply(): CellularAutomaton[TwoDimensionalSpace] =
+        CellularAutomatonBuilder.fromRuleBuilder {
+            DeclarativeRuleBuilder.configureRules:
+                DEAD when fewerThan(2) withState ALIVE whenCenterIs ALIVE
+                ALIVE when surroundedBy(2) withState ALIVE whenCenterIs ALIVE
+                ALIVE when surroundedBy(3) withState ALIVE whenCenterIs ALIVE
+                DEAD when atLeastSurroundedBy(4) withState ALIVE whenCenterIs ALIVE
+                ALIVE when surroundedBy(3) withState ALIVE whenCenterIs DEAD
+        }.build()

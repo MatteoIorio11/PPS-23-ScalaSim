@@ -24,9 +24,9 @@ object CellularAutomaton:
         */
       def value: T
 
-      infix def map[B](f: T => B): ValuedState[B] =
-        val v: B = f(value)
-        new ValuedState[B] { override def value: B = v }
+      infix def update(f: T => T): ValuedState[T] =
+        val v: T = f(value)
+        new ValuedState[T] { override def value: T = v }
 
     /**
      * Used when no specific state is needed for the center in order to match with the rules.
@@ -75,7 +75,7 @@ object CellularAutomaton:
 
       override def applyRule(neighbors: Neighbour[D]): Iterable[Cell[D]] =
         rules.get(neighbors.center.state) match
-          case None => Iterable(neighbors.center)
+          case None => List()
           case Some(r) => r.applyTransformation(neighbors)
 
       override def addRule(rule: MultipleOutputNeighbourRule[D]): Unit

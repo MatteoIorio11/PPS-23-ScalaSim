@@ -9,7 +9,7 @@ import domain.engine.{Engine2D, GUIEngine2D}
 import domain.exporter.{Exporter, JCodecVideoGenerator, SimpleMatrixToImageConverter}
 import domain.simulations.briansbrain.BriansBrainEnvironment
 import domain.simulations.gameoflife.GameOfLifeEnvironment
-import domain.simulations.wator.WaTorEnvironment
+import domain.simulations.* 
 import domain.simulations.langtonsant.LangtonsAntEnvironment
 
 import java.awt.{Color, Graphics}
@@ -22,7 +22,7 @@ object EnvironmentOption:
   val options = List(
     EnvironmentOption("Brian's Brain", (width, height) => BriansBrainEnvironment(width), BriansBrainEnvironment.colors, false),
     EnvironmentOption("Game of Life", GameOfLifeEnvironment.apply, GameOfLifeEnvironment.colors, true),
-    EnvironmentOption("Wa Tor", WaTorEnvironment.apply, WaTorEnvironment.colors, true),
+    EnvironmentOption("Wa Tor", WaTorEnvironment.apply, WaTorEnvironment.colors, true), 
     EnvironmentOption("Langton's Ant", (width, height) => LangtonsAntEnvironment(width), LangtonsAntEnvironment.colors, true)
   )
 

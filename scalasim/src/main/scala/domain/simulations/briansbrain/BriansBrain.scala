@@ -13,6 +13,8 @@ import domain.base.Dimensions.*
 import domain.base.Position
 import domain.simulations.briansbrain.BriansBrain.CellState
 import domain.utils.ViewBag.ViewBag
+import dsl.automaton.rule.DeclarativeRuleBuilder
+import dsl.automaton.rule.DeclarativeRuleBuilder.ExpressionRuleDSL.surroundedBy
 
 import java.awt.Color
 import scala.collection.mutable.ArrayBuffer
@@ -54,34 +56,23 @@ object BriansBrainEnvironment extends ViewBag:
   )
 
 object BriansBrain:
-  def apply(): CellularAutomaton[TwoDimensionalSpace] =
-    val briansBrain = BriansBrainImpl()
-    val onRule = NeighbourRule(Some(CellState.ON)): (x: Neighbour[TwoDimensionalSpace]) =>
-      Cell(x.center.position, CellState.DYING)
+  import dsl.automaton.CellularAutomatonBuilder
+  import dsl.automaton.rule.DeclarativeRuleBuilder
+  import dsl.automaton.rule.DeclarativeRuleBuilder.DSLExtensions.*
+  import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.CustomNeighbourhoodDSL.*
 
-    val offRule = NeighbourRule(Some(CellState.OFF)): (x: Neighbour[TwoDimensionalSpace]) =>
-      NeighborRuleUtility.getNeighboursWithState(CellState.ON, x).length match
-        case 2 => Cell(x.center.position, CellState.ON)
-        case _ => Cell(x.center.position, CellState.OFF)
-
-    val dyingRule = NeighbourRule(Some(CellState.DYING)): (x: Neighbour[TwoDimensionalSpace]) =>
-      Cell(x.center.position, CellState.OFF)
-
-    briansBrain.addRule(onRule)
-    briansBrain.addRule(offRule)
-    briansBrain.addRule(dyingRule)
-    briansBrain
+  import CellState.*
 
   enum CellState extends State:
     case ON
     case OFF
     case DYING
 
-  private case class BriansBrainImpl() extends CellularAutomaton[TwoDimensionalSpace] with MapSingleRules[TwoDimensionalSpace]:
-    var ruleCollection = Map()
-    override def rules: Rules = ruleCollection
-
-    override def addRule(neighborRule: NeighbourRule[TwoDimensionalSpace]): Unit =
-      neighborRule.matcher  match
-        case Some(state) =>  ruleCollection = ruleCollection + (state -> neighborRule)
-        case None => ruleCollection
+  def apply(): CellularAutomaton[TwoDimensionalSpace] =
+    CellularAutomatonBuilder.fromRuleBuilder {
+      DeclarativeRuleBuilder.configureRules:
+        DYING whenNeighbourhoodIsExactlyLike(c(ON))
+        ON when surroundedBy(2) withState ON whenCenterIs OFF otherwise OFF
+        OFF whenNeighbourhoodIsExactlyLike(c(DYING))
+    }.build()
+    
