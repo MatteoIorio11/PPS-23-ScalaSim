@@ -41,9 +41,12 @@ object GameOfLifeEnvironment extends ViewBag:
         var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(CellState.DEAD)
 
         initialise()
-        override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
+        override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
             import domain.automaton.NeighborRuleUtility.given
-            availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
+            Neighbour[TwoDimensionalSpace](
+                cell,
+                availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+            )
 
         override protected def initialise(): Unit =
             initialCells.foreach((state, amount) => matrix.spawnCells(amount)(state))

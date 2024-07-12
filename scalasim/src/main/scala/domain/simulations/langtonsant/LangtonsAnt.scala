@@ -45,8 +45,11 @@ object LangtonsAntEnvironment extends ViewBag:
     
     initialise()
 
-    override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
-      availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
+    override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
+        Neighbour[TwoDimensionalSpace](
+            cell,
+            availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+        )
 
     override protected def initialise(): Unit =
       matrix = matrix.spawnCell(WHITE)(WHITE)

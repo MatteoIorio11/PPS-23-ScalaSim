@@ -39,13 +39,15 @@ object WaTorEnvironment extends ViewBag:
         initialise()
 
         override protected def initialise(): Unit =
-
             initialCells.foreach((state, amount) => matrix = matrix.spawnCells(amount)(state))
             matrix = matrix.spawnCells(1, 1000)(Shark(), Fish())
 
-        override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
+        override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
             import domain.automaton.NeighborRuleUtility.given
-            availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+            Neighbour[TwoDimensionalSpace](
+                cell,
+                availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+            )
 
 object WaTorCellularAutomaton:
     val fishReproductionThreshold: Int = 10

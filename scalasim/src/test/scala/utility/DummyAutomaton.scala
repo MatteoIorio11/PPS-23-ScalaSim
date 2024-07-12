@@ -40,7 +40,10 @@ object DummyAutomatonEnvironment extends ViewBag:
         matrix = matrix.spawnCell(DummyState.DEAD)(DummyState.ALIVE)
       override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
           import domain.automaton.NeighborRuleUtility.given
-          availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
+          Neighbour(
+            cell,
+            availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+          )
 object DummyToroidEnv extends ViewBag:
   def apply(w: Int, h: Int): SimpleEnvironment[TwoDimensionalSpace] =
         DummyToroidEnvironmentImpl(w, h, DummyAutomaton())
@@ -54,7 +57,10 @@ object DummyToroidEnv extends ViewBag:
     override protected def initialise() = matrix = matrix.spawnCell(DummyState.DEAD)(DummyState.ALIVE)
     override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
       import domain.automaton.NeighborRuleUtility.given
-        availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
+      Neighbour(
+        cell,
+        availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+      )
   override def colors: Map[State, Color] = Map((DummyState.DEAD -> Color.BLACK), (DummyState.ALIVE -> Color.WHITE))
 
 
