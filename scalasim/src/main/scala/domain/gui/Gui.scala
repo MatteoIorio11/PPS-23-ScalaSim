@@ -135,34 +135,39 @@ class Gui(val dimension: (Int, Int), colors: Map[State, Color]) extends JPanel w
   )
 
   startButton.addActionListener(_ =>
-    guiE.foreach(guiEngine => guiEngine.stopEngine)
-    currentPanel.foreach(panel => frame.remove(panel))
+    try{
+      guiE.foreach(guiEngine => guiEngine.stopEngine)
+      currentPanel.foreach(panel => frame.remove(panel))
 
-    val selectedOption = comboBox.getSelectedItem.toString
-    val environmentOption = EnvironmentOption.options.find(_.name == selectedOption).get
-    val width = widthSlider.getValue()
-    val height = if environmentOption.isToroidal then heightSlider.getValue() else width
+      val selectedOption = comboBox.getSelectedItem.toString
+      val environmentOption = EnvironmentOption.options.find(_.name == selectedOption).get
+      val width = widthSlider.getValue()
+      val height = if environmentOption.isToroidal then heightSlider.getValue() else width
 
-    val initialCells = stateFields.map { case (state, (_, field)) =>
-      state -> field.getText.toInt
+      val initialCells = stateFields.map { case (state, (_, field)) =>
+        state -> field.getText.toInt
+      }
+
+      val env = environmentOption.createEnvironment(width, height, initialCells)
+      val colors = environmentOption.colors
+
+      val pixelPanel = Gui((width, height), colors)
+      val panelSize = 500
+      val pixelSize = panelSize / math.max(width, height)
+      pixelPanel.setPixelSize(pixelSize)
+
+      guiE = Some(GUIEngine2D(env, pixelPanel))
+      currentPanel = Some(pixelPanel)
+
+      pixelPanel.setBounds(400, 50, 500, 500)
+      frame.add(pixelPanel)
+      frame.revalidate()
+      frame.repaint()
+      guiE.foreach(engine => engine.startEngine)
+    } catch {
+      case ex: Exception =>
+        JOptionPane.showMessageDialog(frame, s"Bad environment configuration", "Error", JOptionPane.ERROR_MESSAGE)
     }
-
-    val env = environmentOption.createEnvironment(width, height, initialCells)
-    val colors = environmentOption.colors
-
-    val pixelPanel = Gui((width, height), colors)
-    val panelSize = 500
-    val pixelSize = panelSize / math.max(width, height)
-    pixelPanel.setPixelSize(pixelSize)
-
-    guiE = Some(GUIEngine2D(env, pixelPanel))
-    currentPanel = Some(pixelPanel)
-
-    pixelPanel.setBounds(400, 50, 500, 500)
-    frame.add(pixelPanel)
-    frame.revalidate()
-    frame.repaint()
-    guiE.foreach(engine => engine.startEngine)
   )
 
   stopButton.addActionListener(_ =>
@@ -174,32 +179,37 @@ class Gui(val dimension: (Int, Int), colors: Map[State, Color]) extends JPanel w
   )
 
   exportButton.addActionListener(_ => {
-    val selectedOption = comboBox.getSelectedItem.toString
-    val environmentOption = EnvironmentOption.options.find(_.name == selectedOption).get
-    val width = widthSlider.getValue()
-    val height = if environmentOption.isToroidal then heightSlider.getValue() else width
+    try {
+      val selectedOption = comboBox.getSelectedItem.toString
+      val environmentOption = EnvironmentOption.options.find(_.name == selectedOption).get
+      val width = widthSlider.getValue()
+      val height = if environmentOption.isToroidal then heightSlider.getValue() else width
 
-    val initialCells = stateFields.map { case (state, (_, field)) =>
-      state -> field.getText.toInt
+      val initialCells = stateFields.map { case (state, (_, field)) =>
+        state -> field.getText.toInt
+      }
+
+      val env = environmentOption.createEnvironment(width, height, initialCells)
+      val engine = Engine2D(env, 5)
+      engine.startEngine
+      Thread.sleep(2000)
+      engine.stopEngine
+
+      Exporter.exportMatrix(
+        engine,
+        environmentOption.colors,
+        converter = SimpleMatrixToImageConverter,
+        videoGenerator = JCodecVideoGenerator,
+        cellSize = 10,
+        videoFilename = "output.mp4",
+        secondsPerImage = 0.1
+      )
+
+      JOptionPane.showMessageDialog(frame, "Video exported as output.mp4")
+    } catch {
+      case ex: Exception =>
+        JOptionPane.showMessageDialog(frame, s"Bad environment configuration", "Error", JOptionPane.ERROR_MESSAGE)
     }
-
-    val env = environmentOption.createEnvironment(width, height, initialCells)
-    val engine = Engine2D(env, 5)
-    engine.startEngine
-    Thread.sleep(2000)
-    engine.stopEngine
-
-    Exporter.exportMatrix(
-      engine,
-      environmentOption.colors,
-      converter = SimpleMatrixToImageConverter,
-      videoGenerator = JCodecVideoGenerator,
-      cellSize = 10,
-      videoFilename = "output.mp4",
-      secondsPerImage = 0.1
-    )
-
-    JOptionPane.showMessageDialog(frame, "Video exported as output.mp4")
   })
 
   exitButton.addActionListener(_ =>
