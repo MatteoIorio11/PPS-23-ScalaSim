@@ -5,10 +5,6 @@ import domain.automaton.Cell
 import domain.automaton.Cell.*
 import domain.automaton.CellularAutomaton.*
 import domain.automaton.NeighborRuleUtility
-import domain.automaton.NeighborRuleUtility.NeighbourhoodLocator
-import domain.automaton.Neighbour
-import domain.automaton.NeighbourRule
-import domain.automaton.Rule
 import domain.base.Dimensions.*
 import domain.base.Position
 import domain.simulations.briansbrain.BriansBrain.CellState
@@ -29,10 +25,10 @@ trait BriansBrainEnvironment extends SimpleEnvironment[TwoDimensionalSpace] with
 object BriansBrainEnvironment extends ViewBag:
   private val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.OFF)
 
-  def apply(dimension: Int): BriansBrainEnvironment =
-    BriansBrainEnvironmentImpl(dimension, cellularAutomata = BriansBrain())
+  def apply(dimension: Int, initialCells: Map[CellState, Int]): BriansBrainEnvironment =
+    BriansBrainEnvironmentImpl(dimension, initialCells, cellularAutomata = BriansBrain())
 
-  private class BriansBrainEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
+  private class BriansBrainEnvironmentImpl(val side: Int, val initialCells: Map[CellState, Int], val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
     extends BriansBrainEnvironment:
 
     require(side > 0)
@@ -47,7 +43,7 @@ object BriansBrainEnvironment extends ViewBag:
       availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
 
     override protected def initialise(): Unit =
-      matrix.spawnCells(side*side/3)(CellState.ON)
+      initialCells.foreach((state, amount) => matrix.spawnCells(amount)(state))
 
   override def colors: Map[State, Color] = Map(
     CellState.ON -> Color.WHITE,
