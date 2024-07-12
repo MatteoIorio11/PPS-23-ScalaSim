@@ -6,14 +6,11 @@ import domain.automaton.Neighbour
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.automaton.Cell
 import domain.base.Position
-import domain.simulations.WaTorCa.WatorState.*
-import domain.simulations.WaTorCa.fishReproductionThreshold
-import domain.simulations.WaTorCa.sharkInitialEnergy
-import domain.simulations.WaTorCa.sharkReproductionThreshold
-import domain.simulations.WaTorCa.sharkEatFishEnergy
+import domain.simulations.WaTorCellularAutomaton.WatorState.*
+import domain.simulations.WaTorCellularAutomaton.*
 
 class WaTorTest extends AnyFunSuite:
-  private val waTorCa = WaTorCa()
+  private val waTorCa = WaTorCellularAutomaton()
 
   test("Custom state equals should work as expected"):
     val f1 = Cell(Position(1, 1), Fish())
