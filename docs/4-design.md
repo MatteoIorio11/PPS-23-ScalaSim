@@ -13,7 +13,7 @@ Il _Cellular Automaton_, puo essere visto come un contenitore di regole che fann
 
 Dal momento in cui esistono diverse categorie di _Cellular Automaton_, tra cui una specifica categoria la quale per un singolo stato di una _Cell_ potrebbero venire applicate piu di una regola contemporaneamente, si e deciso di utilizzare un _type parameter_ per la definizione della struttura dati nella quale andare a memorizzare le diverse regole che compongono il _Cellular Automaton_. A supporto di questa funzionalita inoltre si e deciso di implementare, tramite l'utilizzo di _mixin_, diverse strutture dati gia funzionanti da utilizzare per memorizzare lavorare su tali regole.
 
-Il design che riguarda il _Cellular Automaton_ ha richiesto una serie di scelte importanti, affinche fosse possibile riuscire ad incapsulare la sua astrazione in una serie di diversi componenti.
+Il design che riguarda il _Cellular Automaton_ ha richiesto una serie di scelte importanti, affinche fosse possibile riuscire ad incapsulare la sua astrazione in una serie di diversi componenti. 
 
 ### Cell
 
