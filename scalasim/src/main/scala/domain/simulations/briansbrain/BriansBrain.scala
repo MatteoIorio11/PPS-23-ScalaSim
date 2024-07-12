@@ -25,10 +25,10 @@ trait BriansBrainEnvironment extends SimpleEnvironment[TwoDimensionalSpace] with
 object BriansBrainEnvironment extends ViewBag:
   private val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.OFF)
 
-  def apply(dimension: Int, initialCells: Map[CellState, Int]): BriansBrainEnvironment =
+  def apply(dimension: Int, initialCells: Map[State, Int]): BriansBrainEnvironment =
     BriansBrainEnvironmentImpl(dimension, initialCells, cellularAutomata = BriansBrain())
 
-  private class BriansBrainEnvironmentImpl(val side: Int, val initialCells: Map[CellState, Int], val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
+  private class BriansBrainEnvironmentImpl(val side: Int, val initialCells: Map[State, Int], val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
     extends BriansBrainEnvironment:
 
     require(side > 0)
