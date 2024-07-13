@@ -16,6 +16,7 @@ import java.awt.Color
 import scala.collection.mutable.ArrayBuffer
 
 import Environment.*
+import domain.automaton.Neighbour
 
 /**
   * TODO: write how this CA work.
@@ -39,9 +40,12 @@ object BriansBrainEnvironment extends ViewBag:
 
     initialise()
 
-    override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
-      import domain.automaton.NeighborRuleUtility.given
-      availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position).toList)
+    override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
+        import domain.automaton.NeighborRuleUtility.given
+        Neighbour[TwoDimensionalSpace](
+            cell,
+            availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+        )
 
     override protected def initialise(): Unit =
       initialCells.foreach((state, amount) => matrix.spawnCells(amount)(state))

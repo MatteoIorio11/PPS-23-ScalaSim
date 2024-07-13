@@ -114,4 +114,25 @@ class WaTorTest extends AnyFunSuite:
     val res = waTorCa.applyRule(n)
     res should contain theSameElementsAs List(newShark, Cell(Position(1, 1), Water))
     res.find(_.position == newShark.position).get.state.asInstanceOf[Shark].value shouldBe newShark.state.asInstanceOf[Shark].value
-    
+
+  test("A shark should be alive after some iterations"):
+    var shark = Cell[TwoDimensionalSpace](Position(5, 5), Shark(SharkInfo(chrono = 0, energy = 30)))
+    var neighbours: Seq[Cell[TwoDimensionalSpace]] = for
+      i <- 0 to 5
+      j <- 0 until 5
+    yield
+      if j == i then Cell(Position(i, j), Water) else Cell(Position(i, j), Fish())
+
+    val maxIter = 30
+    var currIter = 0
+    while currIter < maxIter do
+      val n: Neighbour[TwoDimensionalSpace] = Neighbour(shark, neighbours)
+      val res = waTorCa.applyRule(n)
+      
+      res.find(_.state == Shark()) should not be empty
+      shark = res.find(_.state == Shark()).get
+      if res.size > 1 then
+        val otherCell = res.find(_.state != Shark()).getOrElse(Cell(Position(-1, -1), Water))
+        neighbours = neighbours.map(c => if c.position == shark.position then otherCell else c)
+
+      currIter += 1

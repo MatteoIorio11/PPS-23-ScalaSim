@@ -63,7 +63,7 @@ object Engine:
     override def nextIteration: Unit = 
         environment().matrix.asInstanceOf[Iterable[Iterable[Cell[TwoDimensionalSpace]]]]
                 .flatMap(_.map(cell => cell))
-                .map(cell => env.applyRule(cell, env.neighbours(cell)))
+                .map(cell => env.applyRule(env.neighbours(cell)))
         saveInHistory
   /**
     * This trait represent a specific type of 2D engine that runs on a Virtual Thread.

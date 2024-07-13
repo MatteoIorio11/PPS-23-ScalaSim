@@ -34,7 +34,7 @@ class EnvironmentTest extends AnyFunSuite:
     test("Apply the rule of the CA should return the expected cell"):
         val cell: Cell[TwoDimensionalSpace] = Cell(Position(0, 0), DummyState.DEAD)
         val neigh = env.neighbours(cell)
-        env.applyRule(cell, neigh) shouldBe Cell(Position(0, 0), DummyState.ALIVE)
+        env.applyRule(neigh) shouldBe Cell(Position(0, 0), DummyState.ALIVE)
 class ToroidEnvironmentTest extends AnyFunSuite:
     val env = DummyToroidEnv(10, 4)
 
@@ -50,9 +50,9 @@ class ToroidEnvironmentTest extends AnyFunSuite:
         val cell: Cell[TwoDimensionalSpace] = Cell(Position(0, 0), DummyState.DEAD)
         val neighbours = List(List(0,9), List(1,9), List(1,0), List(1,1), List(0,1), List(3,9), List(3,1), List(3,0))
         env.neighbours(cell = cell) shouldNot be (List.empty)
-        env.neighbours(cell).map(cell => cell.position.coordinates).forall(it => neighbours.contains(it)) should be (true)
+        env.neighbours(cell).neighbourhood.map(cell => cell.position.coordinates).forall(it => neighbours.contains(it)) should be (true)
 
     test("Apply the rule of the CA should return the expected cell"):
         val cell: Cell[TwoDimensionalSpace] = Cell(Position(0, 0), DummyState.DEAD)
         val neigh = env.neighbours(cell)
-        env.applyRule(cell, neigh) shouldBe Cell(Position(0, 0), DummyState.ALIVE)
+        env.applyRule(neigh) shouldBe Cell(Position(0, 0), DummyState.ALIVE)

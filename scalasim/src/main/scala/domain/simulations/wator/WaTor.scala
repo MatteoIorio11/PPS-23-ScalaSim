@@ -39,12 +39,15 @@ object WaTorEnvironment extends ViewBag:
         initialise()
 
         override protected def initialise(): Unit =
-
             initialCells.foreach((state, amount) => matrix = matrix.spawnCells(amount)(state))
+            matrix = matrix.spawnCells(1, 1000)(Shark(), Fish())
 
-        override def neighbours(cell: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
+        override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
             import domain.automaton.NeighborRuleUtility.given
-            availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+            Neighbour[TwoDimensionalSpace](
+                cell,
+                availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+            )
 
 object WaTorCellularAutomaton:
     val fishReproductionThreshold: Int = 10
@@ -86,31 +89,28 @@ object WaTorCellularAutomaton:
             case x => Some(filteredcells(Random.nextInt(x)))
 
     private def fishRule: MultipleOutputNeighbourRule[TwoDimensionalSpace] =
-        def incrementChronon(fish: Cell[TwoDimensionalSpace], newPosition: Option[Position[TwoDimensionalSpace]] = None): Cell[TwoDimensionalSpace] = newPosition match
-            case Some(pos) => Cell[TwoDimensionalSpace](pos, fish.state.asFish.update(_ + 1))
-            case None      => Cell[TwoDimensionalSpace](fish.position, fish.state.asFish.update(_ + 1))
+        def incrementChronon(fish: Cell[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
+            Cell(fish.position, fish.state.asFish.update(_ + 1))
 
+        def moveFishTo(from: Cell[TwoDimensionalSpace], to: Cell[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
+            computeOldCell(from) match
+                case Cell(p, Water) => Iterable(Cell(to.position, incrementChronon(from).state), Cell(p, Water))
+                case Cell(p, s)     => Iterable(Cell(to.position, Fish(1)), Cell(p, s))
+
+        def computeOldCell(fish: Cell[TwoDimensionalSpace]): Cell[TwoDimensionalSpace] =
+            fish.state.asFish.value match
+                case `fishReproductionThreshold` => Cell(fish.position, Fish())
+                case _                           => Cell(fish.position, Water)
+            
         MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(Fish())): n =>
             findRandomCellThat(n.neighbourhood)(_.state == Water) match
                 case None => Iterable(incrementChronon(n.center))
-                case Some(freeCell) =>
-                    n.center.state.asFish.value match
-                        case `fishReproductionThreshold` =>
-                            Iterable(
-                                Cell[TwoDimensionalSpace](freeCell.position, Fish(1)),
-                                Cell[TwoDimensionalSpace](n.center.position, Fish()),
-                            )
-                        case _ => 
-                            Iterable(
-                                incrementChronon(n.center, Some(freeCell.position)),
-                                Cell[TwoDimensionalSpace](n.center.position, Water),
-                            )
-
+                case Some(freeCell) => moveFishTo(n.center, freeCell)
 
     private def sharkRule: MultipleOutputNeighbourRule[TwoDimensionalSpace] =
         def incrementSharkStats(shark: Cell[TwoDimensionalSpace], energyIncrement: Option[Int] = None): Cell[TwoDimensionalSpace] =
             val eInc = if energyIncrement.isEmpty then 0 else energyIncrement.get
-            Cell(shark.position,shark.state.asShark.update(i => SharkInfo(i.chrono + 1, i.energy - 1 + eInc)))
+            Cell(shark.position, shark.state.asShark.update(i => SharkInfo(i.chrono + 1, i.energy - 1 + eInc)))
 
         def moveSharkTo(from: Cell[TwoDimensionalSpace], to: Cell[TwoDimensionalSpace], eatingFish: Boolean = false): Iterable[Cell[TwoDimensionalSpace]] =
             val oldCell = computeOldCell(from)

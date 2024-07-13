@@ -28,11 +28,10 @@ object Environment:
       protected def saveCell(cells: Cell[D]*): Unit
       /**
         * Apply a specific Cellular Automaton's rule by using the input cell and the neighbors. 
-        * @param cell input cell where It is necessary to apply the rule.
-        * @param neighbors neighbors of the input cell.
+        * @param neighbors the neighbourhood to which apply a rule.
         * @return the result cell/cells after applying the rule.
         */
-      def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): R
+      def applyRule(neighbors: Neighbour[D]): R
 
     /**
       * This trait represents a particular type of Environment in which It is used a Cellular Automaton where
@@ -45,8 +44,8 @@ object Environment:
         * Cellular Automaton that will be used inside this environment.
         */
       def cellularAutomata: CellularAutomaton[D]
-      def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Cell[D] = 
-        val newCell = cellularAutomata.applyRule(Neighbour(cell, neighbors))
+      def applyRule(neighbors: Neighbour[D]): Cell[D] = 
+        val newCell = cellularAutomata.applyRule(neighbors)
         saveCell(newCell)
         newCell
 
@@ -60,8 +59,8 @@ object Environment:
         * Cellular Automaton that will be used inside this environment.
         */
       def cellularAutomata: ComplexCellularAutomaton[D]
-      override def applyRule(cell: Cell[D], neighbors: Iterable[Cell[D]]): Iterable[Cell[D]] = 
-          val newCell = cellularAutomata.applyRule(Neighbour(cell, neighbors))
+      override def applyRule(neighbors: Neighbour[D]): Iterable[Cell[D]] = 
+          val newCell = cellularAutomata.applyRule(neighbors)
           saveCell(newCell.toSeq*)
           newCell
       
@@ -93,7 +92,7 @@ object Environment:
         * @param cell input cell for which It is necessary to search the Neighbours.
         * @return A collection where are stored all the neighbours of the input cell.
         */
-      def neighbours(cell: Cell[D]): Iterable[Cell[D]]
+      def neighbours(cell: Cell[D]): Neighbour[TwoDimensionalSpace]
       /**
         * Space dimension of the Environment.
         */
