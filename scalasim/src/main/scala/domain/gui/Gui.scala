@@ -89,7 +89,7 @@ class Gui(val dimension: (Int, Int), colors: Map[State, Color]) extends JPanel w
   var currentPanel: Option[Gui] = None
   var stateFields: Map[State, (JLabel, JTextField)] = Map()
 
-  def updateStateFields(environmentOption: EnvironmentOption[_, _]): Unit = {
+  def updateStateFields(environmentOption: EnvironmentOption[?, ?]): Unit = {
     stateFields.values.foreach { case (label, field) =>
       frame.remove(label)
       frame.remove(field)

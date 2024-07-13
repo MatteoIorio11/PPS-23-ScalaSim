@@ -61,13 +61,11 @@ class WaTorTest extends AnyFunSuite:
     fish.find(_.position == newFish.position).get.state.asInstanceOf[Fish].value shouldBe 0
     fish.find(_.position == oldFish.position).get.state.asInstanceOf[Fish].value shouldBe 1
 
-  test("A shark should move to a free cell and should consume 1 unit of energy and increment chronon"):
+  test("A shark should move to a free cell and should consume energy and increment chronon"):
     val n: Neighbour[TwoDimensionalSpace] = Neighbour(
       Cell(Position(1, 1), Shark()),
       List(Cell(Position(0, 1), Water))
     )
-
-
     val res = waTorCa.applyRule(n)
 
     res should contain theSameElementsAs List(
@@ -75,7 +73,7 @@ class WaTorTest extends AnyFunSuite:
       Cell(Position(1, 1), Water),
     )
     
-    res.find(_.position == Position(0, 1)).get.state.asInstanceOf[Shark].value shouldBe SharkInfo(1, sharkInitialEnergy - 1)
+    res.find(_.position == Position(0, 1)).get.state.asInstanceOf[Shark].value shouldBe SharkInfo(1, sharkInitialEnergy - sharkEnergyConsmptionPerStep)
 
 
   test("A shark should reproduce when reaching threshold"):
@@ -85,7 +83,7 @@ class WaTorTest extends AnyFunSuite:
     )
 
     val newShark = Cell(Position(1, 1), Shark())
-    val oldShark = Cell(Position(0, 1), Shark(SharkInfo(1, sharkInitialEnergy - 1)))
+    val oldShark = Cell(Position(0, 1), Shark(SharkInfo(1, sharkInitialEnergy - sharkEnergyConsmptionPerStep)))
 
     val sharks = waTorCa.applyRule(n)
 
@@ -109,7 +107,7 @@ class WaTorTest extends AnyFunSuite:
       List(Cell(Position(0, 1), Fish()), Cell(Position(2, 1), Water))
     )
 
-    val newShark = Cell(Position(0, 1), Shark(SharkInfo(1, sharkInitialEnergy - 1 + sharkEatFishEnergy)))
+    val newShark = Cell(Position(0, 1), Shark(SharkInfo(1, sharkInitialEnergy - sharkEnergyConsmptionPerStep + sharkEatFishEnergy)))
 
     val res = waTorCa.applyRule(n)
     res should contain theSameElementsAs List(newShark, Cell(Position(1, 1), Water))

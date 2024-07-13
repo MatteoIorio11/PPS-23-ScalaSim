@@ -42,6 +42,18 @@ object WaTorEnvironment extends ViewBag:
             initialCells.foreach((state, amount) => matrix = matrix.spawnCells(amount)(state))
             matrix = matrix.spawnCells(1, 1000)(Shark(), Fish())
 
+
+        override protected def saveCell(cells: Cell[TwoDimensionalSpace]*): Unit = cells foreach (super.saveCell(_))
+        
+        override def applyRule(neighbors: Neighbour[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
+            val res = super.applyRule(neighbors)
+
+            val sharks = matrix.flatMap(x => x).filter(_.state == Shark()).toList
+
+            res filter (c => sharks.map(_.position).contains(c.position)) foreach(s => println(s"${s} => callee: ${neighbors.center}"))
+
+            res
+
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
             import domain.automaton.NeighborRuleUtility.given
             Neighbour[TwoDimensionalSpace](
@@ -53,7 +65,8 @@ object WaTorCellularAutomaton:
     val fishReproductionThreshold: Int = 10
     val sharkReproductionThreshold: Int = 10
     val sharkInitialEnergy: Int = 1000
-    val sharkEatFishEnergy: Int = 100
+    val sharkEnergyConsmptionPerStep = 100
+    val sharkEatFishEnergy: Int = 300
 
     object WatorState:
         sealed trait StateComparison:
@@ -110,7 +123,7 @@ object WaTorCellularAutomaton:
     private def sharkRule: MultipleOutputNeighbourRule[TwoDimensionalSpace] =
         def incrementSharkStats(shark: Cell[TwoDimensionalSpace], energyIncrement: Option[Int] = None): Cell[TwoDimensionalSpace] =
             val eInc = if energyIncrement.isEmpty then 0 else energyIncrement.get
-            Cell(shark.position, shark.state.asShark.update(i => SharkInfo(i.chrono + 1, i.energy - 1 + eInc)))
+            Cell(shark.position, shark.state.asShark.update(i => SharkInfo(i.chrono + 1, i.energy - sharkEnergyConsmptionPerStep + eInc)))
 
         def moveSharkTo(from: Cell[TwoDimensionalSpace], to: Cell[TwoDimensionalSpace], eatingFish: Boolean = false): Iterable[Cell[TwoDimensionalSpace]] =
             val oldCell = computeOldCell(from)
