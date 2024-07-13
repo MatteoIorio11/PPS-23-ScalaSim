@@ -11,10 +11,12 @@ import base.Position
 
 class GameOfLifeEnvironmentTest extends AnyFunSuite with BeforeAndAfterEach:
     val (width, height)= (100, 100)
-    val env = GameOfLifeEnvironment(height, width)
+    val env = GameOfLifeEnvironment(height, width, Map(
+        CellState.ALIVE -> width*height/3
+    ))
 
     test("Initialise environment with dimension <= 0 should throw an error"):
-        val exception = intercept[RuntimeException](GameOfLifeEnvironment(0,0))
+        val exception = intercept[RuntimeException](GameOfLifeEnvironment(0,0, Map()))
         exception shouldBe a[IllegalArgumentException]
 
 
