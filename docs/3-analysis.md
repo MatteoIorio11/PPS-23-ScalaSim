@@ -27,7 +27,7 @@ Una volta definito il modello della simulazione, deve essere predisposta una
 componente software in grado di eseguire e, potenzialmente mostrare o esportare
 il risultato della computazione. Il "motore" del simulatore dovrà quindi essere in
 grado di eseguire un qualsiasi tipo di simulazione in maniera del tutto
-indipendente dal tipo di ambiente utilizzato dall'automa.
+indipendente dal tipo di ambiente utilizzato dall'automa..
 
 Parallelamente all'esecuzione di una simulazione, dovrà essere possibile
 
@@ -42,4 +42,4 @@ Parallelamente all'esecuzione di una simulazione, dovrà essere possibile
 Trattandosi di un simulatore con la possibilità di visualizzazione in tempo
 reale, il sistema deve garantire un discreto livello di efficienza. Riguardo
 l'interfaccia grafica che permette l'interazione col simulatore stesso, essa
-dev'essere intuitiva e rapida (?).
+dev'essere intuitiva e rapida.

@@ -3,7 +3,7 @@
 Il design architetturale dell'intero sistema puo essere suddiviso in 3 macro componenti, i quali a loro volta sono suddivisi e descritti in componenti piu semplici che incapsulano un unico argomento. Le tre macro categorie di concetti che compongono il sistema sono:
 1. _Engine_
 2. _Environment_
-3. _Cellular Automaton
+3. _Cellular Automaton_ 
 
 Nelle sezioni successive verrano elencate le diverse strategie utilizzate per sviluppare le diverse componenti, andando ad elencare le scelte effettuate nella  realizzazione delle diverse funzionalita per far sii che sia altamente personalizzabile, in modo da facilitare la creazione di simulazioni.
 
@@ -55,3 +55,5 @@ L'ultimo componente necessario alla realizzazione dell'intero sistema e l'_Engin
 
 Dal momento in cui possono esserci diverse modalita con la quale voler eseguire la simulazione, ad esempio visualizzazione real time con GUI, simulazione con output finale un video etc etc, si e deciso di sviluppare le diverse modalita di esecuzione tramite l'utilizzo dei _Mixin_.
 
+## Design Interfaccia Grafica
+[TODO: VINCI]
