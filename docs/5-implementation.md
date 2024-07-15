@@ -56,13 +56,13 @@ La definizione di questo _Environment_ permette all'utente di applicare una dete
 Come descritto in precedenza, un automa cellulare ha il proprio spazio in cui evolve, lo spazio potrebbe essere rappresentato da un semplice rettangolo dimensionale, a forme molto piu complesse come quelle di cubi e toroidi. Per rappresentare questa diversita di struttura dell'_Environment_ sono state definite una serie di _trait_ che possono rappresentare diverse strutture spaziali da utilizzare nella simulazione.
 
 ```scala
-trait SquareEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
+trait SquareEnvironment extends Space[TwoDimensionalSpace]:
     def side: Int
     override def dimension: Tuple2[Int, Int] = (side, side)
-trait CubicEnvironment extends GenericEnvironment[ThreeDimensionalSpace, ?]:
+trait CubicEnvironment extends Space[ThreeDimensionalSpace]:
     def edge: Int
     override def dimension = (edge, edge, edge)
-trait RectangularEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
+trait RectangularEnvironment extends Space[TwoDimensionalSpace]:
     def width: Int
     def heigth: Int
     override def dimension: Tuple2[Int, Int] = (heigth, width)
@@ -74,7 +74,7 @@ trait ToroidEnvironmnt extends RectangularEnvironment:
         case value if value < 0 => result + divisor
         case _ => result
 ```
-I _trait_ qui sopra definiti permettono di modellare uno specifico _Environment_ da utilizzare per una simulazione. Questo tipo di modellazione permette di introdurre concetti specifici caratteristici per un certo tipo di _Environment_, come nel caso di un _Environment_ toroidale il quale puo essere visualizzato come un rettangolo in uno spazio bidimensionale. All'interno di questo _trait_ si ha avuto la necessita di introdurre una nuova operazione di _modulo_ per gestire eventuali numeri negativi.
+I _trait_ qui sopra definiti permettono di modellare uno specifico _Space_ da utilizzare per una simulazione. Questo tipo di modellazione permette di introdurre concetti specifici caratteristici per un certo tipo di _Space_, come nel caso di uno spazio toroidale il quale puo essere visualizzato come un rettangolo in uno spazio bidimensionale. Questo tipo di visione ci permette poi di introdurre specifici metodi da utilizzare per modellare lo spazio correttamente.
 
 ### Space
 Come formulato in precedenza, e fondamentale avere all'interno di una simulazione una strtuttura dati al cui interno vengono memorizzate tutte le _Cell_ inerenti ad una simulazione. Per la rappresentazione di questo particolare aspetto si e sviluppato uno specifico _trait_ all'interno dell'_Environment_ denominato _Space_ generico nella dimensione. La dimensione dello spazio e dell'automa cellulare sara sempre la stessa dal momento in cui vengono definite tramite lo stesso generico in input all'_Environment_.
