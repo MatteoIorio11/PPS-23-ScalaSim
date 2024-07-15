@@ -38,11 +38,71 @@ object Cell:
       (override val position: Position[D], override val state: State)
     extends Cell[D]
 ```
-Dopo la definizione del _trait_ si e passati allo sviluppo dell'_object Cell_ il cui compito e quello di essere una _factory_ per le _Cell_.
+Dopo la definizione del _trait_ si e passati allo sviluppo dell'_object Cell_ il cui compito e quello di fornire una _factory_ per le _Cell_. Oltre a cio e stata definita una _case class_ che implementasse il _trait Cell_, in modo da fornire una sua implementazione da utilizzare durante lo sviluppo delle simulazioni.
 ### Neighbourhood
 ### Rule
 
 ## Environment
+Il secondo macro componente che e stato necessario sviluppare e l'_Environment_. Questo componente software incapsula lo spazio all'interno della quale vengono memorizzate le _Cell_ di un _Cellular Automaton_. Per modellare questa astrazione nel tipo di simulazione che si vuole implementare, e stato necessario fare in modo che l'intero _Environment_ fosse generico nel tipo di _Cellular Automaton_ che si sta utilizzando. Per fare in modo di avere una rappresentazione generale dell'ambiente, e stato realizzato il _trait Generic Environment_, il quale e definito in due campi generici, il primo fa riferimento alla _Dimension_ della simulazione, mentre il secondo generico riguarda il tipo di ritorno dopo l'applicazione di una specifica regola.
+
+```scala
+trait GenericEnvironment[D <: Dimension, R] extends Space[D]:
+  protected def saveCell(cells: Cell[D]*): Unit
+  def applyRule(neighbors: Neighbour[D]): R
+```
+La definizione di questo _Environment_ permette all'utente di applicare una determinata regola dato uno specifico _Neighbour_ per poi sucessivamente salvare il risulato all'intero della struttura dati che si occupa di mantenere tutte le celle della simulazione.
+
+### Tipologie di Environment
+Come descritto in precedenza, un automa cellulare ha il proprio spazio in cui evolve, lo spazio potrebbe essere rappresentato da un semplice rettangolo dimensionale, a forme molto piu complesse come quelle di cubi e toroidi. Per rappresentare questa diversita di struttura dell'_Environment_ sono state definite una serie di _trait_ che possono rappresentare diverse strutture spaziali da utilizzare nella simulazione.
+
+```scala
+trait SquareEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
+    def side: Int
+    override def dimension: Tuple2[Int, Int] = (side, side)
+trait CubicEnvironment extends GenericEnvironment[ThreeDimensionalSpace, ?]:
+    def edge: Int
+    override def dimension = (edge, edge, edge)
+trait RectangularEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
+    def width: Int
+    def heigth: Int
+    override def dimension: Tuple2[Int, Int] = (heigth, width)
+trait ToroidEnvironmnt extends RectangularEnvironment:
+  extension (dividend: Int)
+    infix def /%/(divisor: Int): Int = 
+      val result = dividend % divisor
+      result match
+        case value if value < 0 => result + divisor
+        case _ => result
+```
+I _trait_ qui sopra definiti permettono di modellare uno specifico _Environment_ da utilizzare per una simulazione. Questo tipo di modellazione permette di introdurre concetti specifici caratteristici per un certo tipo di _Environment_, come nel caso di un _Environment_ toroidale il quale puo essere visualizzato come un rettangolo in uno spazio bidimensionale. All'interno di questo _trait_ si ha avuto la necessita di introdurre una nuova operazione di _modulo_ per gestire eventuali numeri negativi.
+
+### Space
+Come formulato in precedenza, e fondamentale avere all'interno di una simulazione una strtuttura dati al cui interno vengono memorizzate tutte le _Cell_ inerenti ad una simulazione. Per la rappresentazione di questo particolare aspetto si e sviluppato uno specifico _trait_ all'interno dell'_Environment_ denominato _Space_ generico nella dimensione. La dimensione dello spazio e dell'automa cellulare sara sempre la stessa dal momento in cui vengono definite tramite lo stesso generico in input all'_Environment_.
+
+```scala
+trait Space[D <: Dimension]:
+   type Matrix
+   def currentMatrix: Matrix
+   def matrix: Matrix
+   def neighbours(cell: Cell[D]): Neighbour[TwoDimensionalSpace]
+   def dimension: Tuple
+   protected def initialise(): Unit
+   protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
+```
+
+Dal momento in cui non e possibile sapere in anticipo il tipo di dimensione, la struttura dati all'interno della quale verranno memorizzate le _Cell_ e definita tramite un _type_ in questo modo lo user avra libera scelta nella tipologia di struttura dati da utilizare. Questo _trait_ in oltre si occupa anche di andare a definire alcune operazioni di utility per lavorare sulla struttura dati utilizzata. Uno dei passaggi fondamentali per una qualsiasi simulazione riguarda l'inizializzazione dello spazio. Proprio per questo e stato definito il metodo _initialise_, al cui interno verra definita lo stato iniziale della simulazione.
+
+
+
+
+### Space Implementation
+Durante lo sviluppo dello _
+
+### Cellular Automaton's Type
+ADD mixin
+
+### Space
+### Implementations
 
 ## Engine
 
