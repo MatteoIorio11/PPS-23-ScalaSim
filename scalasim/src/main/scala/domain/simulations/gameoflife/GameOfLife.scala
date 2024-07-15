@@ -42,10 +42,10 @@ object GameOfLifeEnvironment extends ViewBag:
 
         initialise()
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
-            import domain.automaton.NeighborRuleUtility.given
+            import domain.automaton.NeighborRuleUtility.MooreNeighbourhood
             Neighbour[TwoDimensionalSpace](
                 cell,
-                availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+                availableCells(MooreNeighbourhood.absoluteNeighboursLocations(cell.position))
             )
 
         override protected def initialise(): Unit =

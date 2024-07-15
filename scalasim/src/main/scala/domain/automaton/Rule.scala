@@ -216,10 +216,10 @@ object NeighborRuleUtility:
          def -(rp: RelativePositions): Position[D] = p - rp.toPosition[D]
 
    /**
-     * [[NeighbourhoodLocator]] in a two dimensional space representing a full circle of radius one
-     * starting from a central position.
+     * Two dimensional square lattice composed of a central cell and the eight
+     * cells that surround it.
      */
-   given circleNeighbourhoodLocator: NeighbourhoodLocator[TwoDimensionalSpace] = new NeighbourhoodLocator[TwoDimensionalSpace]:
+   object MooreNeighbourhood extends NeighbourhoodLocator[TwoDimensionalSpace]:
       override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
          import RelativePositions.*
          List(
@@ -232,6 +232,20 @@ object NeighborRuleUtility:
             South,
             BottomRight,
             ).map(p => Position(p.coordinates.toArray*))
+
+  /**
+    * Two dimensional square lattice composed of a central cell and its four adjacent
+    * cells.
+    */
+   object VonNeumannNeighbourhood extends NeighbourhoodLocator[TwoDimensionalSpace]:
+     override def relativeNeighboursLocations: Iterable[Position[TwoDimensionalSpace]] =
+       import RelativePositions.*
+       List(
+         North,
+         East,
+         South,
+         West,
+       ).map(p => Position(p.coordinates.toArray*))
 
    /**
      * Returns a [[NeighbourhoodLocator]] in a two dimensional space representing configured

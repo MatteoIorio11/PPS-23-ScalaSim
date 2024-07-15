@@ -87,5 +87,5 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
 
       val locator = getCircularNeighbourhoodPositions(radius = 2)
 
-      // locator.relativeNeighboursLocations.toList should contain theSameElementsAs relativeNeighbourhood
+      locator.relativeNeighboursLocations.toList should contain theSameElementsAs relativeNeighbourhood
       locator.absoluteNeighboursLocations(center) should contain theSameElementsAs absNeighbourhood
