@@ -34,22 +34,25 @@ object CellularAutomaton:
     object AnyState extends State
 
    /**
-    * TODO
-    * @tparam D
-    * @tparam I
-    * @tparam O
-    * @tparam R
+    * Generic Cellular automaton trait. It defines all the information about a general automaton.
+    * A cellular automaton must define a collection of rules, where inside each rule is stored the logic
+    * to apply to a particular cell. The cellular automaton can be seen as a collection of rules,
+    * where each rule must be used only in a specific state. The cellular automaton manages the logic for all Its Cells.
+    * @tparam D space dimension
+    * @tparam I input type for applying a rule
+    * @tparam O output type after applying a rule
+    * @tparam R input type of the rule.
     */
     trait GenericCellularAutomaton[D <: Dimension, I, O, R <: Rule[I, O, State]]:
       def applyRule(input: I): O
       def addRule(rule: R): Unit
 
     /**
-     * Cellular automaton trait. It defines all the information about a general automaton.
-     * A cellular automaton must define a collection of rules, where inside each rule is stored the logic
-     * to apply to a particular cell. The cellular automaton can be seen as a collection of rules,
-     * where each rule must be used only in a specific state. The cellular automaton manages the logic for all Its Cells.
-     * @param D the [[Dimension]] of the space;
+      * Celluar Automaton traits. This trait define a particular type of Generic Cellular Automaton where the input type for the
+      * method 'applyRule' is [[Neighbour]] and the output of this method is a single [[Cell]]. This kind of cellular automaton
+      * referrs to a simple Generic Cellular Automaton that works always with one single [[Cell]], the output after applying each rule
+      * returns always one new single cell.
+      * @param D the [[Dimension]] of the space;
       */
     trait CellularAutomaton[D <: Dimension] extends GenericCellularAutomaton[D, Neighbour[D], Cell[D], NeighbourRule[D]]:
         /**
@@ -67,8 +70,10 @@ object CellularAutomaton:
         def rules: Rules
 
     /**
-     * TODO
-     * @tparam D
+     * Complex Cellular Automaton trait. It defines a specifc type of cellular automaton that works with multiple cells, in fact this
+     * type of Cellular Automaton returns a collection of new cells after applying a rule. This type of cellular automaton also has a
+     * different type input for the rule definition, because It uses a [[MultipleOutputNeighbourRule]].
+     * @tparam D space dimension.
      */
     trait ComplexCellularAutomaton[D <: Dimension] extends GenericCellularAutomaton[D, Neighbour[D], Iterable[Cell[D]], MultipleOutputNeighbourRule[D]]:
       protected def rules: Map[State, MultipleOutputNeighbourRule[D]]
@@ -123,7 +128,9 @@ object CellularAutomaton:
             case Some(rulez) => ruleCollection = ruleCollection + (cellState -> (rulez + rule))
             case None => ruleCollection = ruleCollection + (cellState -> Set(rule))
 
-
+    /**
+      * Factory for Multi Output Cellular Automaton.
+      */
     object MultiOutputCellularAutomaton:
       def apply[D <: Dimension](): ComplexCellularAutomaton[D] = MultiOutputCellularAutomatonImpl()
 
