@@ -114,7 +114,7 @@ object Environment:
       * By extending this trait It will be necessary to specify the Square's side. This informations
       * will be used for interact with the used Matrix.
       */
-    trait SquareEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
+    trait SquareEnvironment extends Space[TwoDimensionalSpace]:
         def side: Int
         override def dimension: Tuple2[Int, Int] = (side, side)
 
@@ -123,7 +123,7 @@ object Environment:
       * edge. By extending this trait It will be necessary to specify the Cubic's edge. This informations
       * will be used for interact with the used Matrix.
       */
-    trait CubicEnvironment extends GenericEnvironment[ThreeDimensionalSpace, ?]:
+    trait CubicEnvironment extends Space[ThreeDimensionalSpace]:
         def edge: Int
         override def dimension = (edge, edge, edge)
 
@@ -132,7 +132,7 @@ object Environment:
       * In fact by extending this method It will be necessary to specify the Rectangle's informations. This informations
       * will be used for interact with the used Matrix.
       */
-    trait RectangularEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
+    trait RectangularEnvironment extends Space[TwoDimensionalSpace]:
         def width: Int
         def heigth: Int
         override def dimension: Tuple2[Int, Int] = (heigth, width)
