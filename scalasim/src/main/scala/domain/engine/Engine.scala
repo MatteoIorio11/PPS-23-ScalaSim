@@ -43,8 +43,7 @@ object Engine:
     def stopEngine: Unit
   
   /**
-    * TODO
-    * 
+    * Engine where the environment is defined as a [[SimpleEnvironment]] in [[D]]
     * @param D the dimension of the space.
     * @param R Matrix type.
     */
@@ -101,8 +100,7 @@ object Engine:
                 Thread.sleep(ONE_SECOND)
             stopEngine
   /**
-    * TODO
-    * 
+    * Complex Engine, where the environmnet is defined like a [[ComplexEnvironment]] in [[D]].
     * @param D the dimension of the space.
     * @param R Matrix type.
     */
@@ -123,9 +121,13 @@ object Engine:
       */
   
   /**
-    * TODO
+    * Trait that represent an Engine for Real Time simulation with a GUI, this trait extends from the [[IterableEngine2D]]. By using
+    * this trait the user can observe a real time simulation.
     */
   trait GUIEngine2D extends IterableEngine2D:
+    /**
+      * Attached view to the engine for the real time simulation.
+      */
       def view: EngineView[TwoDimensionalSpace]
       /**
         * Update the current view attached to this engine.
@@ -162,7 +164,7 @@ object TimerEngine2D:
       require(timer >= 0)
       override def run() = startTimer
 /**
-  * TODO
+  * Gui Engine 2D for real time simulation. Factory Object for the Engine.
   */
 object GUIEngine2D:
   import Engine.* 
