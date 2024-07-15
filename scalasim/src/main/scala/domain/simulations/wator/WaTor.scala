@@ -44,10 +44,6 @@ object WaTorEnvironment extends ViewBag:
 
 
         override protected def saveCell(cells: Cell[TwoDimensionalSpace]*): Unit = cells foreach (super.saveCell(_))
-        
-        override def applyRule(neighbors: Neighbour[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
-            val res = super.applyRule(neighbors)
-            res
 
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
             import domain.automaton.NeighborRuleUtility.MooreNeighbourhood
