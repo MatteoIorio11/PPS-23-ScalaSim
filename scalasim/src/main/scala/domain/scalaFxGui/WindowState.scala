@@ -19,6 +19,7 @@ trait WindowState:
   def addComboBox(items: Seq[String], name: String): State[Window, Unit]
   def addAutomaton(name: String): State[Window, Unit]
   def addPixelPanel(name: String, panel: String): State[Window, Unit]
+  def addInput(name: String, panel: String): State[Window, Unit]
   def getSelectedComboBoxItem(name: String): State[Window, String]
   def toLabel(text: String, name: String): State[Window, Unit]
   def show(): State[Window, Unit]
@@ -46,6 +47,8 @@ object WindowStateImpl extends WindowState:
     State(w => ((w.addComboBox(items.toArray, name)), {}))
   def addPixelPanel(name: String, panel: String): State[Window, Unit] =
     State(w => ((w.addPixelPanel(name, panel)), {}))
+  def addInput(name: String, panel: String): State[Window, Unit] =
+    State(w => ((w.addInput(name, panel)), {}))
 
   def addAutomaton(name: String): State[Window, Unit] =
     State(w => ((w.addAutomaton(name)), {}))

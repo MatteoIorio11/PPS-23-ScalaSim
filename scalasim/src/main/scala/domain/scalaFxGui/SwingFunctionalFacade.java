@@ -14,6 +14,7 @@ class SwingFunctionalFacade {
         Frame addComboBox(String[] items, String name);
         Frame addAutomaton(String name);
         Frame addPixelPanel(String name, String panel);
+        Frame addInput(String name, String panel);
         String getSelectedComboBoxItem(String name);
         Frame showToLabel(String text, String name);
         Frame show();
@@ -31,6 +32,7 @@ class SwingFunctionalFacade {
         private final Map<String, JLabel> labels = new HashMap<>();
         private final Map<String, JComboBox<String>> comboBoxes = new HashMap<>();
         private final Map<String, JPanel> automatonPanels = new HashMap<>();
+        private final Map<String, JTextField> inputs = new HashMap<>();
         private String currentAutomaton = "";
         private final LinkedBlockingQueue<String> eventQueue = new LinkedBlockingQueue<>();
         private final Supplier<String> events = () -> {
@@ -133,6 +135,20 @@ class SwingFunctionalFacade {
 
             this.panels.put(name, jp);
             jp.setVisible(true);
+            return this;
+        }
+
+        @Override
+        public Frame addInput(String name, String panel) {
+            if (this.inputs.containsKey(name)) {
+                throw new IllegalArgumentException("An input with name " + name + " already exists.");
+            }
+            //Check the panel exists
+
+            JTextField input = new JTextField();
+
+            this.inputs.put(name, input);
+            input.setVisible(true);
             return this;
         }
 
