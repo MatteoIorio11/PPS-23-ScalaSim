@@ -8,7 +8,6 @@ import domain.automaton.CellularAutomaton.ComplexCellularAutomaton
 import domain.automaton.CellularAutomaton.State
 import domain.automaton.MultipleOutputNeighbourRule
 import domain.automaton.NeighborRuleUtility.RelativePositions
-import domain.automaton.NeighborRuleUtility.circleNeighbourhoodLocator
 import domain.automaton.Neighbour
 import domain.base.Dimensions.Dimension
 import domain.base.Dimensions.TwoDimensionalSpace
@@ -46,9 +45,10 @@ object LangtonsAntEnvironment extends ViewBag:
     initialise()
 
     override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
+        import domain.automaton.NeighborRuleUtility.MooreNeighbourhood
         Neighbour[TwoDimensionalSpace](
             cell,
-            availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+            availableCells(MooreNeighbourhood.absoluteNeighboursLocations(cell.position))
         )
 
     override protected def initialise(): Unit =
