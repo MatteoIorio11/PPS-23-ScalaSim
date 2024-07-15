@@ -10,7 +10,8 @@ import domain.exporter.{Exporter, JCodecVideoGenerator, SimpleMatrixToImageConve
 import domain.simulations.briansbrain.BriansBrainEnvironment
 import domain.simulations.gameoflife.GameOfLifeEnvironment
 import domain.simulations.*
-import domain.simulations.WaTorCellularAutomaton.WatorState.{Fish, Shark}
+import domain.simulations.wator.WaTor.{Fish, Shark}
+import domain.simulations.wator.*
 import domain.simulations.briansbrain.BriansBrain.CellState
 import domain.simulations.gameoflife.GameOfLife.CellState as GameOfLifeState
 import domain.simulations.langtonsant.LangtonsAntEnvironment
@@ -166,7 +167,7 @@ class Gui(val dimension: (Int, Int), colors: Map[State, Color]) extends JPanel w
       guiE.foreach(engine => engine.startEngine)
     } catch {
       case ex: Exception =>
-        JOptionPane.showMessageDialog(frame, s"Bad environment configuration", "Error", JOptionPane.ERROR_MESSAGE)
+        JOptionPane.showMessageDialog(frame, s"Bad environment configuration " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE)
     }
   )
 
