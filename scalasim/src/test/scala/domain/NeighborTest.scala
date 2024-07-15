@@ -10,6 +10,9 @@ import domain.automaton.CellularAutomaton.CellularAutomaton
 import domain.base.Position
 import domain.automaton.NeighborRuleUtility.getCircularNeighbourhoodPositions
 import domain.automaton.CellularAutomaton.ValuedState
+import domain.automaton.NeighborRuleUtility.MooreNeighbourhood
+import domain.automaton.NeighborRuleUtility.MooreNeighbourhood.relativeNeighboursLocations
+import domain.automaton.NeighborRuleUtility.VonNeumannNeighbourhood
 
 class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
     test("A two dimensional neighborhood should be mapped correctly"):
@@ -89,3 +92,35 @@ class NeighborTest extends org.scalatest.funsuite.AnyFunSuite:
 
       locator.relativeNeighboursLocations.toList should contain theSameElementsAs relativeNeighbourhood
       locator.absoluteNeighboursLocations(center) should contain theSameElementsAs absNeighbourhood
+
+    test("Moore neighbourhood should work as expected"):
+      val center: Position[TwoDimensionalSpace] = Position(1, 1)
+
+      val absNeighbourhood: List[Position[TwoDimensionalSpace]] = List(
+        (0, 0), (0, 1), (0, 2),
+        (1, 0),         (1, 2),
+        (2, 0), (2, 1), (2, 2)
+      ).map(x => Position(x._1, x._2))
+
+      val relativeNeighbourhood: List[Position[TwoDimensionalSpace]] = List(
+        (-1, -1), (-1, 0), (-1, 1),
+        (0, -1),         (0, 1),
+        (1, -1), (1, 0), (1, 1)
+      ).map(x => Position(x._1, x._2))
+
+      MooreNeighbourhood.relativeNeighboursLocations should contain theSameElementsAs relativeNeighbourhood
+      MooreNeighbourhood.absoluteNeighboursLocations(center) should contain theSameElementsAs absNeighbourhood
+
+    test("Von Neumann neighbourhood should work as expected"):
+      val center: Position[TwoDimensionalSpace] = Position(1, 1)
+
+      val absNeighbourhood: List[Position[TwoDimensionalSpace]] = List(
+        (0, 1), (1, 0), (1, 2), (2, 1)
+      ).map(x => Position(x._1, x._2))
+
+      val relativeNeighbourhood: List[Position[TwoDimensionalSpace]] = List(
+        (-1, 0), (0, -1), (0, 1), (1, 0)
+      ).map(x => Position(x._1, x._2))
+
+      VonNeumannNeighbourhood.relativeNeighboursLocations should contain theSameElementsAs relativeNeighbourhood
+      VonNeumannNeighbourhood.absoluteNeighboursLocations(center) should contain theSameElementsAs absNeighbourhood
