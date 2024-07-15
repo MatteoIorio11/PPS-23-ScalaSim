@@ -47,11 +47,6 @@ object WaTorEnvironment extends ViewBag:
         
         override def applyRule(neighbors: Neighbour[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
             val res = super.applyRule(neighbors)
-
-            val sharks = matrix.flatMap(x => x).filter(_.state == Shark()).toList
-
-            res filter (c => sharks.map(_.position).contains(c.position)) foreach(s => println(s"${s} => callee: ${neighbors.center}"))
-
             res
 
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
