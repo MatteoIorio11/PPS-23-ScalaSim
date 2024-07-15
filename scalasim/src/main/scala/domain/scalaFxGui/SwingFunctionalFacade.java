@@ -12,6 +12,8 @@ class SwingFunctionalFacade {
         Frame addButton(String text, String name);
         Frame addLabel(String text, String name);
         Frame addComboBox(String[] items, String name);
+        Frame addAutomaton(String name);
+        Frame addPixelPanel(String name, String panel);
         String getSelectedComboBoxItem(String name);
         Frame showToLabel(String text, String name);
         Frame show();
@@ -106,6 +108,34 @@ class SwingFunctionalFacade {
             this.jframe.setVisible(true);
             return this;
         }
+
+        @Override
+        public Frame addAutomaton(String name){
+            if (this.automatonPanels.containsKey(name)) {
+                throw new IllegalArgumentException("An automaton panel with name " + name + " already exists.");
+            }
+
+            JPanel jp = new JPanel();
+            jp.setVisible(false);
+            this.automatonPanels.put(name, jp);
+            this.jframe.getContentPane().add(jp);
+            return this;
+        }
+
+        @Override
+        public Frame addPixelPanel(String name, String panel) {
+            if (this.pixelPanels.containsKey(name)) {
+                throw new IllegalArgumentException("A pixel panel with name " + name + " already exists.");
+            }
+            //Check the panel exists
+
+            JPanel jp = new JPanel();
+
+            this.panels.put(name, jp);
+            jp.setVisible(true);
+            return this;
+        }
+
 
         @Override
         public Frame showAutomaton(String name) {

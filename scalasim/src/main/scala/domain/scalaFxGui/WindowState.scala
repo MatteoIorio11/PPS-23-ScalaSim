@@ -18,6 +18,7 @@ trait WindowState:
   def addLabel(text: String, name: String): State[Window, Unit]
   def addComboBox(items: Seq[String], name: String): State[Window, Unit]
   def addAutomaton(name: String): State[Window, Unit]
+  def addPixelPanel(name: String, panel: String): State[Window, Unit]
   def getSelectedComboBoxItem(name: String): State[Window, String]
   def toLabel(text: String, name: String): State[Window, Unit]
   def show(): State[Window, Unit]
@@ -43,6 +44,11 @@ object WindowStateImpl extends WindowState:
     State(w => ((w.addLabel(text, name)), {}))
   def addComboBox(items: Seq[String], name: String): State[Window, Unit] =
     State(w => ((w.addComboBox(items.toArray, name)), {}))
+  def addPixelPanel(name: String, panel: String): State[Window, Unit] =
+    State(w => ((w.addPixelPanel(name, panel)), {}))
+
+  def addAutomaton(name: String): State[Window, Unit] =
+    State(w => ((w.addAutomaton(name)), {}))
   def getSelectedComboBoxItem(name: String): State[Window, String] =
     State(w => (w, w.getSelectedComboBoxItem(name)))
   def toLabel(text: String, name: String): State[Window, Unit] =
@@ -74,7 +80,7 @@ object WindowStateImpl extends WindowState:
 
   val gameOfLifeAutomaton = for
     _ <- addAutomaton("Game-Of-Life")
-    _ <- addPixelPanel("Game-Of-Life-Panel")
+    _ <- addPixelPanel("Game-Of-Life-Panel", "Game-Of-Life")
     _ <- addInput("Game-Of-Life-Width", "Game-Of-Life-Panel")
     _ <- addInput("Game-Of-Life-Height", "Game-Of-Life-Panel")
   yield e
