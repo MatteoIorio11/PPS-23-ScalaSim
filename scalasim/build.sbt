@@ -22,7 +22,6 @@ lazy val root = project
     scalacOptions ++= Seq("-deprecation"),
     javaOptions ++= Seq("--enable-preview"),
 
-    // assembly / assemblyOutputPath := file("./scalasim.jar"),
-    // assembly / mainClass := Some("domain.gui.GuiRunner"),
-  )
+    assembly / assemblyJarName := "scalasim.jar"
+ )
 
