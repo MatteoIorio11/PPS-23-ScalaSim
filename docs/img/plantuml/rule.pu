@@ -1,0 +1,23 @@
+@startuml rule
+interface Rule<I, O, P> {
+    + matcher: P
+    - tFunc(in: I): O
+    + applyTransformation(in: I): O
+}
+
+interface MultipleOutputRule<I, O: Iterable<?>, P>
+
+interface NeighbourRule<D: Dimension> {
+    + matcher: State
+    - tFunc(in: Neighbour<D>): Cell<D>
+}
+
+interface MultiupleOutputNeighbourRule<D: Dimension> {
+    + matcher: State
+    - tFunc(in: Neighbour<D>): Iterable<Cell<D>>
+}
+
+MultipleOutputRule -up-|> Rule
+NeighbourRule -up-|> Rule
+MultiupleOutputNeighbourRule -up-|> MultipleOutputRule
+@enduml

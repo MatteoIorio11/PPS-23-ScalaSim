@@ -17,23 +17,107 @@ Il design che riguarda il _Cellular Automaton_ ha richiesto una serie di scelte 
 
 ### Cell
 
-Partendo dal concetto piu generale, ogni Cellular Automaton si compone di diversi stati, i quali vengono assunti dalle diverse _Cell_ che sono memorizzate all'interno dell'_Environment_. Ogni _Cell_, si compone di una posizione nello spazio e di uno specifico Stato, il quale determinera assieme ai vicini della cella stessa il suo stato sucessivo. Uno degli aspetti piu importanti della _Cell_, come descritto in precedenza e lo _State_, il quale puo a sua volta essere piu o meno complesso (ad esempio uno stato potrebbe mantenere anche un qualche tipo di informazione). Per affrontare questa problematica si e voluto sviluppare un concetto che astraesse il concetto di _State_, in modo che questo poi possa a sua volta essere esteso con idee ed implementazioni molto piu complesse ed astratte.
+Lo spazio di un ambiente è composto da un numero finito di celle. Ogni cella,
+oltre ad avere assegnate un insieme di coordinate, ha il compito di mantenere
+uno stato in un determinato istante di tempo. Lo **Stato** di una cella è
+un'astrazione che dipende in base all'automa cellulare, ed esso può essere un
+semplice stato "nominale" (e.g. `Dead`, `Alive`, ...) oppure può mantenere un
+valore associato a quello stato (e.g. `Shark(chronon = 1, energy = 100)`,
+`Fish(chronon = 1)`, ...). Per entrambi i casi, lo stato determina
+l'unità fondamentale su cui si basano le regole e i comportamenti dell'automa.
 
-[TODO: aggiungere immagine trait Cell]
+Tramite quest'astrazione è possibile costruire una griglia di celle le quali
+possono contenere un'informazione generica utile per la specifica del
+comportamento dell'automa, mantenendo allo stesso tempo una posizione ben
+definita all'interno dello spazio dell'ambiente stesso.
+
+![Diagramma UML della componente `Cell`](./img/cell.png)
+
+Nel diagramma è mostrata la struttura base delle componenti fondamentali di una
+cella: una cella dipende dallo spazio dell'ambiente in cui risiede, riuscendo
+così a definire una posizione all'interno di tale spazio. Successivamente, ad
+una cella è assegnato uno e un solo stato.
 
 ### Neighbour
 
-Come accennato in precedenza, un aspetto fondamentale nell'applicazione delle regole nei _Cellular Automaton_ e il concetto di vicinato. Per la modellazione di questa idea e stato necessario sviluppare in maniera separata da _Cell_, il concetto di _Neighbour_, il quale presenta due componenti principali per la rappresentazione di tale aspetto:
-1. _center_: rappresenta la cella per il quale viene calcolato il vicinato;
-2. _neighbourhood_: rappresenta la collezione di celle che compone il vicinato della cella centrale, questa collezione non fa riferimento ad una specifica regola con la quale individuare i vicini, dal momento in cui diversi Cellular Automaton potrebbero utilizzare regole diverse per individuare il proprio vicinato.
+Gran parte dei comportamenti degli automi cellulari è caratterizzato dal
+concetto di vicinato di una cella. In letteratura esistono vari generi di
+vicinato, in particolare si ricordano il [vicinato di Moore](https://en.wikipedia.org/wiki/Moore_neighborhood)
+e il [vicinato di Von Neumann](https://en.wikipedia.org/wiki/Von_Neumann_neighborhood).
+Esistono però numerosi automi dove vengono impiegate strategie differenti per
+l'individuazione dei vicini di una cella (e.g. *Rule110*). È quindi
+fondamentale rendere il sistema capace di rappresentare sia vicinati standard
+come i due sopracitati, ma allo stesso tempo permettere in modo semplice la
+definizione di vicinati *custom*.
 
-[TODO: aggiungere immagine trait Neighbour]
+In generale, il concetto di `Neighbour` presenta due componenti principali:
+1. centro: rappresenta la cella per il quale viene calcolato il vicinato;
+2. vicinato: rappresenta la collezione di celle che compone il vicinato della
+   cella centrale; questa collezione non fa riferimento ad una specifica regola
+   con la quale individuare i vicini, dal momento in cui diversi automi
+   cellulari potrebbero utilizzare regole diverse per individuare il proprio
+   vicinato.
+
+Durante il corso di questo documento e all'interno del progetto, si fa spesso
+riferimento a concetti di posizione _relativa_ e _assoluta_: con i due termini
+si indicano due modalità differenti per esprimere le posizioni dei vicini
+componenti un vicinato rispetto al centro. Nel caso in cui si parli di
+posizione relativa, si intende che le posizioni assunte dai vicini saranno
+relative al centro del vicinato, dove quest'ultimo si assume abbia coordinate
+pari all'origine. In questo caso, per esempio, la posizione appena al di sopra
+del centro in uno spazio bidimensionale assumerà coordinate relative pari a
+(-1, 0), in quanto si troverà una riga precedente al centro ma sulla stessa
+colonna. D'altra parte, quando si parla di posizioni assolute, queste fanno
+riferimento alle coordinate assolute di tutte le celle del vicinato rispetto
+l'ambiente della simulazione. Risulta quindi possibile con questa astrazione
+definire una certa configurazione di un vicinato tramite posizioni relative, e
+quindi individuare il vicinato stesso di una certa cella tramite il valore
+delle coordinate di quest'ultima (i.e. il centro del vicinato) e i valori delle
+posizioni relative.
+
+![Diagramma UML della componente `Neighbour` e la sua interazione con l'ambiente e la componente `NeighbourhoodLocator` per la localizzazione di vicinati.](./img/neighbour.png)
+
+Nel diagramma UML soprastante è mostrato come già descritto il concetto di
+`Neighbour`. L'ambiente calcola un vicinato a partire da una cella che ne
+costituirà il centro. Per il calcolo del vicinato, l'ambiente si avvale di un
+`NeighbourhoodLocator`, il quale definisce i pattern e le configurazioni che un
+determinato vicinato deve assumere, definendolo in termini di posizioni
+relative. Infine, quest'ultimo espone un ulteriore metodo per il passaggio da
+posizioni relative a posizioni assolute in riferimento all'ambiente.
 
 ### Rule
 
-L'aspetto piu importante, necessario in oltre, a modellare un Cellular Automaton e il concetto di _Rule_, una regola permette di specificare il comportamento di un Cellular Automaton in un preciso istante, piu in particolare una specifica _Cell_ ed la sua _Neighbour_ e possibile calcolare il nuovo stato. Per la rappresentazione di questo concetto si e voluto sfruttare l'aspetto funzionale di Scala, andando a rappresentare la regola come una funzione con un Input ed un Output generico. Ogni regola in oltre fa riferimento ad uno specifico _State_ del Cellular Automaton. Grazie a questo tipo di modellazione e stato possibile rappresentare il concetto di modifica di piu _Cell_ contemporaneamente.
+Il comportamento di un automa cellulare è definito attraverso un insieme di
+regole, le quali prendendo in input una o più celle dell'ambiente, calcolano un
+nuovo stato della cella per l'iterazione successiva. Data la natura variabile
+delle regole di un automa cellulare, deve essere possibile generalizzare al
+meglio il concetto di regola applicabile ad un determinato stato. Per le
+considerazioni effettuate nella sezione precedente inoltre, la maggior parte
+delle regole di un automa sono basate su un insieme di stati dei vicini di una
+cella. Per questo motivo si è arrivati alla modellazione mostrata nel diagramma
+UML sottostante.
 
-[TODO: aggiungere il trait Rule]
+![Diagramma UML della modellazione di `Rule`, comprendendo le sue specializzazioni e varianti](./img/rule.png)
+
+Nel diagramma UML, `Rule` rappresenta il concetto più generico di regola,
+la quale non è altro che la definizione di una funzione di trasformazione.
+Ogni regola è associata ad un `matcher`, il quale rappresenta il parametro
+che permette di decidere se applicare la funzione o meno. Una ragionevole
+specializzazione di una regola generica è rappresentata da `NeighbourRule`,
+la quale è riassumibile da una funzione che prende in input un vicinato,
+e se il centro ha lo stesso stato specificato dal parametro `matcher` e il
+vicinato soddisfa la regola, allora restituisce in output la nuova
+cella rappresentante il nuovo centro del vicinato. `MultipleOutputRule`
+rappresenta una regola generica il cui output è composto da una collezione
+di output, mentre `MultipleOutputNeighbourRule` ha lo stesso obiettivo
+di `NeighbourRule` con la differenze che il risultato dell'applicazione
+della regola è composto da un insieme di celle. Questo può risultare
+utile per tutte quelle regole che prevedono la modifica simultanea di più
+celle in base allo stato di un centro, oppure per modellare il concetto
+di movimento di una certa entità all'interno dello spazio (e.g. l'automa
+cellulare WaTor).
+
+L'aspetto piu importante, necessario in oltre, a modellare un Cellular Automaton e il concetto di _Rule_, una regola permette di specificare il comportamento di un Cellular Automaton in un preciso istante, piu in particolare una specifica _Cell_ ed la sua _Neighbour_ e possibile calcolare il nuovo stato. Per la rappresentazione di questo concetto si e voluto sfruttare l'aspetto funzionale di Scala, andando a rappresentare la regola come una funzione con un Input ed un Output generico. Ogni regola in oltre fa riferimento ad uno specifico _State_ del Cellular Automaton. Grazie a questo tipo di modellazione e stato possibile rappresentare il concetto di modifica di piu _Cell_ contemporaneamente.
 
 ## Environment
 

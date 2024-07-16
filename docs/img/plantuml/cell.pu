@@ -1,0 +1,26 @@
+@startuml cell
+skinparam groupInheritance 2
+
+interface State
+
+interface ValuedState<T> {
+    + value: T
+}
+
+interface Cell<D: Dimension> {
+    + state: State
+    + position: Position
+}
+
+interface Position<D: Dimension> {
+    coordinates: Iterable<Int>
+}
+
+class Position2D
+
+Position2D --|> Position
+ValuedState -up-|> State
+
+Cell "1" o-- Position
+Cell "1" o-- State
+@enduml
