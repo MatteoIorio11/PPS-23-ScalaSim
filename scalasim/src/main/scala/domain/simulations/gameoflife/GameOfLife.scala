@@ -38,18 +38,18 @@ object GameOfLifeEnvironment extends ViewBag:
         require(cellularAutomata != null)
         require(initialCells.values.sum < heigth*width)
 
-        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(CellState.DEAD)
+        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().generalInitialization(dimension)(CellState.DEAD)
 
         initialise()
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
-            import domain.automaton.NeighborRuleUtility.given
+            import domain.automaton.NeighborRuleUtility.MooreNeighbourhood
             Neighbour[TwoDimensionalSpace](
                 cell,
-                availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+                availableCells(MooreNeighbourhood.absoluteNeighboursLocations(cell.position))
             )
 
         override protected def initialise(): Unit =
-            initialCells.foreach((state, amount) => matrix.spawnCells(amount)(state))
+            initialCells.foreach((state, amount) => matrix.generalMultipleSpawn(dimension)(amount)(state))
 
     override def colors: Map[State, Color] = Map(
         GameOfLife.CellState.ALIVE -> Color.WHITE,

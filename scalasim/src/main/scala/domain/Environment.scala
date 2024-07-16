@@ -27,11 +27,15 @@ object Environment:
     trait GenericEnvironment[D <: Dimension, R] extends Space[D]:
       protected def saveCell(cells: Cell[D]*): Unit
       /**
+        * Execute a single step for the simulation, by going through all the cells stored inside the matrix and apply on each of them a specific rule.
+        */
+      def nextIteration: Unit
+      /**
         * Apply a specific Cellular Automaton's rule by using the input cell and the neighbors. 
         * @param neighbors the neighbourhood to which apply a rule.
         * @return the result cell/cells after applying the rule.
         */
-      def applyRule(neighbors: Neighbour[D]): R
+      protected def applyRule(neighbors: Neighbour[D]): R
 
     /**
       * This trait represents a particular type of Environment in which It is used a Cellular Automaton where
@@ -81,7 +85,7 @@ object Environment:
         * necessary to specify which type of Data Strucuture will be used.
         * @return the current matrix that is stored in the Environment.
         */
-      def currentMatrix: Matrix
+      def currentMatrix: LazyList[Cell[D]]
       /**
         * Data strucuture that will be used for manage the Matrix.
         */
@@ -114,7 +118,7 @@ object Environment:
       * By extending this trait It will be necessary to specify the Square's side. This informations
       * will be used for interact with the used Matrix.
       */
-    trait SquareEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
+    trait SquareEnvironment extends Space[TwoDimensionalSpace]:
         def side: Int
         override def dimension: Tuple2[Int, Int] = (side, side)
 
@@ -123,7 +127,7 @@ object Environment:
       * edge. By extending this trait It will be necessary to specify the Cubic's edge. This informations
       * will be used for interact with the used Matrix.
       */
-    trait CubicEnvironment extends GenericEnvironment[ThreeDimensionalSpace, ?]:
+    trait CubicEnvironment extends Space[ThreeDimensionalSpace]:
         def edge: Int
         override def dimension = (edge, edge, edge)
 
@@ -132,7 +136,7 @@ object Environment:
       * In fact by extending this method It will be necessary to specify the Rectangle's informations. This informations
       * will be used for interact with the used Matrix.
       */
-    trait RectangularEnvironment extends GenericEnvironment[TwoDimensionalSpace, ?]:
+    trait RectangularEnvironment extends Space[TwoDimensionalSpace]:
         def width: Int
         def heigth: Int
         override def dimension: Tuple2[Int, Int] = (heigth, width)
@@ -162,9 +166,8 @@ object Environment:
       * Environment D-dimensional where the matrix is defined as a [[TrieMap]]. This can be used in case It will be necessary
       * to use thread-safe data structures.
       */
-    trait TrieMapEnvironment[D <: Dimension] extends GenericEnvironment[D, ?]:
+    trait TrieMapEnvironment[D <: Dimension] extends Space[TwoDimensionalSpace]:
       override type Matrix = TrieMap[Position[D], Cell[D]]
-      override def currentMatrix: TrieMap[Position[D], Cell[D]]
       override def matrix: TrieMap[Position[D], Cell[D]]
 
     /**
@@ -182,10 +185,11 @@ object Environment:
             val x = cell.position.coordinates.head
             val y = cell.position.coordinates.last
             matrix(x)(y) = cell)
-
-      override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-          matrix.deepCopy
-
+      override def nextIteration: Unit = 
+        matrix.flatMap(cells => cells.map(cell => cell))
+          .foreach(cell => applyRule(neighbours(cell)))
+      override def currentMatrix: LazyList[Cell[TwoDimensionalSpace]] = 
+          LazyList(matrix.flatten.toSeq*)
       /**
         * Extension method for the deep copy of the matrix.
         */
@@ -271,20 +275,6 @@ object Environment:
             })
             .filter(pos => pos.size == MAX_SIZE)
             .map(cor => matrix(cor.head)(cor.last))
-
-     /**
-       * Extension methods for initialize the Space.
-       */
-      extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-          def initializeSpace(initialState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            array.generalInitialization(dimension = dimension)(initialState = initialState)
-
-          def spawnCells(nCells: Int*)(states: State*): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            array.generalMultipleSpawn(dimension)(nCells*)(states*)
-
-          def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            array.generalSpawn(dimension)(initialState)(spawnState)
-
     /**
       * Square Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
@@ -294,18 +284,6 @@ object Environment:
             .map(pos => pos.coordinates.toList)
             .filter(cor => cor.size == MAX_SIZE)
             .map(cor => matrix(cor.head)(cor.last))
-
-        /**
-          * Utilities methods.
-          */
-        extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-          def initializeSpace(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-            array.generalInitialization(dimension)(state)
-          def spawnCells(nCells: Int*)(states: State*): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-            array.generalMultipleSpawn(dimension)(nCells*)(states*)
-          def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            array.generalSpawn(dimension)(initialState)(spawnState)
-
       /**
       * Rectangula Environment2D where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */

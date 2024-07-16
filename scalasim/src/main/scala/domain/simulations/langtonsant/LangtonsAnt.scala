@@ -8,11 +8,11 @@ import domain.automaton.CellularAutomaton.ComplexCellularAutomaton
 import domain.automaton.CellularAutomaton.State
 import domain.automaton.MultipleOutputNeighbourRule
 import domain.automaton.NeighborRuleUtility.RelativePositions
-import domain.automaton.NeighborRuleUtility.circleNeighbourhoodLocator
 import domain.automaton.Neighbour
 import domain.base.Dimensions.Dimension
 import domain.base.Dimensions.TwoDimensionalSpace
 import domain.base.Position
+import domain.utils.States
 import domain.utils.ViewBag.ViewBag
 
 import java.awt.Color
@@ -22,7 +22,7 @@ import domain.Environment.ComplexEnvironment
 
 trait LangtonsAntEnvironment extends ComplexEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D
 
-object LangtonsAntEnvironment extends ViewBag:
+object LangtonsAntEnvironment extends ViewBag with States:
   import LangtonsAntAutomaton.CellState.*
   import LangtonsAntAutomaton.LangstonAntState.ANT
 
@@ -35,6 +35,8 @@ object LangtonsAntEnvironment extends ViewBag:
       WHITE -> Color.WHITE,
       BLACK -> Color.BLACK,
     )
+  override def allStates: Set[State] = 
+    Set(WHITE, BLACK, ANT(WHITE), ANT(BLACK))
 
   private class LangtonsAntEnvironmentImpl(
       override val side: Int,
@@ -46,20 +48,20 @@ object LangtonsAntEnvironment extends ViewBag:
     initialise()
 
     override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
+        import domain.automaton.NeighborRuleUtility.MooreNeighbourhood
         Neighbour[TwoDimensionalSpace](
             cell,
-            availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+            availableCells(MooreNeighbourhood.absoluteNeighboursLocations(cell.position))
         )
 
     override protected def initialise(): Unit =
-      matrix = matrix.spawnCell(WHITE)(WHITE)
+      matrix = matrix.generalInitialization(dimension)(WHITE)
       matrix(side/2)(side/2) = Cell(Position[TwoDimensionalSpace](side/2, side/2), ANT(WHITE))
 
 /**
   * TODO: write how this CA work.
   */
 trait LangtonsAntAutomaton extends ComplexCellularAutomaton[TwoDimensionalSpace]
-
 object LangtonsAntAutomaton:
   import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
   import domain.automaton.NeighborRuleUtility.RelativePositions.*

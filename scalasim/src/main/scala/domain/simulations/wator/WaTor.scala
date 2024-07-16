@@ -34,31 +34,19 @@ object WaTorEnvironment extends ViewBag:
 
         require(initialCells.values.sum < width * heigth)
 
-        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(Water)
+        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().generalInitialization(dimension)(Water)
 
         initialise()
 
         override protected def initialise(): Unit =
-            initialCells.foreach((state, amount) => matrix = matrix.spawnCells(amount)(state))
-            matrix = matrix.spawnCells(1, 1000)(Shark(), Fish())
-
-
+            initialCells.foreach((state, amount) => matrix = matrix.generalMultipleSpawn(dimension)(amount)(state))
         override protected def saveCell(cells: Cell[TwoDimensionalSpace]*): Unit = cells foreach (super.saveCell(_))
-        
-        override def applyRule(neighbors: Neighbour[TwoDimensionalSpace]): Iterable[Cell[TwoDimensionalSpace]] =
-            val res = super.applyRule(neighbors)
-
-            val sharks = matrix.flatMap(x => x).filter(_.state == Shark()).toList
-
-            res filter (c => sharks.map(_.position).contains(c.position)) foreach(s => println(s"${s} => callee: ${neighbors.center}"))
-
-            res
 
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
-            import domain.automaton.NeighborRuleUtility.given
+            import domain.automaton.NeighborRuleUtility.MooreNeighbourhood
             Neighbour[TwoDimensionalSpace](
                 cell,
-                availableCells(circleNeighbourhoodLocator.absoluteNeighboursLocations(cell.position))
+                availableCells(MooreNeighbourhood.absoluteNeighboursLocations(cell.position))
             )
 
 object WaTorCellularAutomaton:
