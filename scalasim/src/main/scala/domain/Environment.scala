@@ -182,10 +182,8 @@ object Environment:
             val x = cell.position.coordinates.head
             val y = cell.position.coordinates.last
             matrix(x)(y) = cell)
-
       override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
           matrix.deepCopy
-
       /**
         * Extension method for the deep copy of the matrix.
         */
@@ -271,20 +269,6 @@ object Environment:
             })
             .filter(pos => pos.size == MAX_SIZE)
             .map(cor => matrix(cor.head)(cor.last))
-
-     /**
-       * Extension methods for initialize the Space.
-       */
-      extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-          def initializeSpace(initialState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            array.generalInitialization(dimension = dimension)(initialState = initialState)
-
-          def spawnCells(nCells: Int*)(states: State*): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            array.generalMultipleSpawn(dimension)(nCells*)(states*)
-
-          def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            array.generalSpawn(dimension)(initialState)(spawnState)
-
     /**
       * Square Environment 2D, where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
@@ -294,18 +278,6 @@ object Environment:
             .map(pos => pos.coordinates.toList)
             .filter(cor => cor.size == MAX_SIZE)
             .map(cor => matrix(cor.head)(cor.last))
-
-        /**
-          * Utilities methods.
-          */
-        extension (array: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]])
-          def initializeSpace(state: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-            array.generalInitialization(dimension)(state)
-          def spawnCells(nCells: Int*)(states: State*): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] =
-            array.generalMultipleSpawn(dimension)(nCells*)(states*)
-          def spawnCell(initialState: State)(spawnState: State): ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-            array.generalSpawn(dimension)(initialState)(spawnState)
-
       /**
       * Rectangula Environment2D where the matrix is defined using the [[ArrayEnvironment2D]] trait.
       */
