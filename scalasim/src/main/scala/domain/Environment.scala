@@ -27,11 +27,15 @@ object Environment:
     trait GenericEnvironment[D <: Dimension, R] extends Space[D]:
       protected def saveCell(cells: Cell[D]*): Unit
       /**
+        * Execute a single step for the simulation, by going through all the cells stored inside the matrix and apply on each of them a specific rule.
+        */
+      def nextIteration: Unit
+      /**
         * Apply a specific Cellular Automaton's rule by using the input cell and the neighbors. 
         * @param neighbors the neighbourhood to which apply a rule.
         * @return the result cell/cells after applying the rule.
         */
-      def applyRule(neighbors: Neighbour[D]): R
+      protected def applyRule(neighbors: Neighbour[D]): R
 
     /**
       * This trait represents a particular type of Environment in which It is used a Cellular Automaton where
@@ -81,7 +85,7 @@ object Environment:
         * necessary to specify which type of Data Strucuture will be used.
         * @return the current matrix that is stored in the Environment.
         */
-      def currentMatrix: Matrix
+      def currentMatrix: LazyList[Cell[D]]
       /**
         * Data strucuture that will be used for manage the Matrix.
         */
@@ -162,9 +166,8 @@ object Environment:
       * Environment D-dimensional where the matrix is defined as a [[TrieMap]]. This can be used in case It will be necessary
       * to use thread-safe data structures.
       */
-    trait TrieMapEnvironment[D <: Dimension] extends GenericEnvironment[D, ?]:
+    trait TrieMapEnvironment[D <: Dimension] extends Space[TwoDimensionalSpace]:
       override type Matrix = TrieMap[Position[D], Cell[D]]
-      override def currentMatrix: TrieMap[Position[D], Cell[D]]
       override def matrix: TrieMap[Position[D], Cell[D]]
 
     /**
@@ -182,8 +185,11 @@ object Environment:
             val x = cell.position.coordinates.head
             val y = cell.position.coordinates.last
             matrix(x)(y) = cell)
-      override def currentMatrix: ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]] = 
-          matrix.deepCopy
+      override def nextIteration: Unit = 
+        matrix.flatMap(cells => cells.map(cell => cell))
+          .foreach(cell => applyRule(neighbours(cell)))
+      override def currentMatrix: LazyList[Cell[TwoDimensionalSpace]] = 
+          LazyList(matrix.flatten.toSeq*)
       /**
         * Extension method for the deep copy of the matrix.
         */
