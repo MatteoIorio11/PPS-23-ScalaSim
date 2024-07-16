@@ -36,7 +36,7 @@ object BriansBrainEnvironment extends ViewBag:
     require(cellularAutomata != null)
     require(initialCells.values.sum < side*side)
 
-    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(CellState.OFF)
+    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().generalInitialization(dimension)(CellState.OFF)
 
     initialise()
 
@@ -48,7 +48,7 @@ object BriansBrainEnvironment extends ViewBag:
         )
 
     override protected def initialise(): Unit =
-      initialCells.foreach((state, amount) => matrix.spawnCells(amount)(state))
+      initialCells.foreach((state, amount) => matrix.generalMultipleSpawn(dimension)(amount)(state))
 
   override def colors: Map[State, Color] = Map(
     CellState.ON -> Color.WHITE,

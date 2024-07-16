@@ -52,7 +52,7 @@ object LangtonsAntEnvironment extends ViewBag:
         )
 
     override protected def initialise(): Unit =
-      matrix = matrix.spawnCell(WHITE)(WHITE)
+      matrix = matrix.generalInitialization(dimension)(WHITE)
       matrix(side/2)(side/2) = Cell(Position[TwoDimensionalSpace](side/2, side/2), ANT(WHITE))
 
 /**

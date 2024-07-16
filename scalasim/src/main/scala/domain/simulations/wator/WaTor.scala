@@ -34,15 +34,12 @@ object WaTorEnvironment extends ViewBag:
 
         require(initialCells.values.sum < width * heigth)
 
-        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(Water)
+        var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().generalInitialization(dimension)(Water)
 
         initialise()
 
         override protected def initialise(): Unit =
-            initialCells.foreach((state, amount) => matrix = matrix.spawnCells(amount)(state))
-            matrix = matrix.spawnCells(1, 1000)(Shark(), Fish())
-
-
+            initialCells.foreach((state, amount) => matrix = matrix.generalMultipleSpawn(dimension)(amount)(state))
         override protected def saveCell(cells: Cell[TwoDimensionalSpace]*): Unit = cells foreach (super.saveCell(_))
 
         override def neighbours(cell: Cell[TwoDimensionalSpace]): Neighbour[TwoDimensionalSpace] =
