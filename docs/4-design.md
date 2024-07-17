@@ -99,25 +99,22 @@ UML sottostante.
 
 ![Diagramma UML della modellazione di `Rule`, comprendendo le sue specializzazioni e varianti](./img/rule.png)
 
-Nel diagramma UML, `Rule` rappresenta il concetto più generico di regola,
-la quale non è altro che la definizione di una funzione di trasformazione.
-Ogni regola è associata ad un `matcher`, il quale rappresenta il parametro
-che permette di decidere se applicare la funzione o meno. Una ragionevole
-specializzazione di una regola generica è rappresentata da `NeighbourRule`,
-la quale è riassumibile da una funzione che prende in input un vicinato,
-e se il centro ha lo stesso stato specificato dal parametro `matcher` e il
-vicinato soddisfa la regola, allora restituisce in output la nuova
-cella rappresentante il nuovo centro del vicinato. `MultipleOutputRule`
-rappresenta una regola generica il cui output è composto da una collezione
-di output, mentre `MultipleOutputNeighbourRule` ha lo stesso obiettivo
-di `NeighbourRule` con la differenze che il risultato dell'applicazione
-della regola è composto da un insieme di celle. Questo può risultare
-utile per tutte quelle regole che prevedono la modifica simultanea di più
-celle in base allo stato di un centro, oppure per modellare il concetto
-di movimento di una certa entità all'interno dello spazio (e.g. l'automa
-cellulare WaTor).
-
-L'aspetto piu importante, necessario in oltre, a modellare un Cellular Automaton e il concetto di _Rule_, una regola permette di specificare il comportamento di un Cellular Automaton in un preciso istante, piu in particolare una specifica _Cell_ ed la sua _Neighbour_ e possibile calcolare il nuovo stato. Per la rappresentazione di questo concetto si e voluto sfruttare l'aspetto funzionale di Scala, andando a rappresentare la regola come una funzione con un Input ed un Output generico. Ogni regola in oltre fa riferimento ad uno specifico _State_ del Cellular Automaton. Grazie a questo tipo di modellazione e stato possibile rappresentare il concetto di modifica di piu _Cell_ contemporaneamente.
+Nel diagramma UML, `Rule` rappresenta il concetto più generico di regola, la
+quale non è altro che la definizione di una funzione di trasformazione. Ogni
+regola è associata ad un `matcher`, il quale rappresenta il parametro che
+permette di decidere se applicare la funzione o meno. Una ragionevole
+specializzazione di una regola generica è rappresentata da `NeighbourRule`, la
+quale è riassumibile da una funzione che prende in input un vicinato, e se il
+centro ha lo stesso stato specificato dal parametro `matcher` e il vicinato
+soddisfa la regola, allora restituisce in output la nuova cella rappresentante
+il nuovo centro del vicinato. `MultipleOutputRule` rappresenta una regola
+generica il cui output è composto da una collezione di output, mentre
+`MultipleOutputNeighbourRule` ha lo stesso obiettivo di `NeighbourRule` con la
+differenze che il risultato dell'applicazione della regola è composto da un
+insieme di celle. Questo può risultare utile per tutte quelle regole che
+prevedono la modifica simultanea di più celle in base allo stato di un centro,
+oppure per modellare il concetto di movimento di una certa entità all'interno
+dello spazio (e.g. l'automa cellulare WaTor).
 
 ## Environment
 
@@ -128,7 +125,7 @@ Il secondo macro concetto che e stato affrontato per il simulatore, e stato l'En
 
 Un aspetto molto importante riguardante l'_Environment_ e la modalita con la quale rappresentare lo spazio in cui salvare le _Cell_. Per fare in modo di lasciare maggiore liberta allo user, nel definirsi la propria struttura dati con la quale rappresentare lo spazio si e deciso di sfruttare un meccanismo di Scala ovvero i _type_ parameters. Attraverso l'utilizzo di questo modalita sara possibile utilizzare qualsiasi tipo di struttura dati per modellare lo spazio in cui salvare le _Cell_ riguardanti la simulazione.
 
-### Configurazione tramite Mixin
+### Configurazione tramite Mixin (IMPLEMENTAZIONE)
 La modellazione dello spazio tramite il _type_ ha reso possibile l'utilizzo dei _Mixin_. La configurazione della struttura dati con la quale modellare lo spazio e definito tramite uno o piu trait che vanno a comporre il _Cake Pattern_, attraverso il quale vengono configurate le diverse informazioni dell'_Environment_.
 
 Questo meccanismo viene in oltre utilizzato per modellare la geometria dello spazio del _Cellular Automaton_. Ovvero ogni _Cellular Automaton_ ha la propria concezione di spazio, ad esempio un semplice rettangolo, o uno spazio piu complesso come quello toroidale. Anche per ls modellazione di questo comportamento dell'_Environment_ vengono utilizzati i _Mixin_ attraverso cui e possibile specificare i diversi comportamenti riguardanti lo spazio geometrico ed inoltre le varie modalita con la quale percepire lo spazio stesso.

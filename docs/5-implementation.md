@@ -42,7 +42,145 @@ Dopo la definizione del _trait_ si e passati allo sviluppo dell'_object Cell_ il
 ### Neighbourhood
 ### Rule
 
+Come già illustrato nel capitolo riguardante il Design, una `Rule` non è altro
+che l'applicazione di una funzione rispetto ad un particolare `matcher`.
+Ogni automa cellulare sviluppato per questo progetto, prevede l'impiego
+di una regola che si basi su vicinati, perciò il `matcher` sarà rappresentato
+da uno specifico `State`, e la funzione di trasformazione accetta in input
+un vicinato e restituisce il nuovo centro di quel vicinato. Negli automi
+cellulari che richiedono di modellare un concetto di movimento (i.e. Langton's
+Ant e WaTor), si impiega la specializzazione `MultipleOutputNeighbourRule`,
+la quale restituisce sempre zero o due celle in output: la prima cella rappresenta
+la nuova cella dopo aver effettuato lo spostamento, mentre la seconda cella
+rappresenta la cella precedente lo spostamento.
+
+#### Domain Specific Language per la costruzione di `NeighbourRule`
+
+Essendo `Rule` il cuore di ogni automa cellulare, risulta necessario costruire
+meccanismi e astrazioni in grado di rendere la creazione di tali regole nella
+maniera più semplice e intuitiva possibile. Grazie alle capacità di Scala, è
+stato possibile define un Domain Specific Language (DSL) in grado di creare
+semplici `NeighbourRule` in maniera dichiarativa.
+
+![Diagramma UML delle classi componenti l'intero apparato del DSL per la crezione di NeighbourRule](./img/dsl.png)
+
+In figura è illustrato come interagiscono tra di loro le componenti del DSL.
+Due specializzazioni sono state sviluppate di `NeighbourRuleBuilder`:
+
+1. `DeclarativeNeighbourRuleBuilder`: permette la creazione di semplici regole
+   costruendo predicati sulla cardinalità dei vicini aventi un certo stato.
+2. `ExplicitNeighbourRuleBuilder`: costruisce `NeighbourRule` permettendo di
+   specificare l'esatta configurazione che deve avere il vicinato.
+
+Come suggerisce il nome, entrambe le componenti implementano il pattern
+**Builder**, ma la chiamata dei metodo del builder dovrebbe avvenire solo
+grazie agli oggetti che espongono il DSL vero e proprio.
+
+Di seguito due esempi dell'impego delle due diverse modalità di costruzione
+delle regole.
+
+```Scala
+DeclarativeRuleBuilder.configureRules:
+  DEAD when fewerThan(2) withState ALIVE whenCenterIs ALIVE
+  ALIVE when surroundedBy(2) withState ALIVE whenCenterIs ALIVE
+  ALIVE when surroundedBy(3) withState ALIVE whenCenterIs ALIVE
+  DEAD when atLeastSurroundedBy(4) withState ALIVE whenCenterIs ALIVE
+  ALIVE when surroundedBy(3) withState ALIVE whenCenterIs DEAD
+```
+
+Nello snippet di codice sopra, vengono specificate le regole dell'automa
+Game of Life. Ogni riga contiene una specifica regola e ogni regola inizia
+con lo stato che assumerà l'automa in caso la regola venga applicata con successo.
+Successivamente, con la keyword `when` si può configurare la composizione
+del vicinato. Nell'esempio sopra, è illustrato come sia possibile specificare:
+
+1. un **limite superiore** di vicini &rarr; `fewerThan`
+2. un numero **esatto** di vicini &rarr; `surroundedBy`
+3. un **limite inferiore** di vicini &rarr; `atLeastSurroundedBy`
+
+Successivamente è quindi necessario specificare quale stato debbano avere i
+vicini, ed opzionalmente il raggio di ricerca dei vicini (keyword non mostrata
+nell'esempio `withRadius`, di default a 1 con vicinato di Moore).
+Successivamente, è opzionale specificare lo stato del centro per cui la regola
+venga applicata, ossia il `matcher` della regola. Se non viene specificato, la
+regola si riferisce a qualunque stato. È infine opzionale specificare uno stato
+alternativo (keyword `otherwise` al termine della regola) in caso in cui la
+regola non possa essere applicata per mancata corrispondenza con il vicinato.
+Se non viene specificato, il caso alternativo è costituito dal centro del
+vicinato in input inalterato.
+
+Il DSL così dichiarato, permette di costruire un insieme di regole semplici
+adatte per modellare automi come Game of Life o Brian's Brain.
+
+È possibile inoltre costruire configurazioni custom di vicinati tramite un
+estensione del `NeighbourRuleBuilder`, impiegata attraverso composizione
+all'interno del `DeclarativeRuleBuilder`.
+
+![Rule110 automaton](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/One-d-cellular-automaton-rule-110.gif/220px-One-d-cellular-automaton-rule-110.gif)
+Come illustrato in figura, si considerino le regole che costituiscono l'automa Rule110.
+
+Tramite l'impiego per composizione di `ExplicitNeighbourRuleBuilder` all'interno
+del builder dichiarativo è possibile specificare le regole in modo immediato tramite:
+
+```Scala
+DeclarativeRuleBuilder.configureRules:
+  White whenNeighbourhoodIsExactlyLike:
+    neighbour(Black) | c(Black) | neighbour(Black)
+  Black whenNeighbourhoodIsExactlyLike:
+    neighbour(Black) | c(Black) | neighbour(White)
+  Black whenNeighbourhoodIsExactlyLike:
+    neighbour(Black) | c(White) | neighbour(Black)
+  White whenNeighbourhoodIsExactlyLike:
+    neighbour(Black) | c(White) | neighbour(White)
+  Black whenNeighbourhoodIsExactlyLike:
+    neighbour(White) | c(Black) | neighbour(Black)
+  Black whenNeighbourhoodIsExactlyLike:
+    neighbour(White) | c(Black) | neighbour(White)
+  Black whenNeighbourhoodIsExactlyLike:
+    neighbour(White) | c(White) | neighbour(Black)
+  White whenNeighbourhoodIsExactlyLike:
+    neighbour(White) | c(White) | neighbour(White)
+```
+
+Come per l'esempio precedente, una regola inizia sempre con lo stato che il
+centro del vicinato assumerà se la regola viene applicata con successo.
+Successivamente viene definito il vicinato attraverso la seguente sintassi:
+
+- `neighbour(s: State)`: si specifica un vicino con lo stato in input. La sua
+  posizione dipenderà dove verrà posizionato il centro all'interno della regola
+  corrente;
+- `c(s: State)`: posizionamento del centro della regola con stato iniziale pari
+  allo stato dato in input (i.e. il `matcher` della regola);
+- `|`: separatore di celle;
+- `x`: _placeholder_ per indicare un vicino da ignorare;
+- `| n |`: carattere di nuova linea.
+
+L'intera sintassi può essere osservata con il seguente esempio:
+
+```Scala
+DeclarativeRuleBuilder.configureRules:
+  Alive whenNeighbourhoodIsExactlyLike:
+    neighbour(Alive) | x       | neighbour(Alive) | n |
+    x                | c(Dead) | x                | n |
+    neighbour(Alive) | x       | neighbour(Alive)
+```
+
+dove, se il centro ha stato `Dead` e il suo vicinato assume il pattern indicato
+(vicini diagonali con stato `Alive`), allora il nuovo centro assumerà stato
+`Alive`.
+
+Per la modellazione dell'automa cellulare Brian's Brain, è possibile osservare
+gran parte della sintassi del DSL costruito:
+
+```Scala
+DeclarativeRuleBuilder.configureRules:
+  DYING whenNeighbourhoodIsExactlyLike(c(ON))
+  ON when surroundedBy(2) withState ON whenCenterIs OFF otherwise OFF
+  OFF whenNeighbourhoodIsExactlyLike(c(DYING))
+```
+
 ## Environment
+
 Il secondo macro componente che e stato necessario sviluppare e l'_Environment_. Questo componente software incapsula lo spazio all'interno della quale vengono memorizzate le _Cell_ di un _Cellular Automaton_. Per modellare questa astrazione nel tipo di simulazione che si vuole implementare, e stato necessario fare in modo che l'intero _Environment_ fosse generico nel tipo di _Cellular Automaton_ che si sta utilizzando. Per fare in modo di avere una rappresentazione generale dell'ambiente, e stato realizzato il _trait Generic Environment_, il quale e definito in due campi generici, il primo fa riferimento alla _Dimension_ della simulazione, mentre il secondo generico riguarda il tipo di ritorno dopo l'applicazione di una specifica regola.
 
 ```scala

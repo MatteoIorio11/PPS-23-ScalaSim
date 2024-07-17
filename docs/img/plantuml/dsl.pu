@@ -1,0 +1,52 @@
+@startuml dsl
+interface NeighbourRuleBuilder<D: Dimension> {
+    + rules(): Set<NeighbourRule<D>>
+    + addRule(nr: NeighbourRule<D>): Unit
+    + build(): Iterable<NeighbourRule<D>>
+}
+
+interface DeclarativeRuleBuilder {
+    + configureRules(config: DeclarativeRuleBuilder ?=> Unit): this.type
+    + setInitialState(s: State): this
+    + setFinalState(s: State): this
+    + setNumNeighbours(count: Int => Boolean): this
+    + setNeighboursState(s: State): this
+    + setOtherwiseState(s: State): this
+}
+
+interface ExplicitNeighbourRuleBuilder {
+    + nextRow(): this
+    + addCell(s: Option<State>): this
+    + setCenter(s: State): this
+    + buildRule(initialState: State): Unit
+    + configureAnother(s:State, config: this.type ?=> Unit): this.type
+}
+
+object ExpressionRuleDSL {
+    + surroundedBy(n: Int): DeclarativeRuleBuilder
+    + atLeastSurroundedBy(n: Int): DeclarativeRuleBuilder
+    + fewerThan(n: Int): DeclarativeRuleBuilder
+}
+
+object CustomNeighbourhoodDSL {
+    + x(): ExplicitNeighbourRuleBuilder
+    + c(s: State): ExplicitNeighbourRuleBuilder
+    + neighbour(s: State): ExplicitNeighbourRuleBuilder
+    + n(): ExplicitNeighbourRuleBuilder
+}
+
+object DSLExtensions {
+    + when(builder: => DeclarativeRuleBuilder): DeclarativeRuleBuilder
+    + whenCenterIs(s: State): EndClause
+}
+ 
+DeclarativeRuleBuilder *-- ExpressionRuleDSL
+ExpressionRuleDSL *-- DSLExtensions
+ExplicitNeighbourRuleBuilder *-- CustomNeighbourhoodDSL
+
+DeclarativeRuleBuilder o-- ExplicitNeighbourRuleBuilder
+
+DeclarativeRuleBuilder -up-|> NeighbourRuleBuilder
+ExplicitNeighbourRuleBuilder -up-|> NeighbourRuleBuilder
+
+@enduml
