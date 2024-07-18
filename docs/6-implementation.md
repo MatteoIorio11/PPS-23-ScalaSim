@@ -1,5 +1,34 @@
 # Implementazione del Sistema
 
+## Assegnazione del lavoro
+
+Di seguito le iniziali dei cognomi dei membri saranno affiancate ad ogni capitolo per il
+quale si ritiene/ritengono maggiormente responsabile/i gli studenti coinvolti.
+
+- V &rarr; Vincenzi Fabio
+- I &rarr; Iorio Matteo
+- F &rarr; Furi Stefano
+
+- [Implementazione del Sistema](#implementazione-del-sistema)
+  - [Cellular Automaton](#cellular-automaton) V-I-F
+    - [Cell](#cell) I-F
+      - [State](#state) I-F
+    - [Rule](#rule) F
+      - [Domain Specific Language per la costruzione di `NeighbourRule`](#domain-specific-language-per-la-costruzione-di-neighbourrule) F
+  - [Environment](#environment) I-V
+    - [Configurazione tramite Mixin](#configurazione-tramite-mixin) I
+    - [Space](#space) I-F
+    - [Tipologie di Space](#tipologie-di-space) I
+    - [Implementations](#implementations) V-I-F
+  - [Engine](#engine) V-I
+  - [Interfaccia Grafica](#interfaccia-grafica) V
+
+In generale, tutti i componenti del gruppo hanno lavorato cooperando
+e in maniera simultanea allo sviluppo dell'intera parte del modello
+di base del simulatore.
+
+---
+
 All'intero di questo capitolo verranno descritte le modalita attraverso la
 quale sono state definite le varie classi, gli eventuali problemi riscontrati
 ed infine le modalita attraverso la quale queste difficolta sono state risolte.
