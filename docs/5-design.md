@@ -176,40 +176,43 @@ Il secondo macro concetto che è costituito dalla componente `Environment`.
 L'*Environment* fa sempre riferimento ad un singolo automa cellulare, ed è
 responsabile del mantenimento dello stato attuale della *griglia* (l'insieme di
 celle). Questo significa che l'ambiente deve poter essere in grado di
-effettuare tre importanti compiti:
+effettuare tre importanti operazioni:
 
 - Manipolazione della griglia;
 - Calcolo di un vicinato;
 - Applicazione e salvataggio delle regole dell'automa cellulare sulle celle
   della griglia.
 
+In considerazione di ciò, possiamo separare ma legare tra loro i concetti
+di spazio e di ambiente inteso come manipolatore e applicatore delle regole
+sulle celle componenti la griglia.
+
+Di seguito il diagramma UML delle classi che compongono ambiente e spazio.
+
 ![Diagramma UML delle classi che compongono l'ambiente e lo spazio.](./img/enva.png)
 
-### Astrazione dello spazio
+Di seguito una breve descrizione per le principali componenti:
 
-Un aspetto molto importante riguardante l'*Environment* e la modalita con la
-quale rappresentare lo spazio in cui salvare le *Cell*. Per fare in modo di
-lasciare maggiore liberta allo user, nel definirsi la propria struttura dati
-con la quale rappresentare lo spazio si e deciso di sfruttare un meccanismo di
-Scala ovvero i *type* parameters. Attraverso l'utilizzo di questo modalita sara
-possibile utilizzare qualsiasi tipo di struttura dati per modellare lo spazio
-in cui salvare le *Cell* riguardanti la simulazione.
+- `Space` &rarr; rappresentazione dello spazio all'interno del quale risiedono
+  le celle durante la simulazione. Lo spazio si compone di una griglia
+  (`Matrix`), la cui struttura viene raffinata dalle implementazioni di questa
+  componente, tra cui si ricordano `SquareEnvironment` e
+  `RectangularEnvironment`.
+- `GenericEnvironment` il quale si compone di uno spazio ed un automa
+  cellulare, e definisce meccanismi con cui modificare la griglia applicando le
+  regole dell'automa. Sue vere e proprie specializzazioni sono rappresentate
+  da `Complex` e `Simple` *environment*, ovvero spazi che accettano rispettivamente
+  `MultiOutputCellularAutomaton` e `CellularAutomaton` semplici.
+- `ArrayEnvironment2D` &rarr; specializzazione di un ambiente che definisce la
+  struttura dati effettiva della griglia (`Matrix`). Questa sarà la componente
+  più utilizzata dagli automi sviluppati per questo elaborato, in quanto rende
+  semplice la manipolazione della griglia in un ambiente bidimensionale. Di
+  interessante rilievo è una sua ulteriore sotto-specializzazione per la
+  rappresentazione di ambienti Toroidali.
 
-### Configurazione tramite Mixin (IMPLEMENTAZIONE)
-
-La modellazione dello spazio tramite il *type* ha reso possibile l'utilizzo dei
-*Mixin*. La configurazione della struttura dati con la quale modellare lo
-spazio e definito tramite uno o piu trait che vanno a comporre il *Cake
-Pattern*, attraverso il quale vengono configurate le diverse informazioni
-dell'*Environment*.
-
-Questo meccanismo viene in oltre utilizzato per modellare la geometria dello
-spazio del *Cellular Automaton*. Ovvero ogni *Cellular Automaton* ha la propria
-concezione di spazio, ad esempio un semplice rettangolo, o uno spazio piu
-complesso come quello toroidale. Anche per ls modellazione di questo
-comportamento dell'*Environment* vengono utilizzati i *Mixin* attraverso cui e
-possibile specificare i diversi comportamenti riguardanti lo spazio geometrico
-ed inoltre le varie modalita con la quale percepire lo spazio stesso.
+L'uso di questa grande mole di specializzazioni verrà illustrato nel capitolo
+riguardante [l'implementazione](./6-implementation.md), tramite l'impiego
+di *mixin*.
 
 ## Engine
 
