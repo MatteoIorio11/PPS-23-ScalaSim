@@ -5,7 +5,7 @@ import domain.Environment.*
 import domain.base.Position
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
 import domain.automaton.{Neighbour, Cell, NeighborRuleUtility}
-import domain.engine.Engine.{IterableThreadEngine2D, IterableTimerEngine2D, IterableEngine2D}
+import domain.engine.Engine.{IterableThreadEngine2D, IterableTimerEngine2D}
 import java.util.concurrent.{ExecutorService, Executor, Executors}
 import domain.engine.Engine.GeneralEngine
 
@@ -25,14 +25,19 @@ object Engine:
     protected def env: GenericEnvironment[D, ?]
     def environment(): GenericEnvironment[D, ?]
     var running: Boolean
-    var history: LazyList[Cell[D]]
-    protected def nextIteration: Unit
+
+    var history: LazyList[Cell[D]] = LazyList()
+
+    protected def nextIteration: Unit = 
+        environment().nextIteration
+        saveInHistory
+       
     protected def saveInHistory: Unit = history = history.appendedAll(currentMatrix)
     /**
       * This method is based on the used environment, the matrix that will be returned is the environment's matrix deep copy.
       * @return the deep copy of the current matrix.
       */
-    def currentMatrix: LazyList[Cell[D]]
+    def currentMatrix: LazyList[Cell[D]] = environment().currentMatrix
     /**
       * Start the Engine. If the engine is already running nothing is done.
       */
@@ -52,20 +57,9 @@ object Engine:
     override def environment(): SimpleEnvironment[D]
 
   /**
-  * This trait represent a specific type of 2D engine where the matrix type is in the form:
-  * [[Iterable(Iterable(Cell(TwoDimensionalSpace)))]].
-  */
-  trait IterableEngine2D extends GeneralEngine[TwoDimensionalSpace]:
-    var history: LazyList[Cell[TwoDimensionalSpace]] = LazyList()
-    override def currentMatrix: LazyList[Cell[TwoDimensionalSpace]] = 
-      environment().currentMatrix
-    override def nextIteration: Unit = 
-        environment().nextIteration
-        saveInHistory
-  /**
     * This trait represent a specific type of 2D engine that runs on a Virtual Thread.
     */
-  trait IterableThreadEngine2D extends Thread with IterableEngine2D:
+  trait IterableThreadEngine2D extends Thread with GeneralEngine[TwoDimensionalSpace]:
     @volatile var running = false
     override def environment(): GenericEnvironment[TwoDimensionalSpace, ?] = 
         this.synchronized:
@@ -82,7 +76,7 @@ object Engine:
       * This trait represent a timed 2D Engine, in which the simulation should runs for the input
       * timer seconds, and after that the simulation will stop It's execution.
       */
-  trait IterableTimerEngine2D extends IterableEngine2D:
+  trait IterableTimerEngine2D extends GeneralEngine[TwoDimensionalSpace]:
         def timer: Int
         private val ONE_SECOND = 1_000
         /**
@@ -122,7 +116,7 @@ object Engine:
     * Trait that represent an Engine for Real Time simulation with a GUI, this trait extends from the [[IterableEngine2D]]. By using
     * this trait the user can observe a real time simulation.
     */
-  trait GUIEngine2D extends IterableEngine2D:
+  trait GUIEngine2D extends GeneralEngine[TwoDimensionalSpace]:
     /**
       * Attached view to the engine for the real time simulation.
       */
