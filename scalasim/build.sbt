@@ -22,6 +22,10 @@ lazy val root = project
     scalacOptions ++= Seq("-deprecation"),
     javaOptions ++= Seq("--enable-preview"),
 
+    Test / javaOptions ++= Seq("--enable-preview"),
+
+    fork := true,
+    
     assembly / assemblyJarName := "scalasim.jar"
  )
 
