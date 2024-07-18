@@ -1,0 +1,40 @@
+@startuml highleveldesign
+
+package base {
+    interface Cell
+    interface State
+    interface Position
+}
+
+package automaton {
+    interface CellularAutomaton
+    interface Rule
+    interface Neighbour
+}
+
+package gui {
+    interface GUI
+    interface Exporter
+}
+
+package simulations {}
+
+interface Environment
+interface Engine
+
+Cell *-- State
+Cell *-- Position
+
+Neighbour "1..*" o-left- Cell
+
+CellularAutomaton "1..*" o-- Rule
+
+Environment "1" o-- CellularAutomaton
+Environment "1..*" o-- Cell
+
+Environment <|-left- simulations
+
+Engine "1" o-- Environment
+gui "1" o-- Engine
+
+@enduml

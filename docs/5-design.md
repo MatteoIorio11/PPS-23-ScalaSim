@@ -1,11 +1,27 @@
-# Design del Sistema
+# Design di Dettaglio
 
-Il design architetturale dell'intero sistema puo essere suddiviso in 3 macro componenti, i quali a loro volta sono suddivisi e descritti in componenti piu semplici che incapsulano un unico argomento. Le tre macro categorie di concetti che compongono il sistema sono:
-1. _Engine_
-2. _Environment_
-3. _Cellular Automaton_ 
+Il design architetturale dell'intero sistema puo essere suddiviso in 3 macro
+componenti, i quali a loro volta sono suddivisi e descritti in componenti piu
+semplici che incapsulano un unico argomento. Le tre macro categorie di concetti
+che compongono il sistema sono:
 
-Nelle sezioni successive verrano elencate le diverse strategie utilizzate per sviluppare le diverse componenti, andando ad elencare le scelte effettuate nella  realizzazione delle diverse funzionalita per far sii che sia altamente personalizzabile, in modo da facilitare la creazione di simulazioni.
+1. **Cellular Automaton**
+2. **Environment**
+3. **Engine**
+
+L'intero sistema si basa su questi tre capisaldi, i quali compongono
+principalmente le componenti di model e controller all'interno del pattern MVC:
+in particlare, *Cellular Automaton* ed *Environment* fanno parte della
+componente model, mentre *Engine* costituisce il controller dell'intero
+applicativo. Questo rende possibile la realizzazione di molteplici componenti
+view che, considerando i requisiti del sistema, può permettere la realizzazione
+di un interfaccia grafica e di un esportatore video che siano unicamente
+dipendenti dall'implementazione del controller.
+
+Nelle sezioni successive verrano elencate le diverse strategie utilizzate per
+sviluppare le diverse componenti, andando ad elencare le scelte effettuate
+nella  realizzazione delle diverse funzionalita per far sii che sia altamente
+personalizzabile, in modo da facilitare la creazione di simulazioni.
 
 ## Cellular Automaton
 
@@ -51,6 +67,7 @@ come i due sopracitati, ma allo stesso tempo permettere in modo semplice la
 definizione di vicinati *custom*.
 
 In generale, il concetto di `Neighbour` presenta due componenti principali:
+
 1. centro: rappresenta la cella per il quale viene calcolato il vicinato;
 2. vicinato: rappresenta la collezione di celle che compone il vicinato della
    cella centrale; questa collezione non fa riferimento ad una specifica regola
