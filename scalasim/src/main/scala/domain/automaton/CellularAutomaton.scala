@@ -70,12 +70,12 @@ object CellularAutomaton:
         def rules: Rules
 
     /**
-     * Complex Cellular Automaton trait. It defines a specifc type of cellular automaton that works with multiple cells, in fact this
+     * Multiple Output Cellular Automaton trait. It defines a specifc type of cellular automaton that works with multiple cells, in fact this
      * type of Cellular Automaton returns a collection of new cells after applying a rule. This type of cellular automaton also has a
      * different type input for the rule definition, because It uses a [[MultipleOutputNeighbourRule]].
      * @tparam D space dimension.
      */
-    trait ComplexCellularAutomaton[D <: Dimension] extends GenericCellularAutomaton[D, Neighbour[D], Iterable[Cell[D]], MultipleOutputNeighbourRule[D]]:
+    trait MultiOutputCellularAutomaton[D <: Dimension] extends GenericCellularAutomaton[D, Neighbour[D], Iterable[Cell[D]], MultipleOutputNeighbourRule[D]]:
       protected def rules: Map[State, MultipleOutputNeighbourRule[D]]
 
       override def applyRule(neighbors: Neighbour[D]): Iterable[Cell[D]] =
@@ -132,9 +132,9 @@ object CellularAutomaton:
       * Factory for Multi Output Cellular Automaton.
       */
     object MultiOutputCellularAutomaton:
-      def apply[D <: Dimension](): ComplexCellularAutomaton[D] = MultiOutputCellularAutomatonImpl()
+      def apply[D <: Dimension](): MultiOutputCellularAutomaton[D] = MultiOutputCellularAutomatonImpl()
 
-      private class MultiOutputCellularAutomatonImpl[D <: Dimension] extends ComplexCellularAutomaton[D]:
+      private class MultiOutputCellularAutomatonImpl[D <: Dimension] extends MultiOutputCellularAutomaton[D]:
 
         protected var rules: Map[State, MultipleOutputNeighbourRule[D]] = Map()
 

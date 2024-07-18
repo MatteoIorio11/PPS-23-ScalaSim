@@ -62,7 +62,7 @@ object Environment:
       /**
         * Cellular Automaton that will be used inside this environment.
         */
-      def cellularAutomata: ComplexCellularAutomaton[D]
+      def cellularAutomata: MultiOutputCellularAutomaton[D]
       override def applyRule(neighbors: Neighbour[D]): Iterable[Cell[D]] = 
           val newCell = cellularAutomata.applyRule(neighbors)
           saveCell(newCell.toSeq*)

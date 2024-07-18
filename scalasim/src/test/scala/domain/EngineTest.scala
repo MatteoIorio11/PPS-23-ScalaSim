@@ -8,6 +8,7 @@ import scala.collection.mutable.ArrayBuffer
 import domain.automaton.CellularAutomaton.CellularAutomaton
 import domain.automaton.Cell
 import _root_.utility.DummyAutomatonEnvironment
+import domain.base.Dimensions.TwoDimensionalSpace
 
 class EngineTest extends AnyFunSuite with BeforeAndAfterEach:
     var engine = Engine2D(DummyAutomatonEnvironment(10), 100)
@@ -28,10 +29,10 @@ class EngineTest extends AnyFunSuite with BeforeAndAfterEach:
         currSimulation should not be (Iterator.empty)
 
     test("Starting the engine should create a new stage for the simulation environment"):
-        val initialState = engine.currentMatrix.flatMap(it => it.map(cell => cell))
+        val initialState: Iterable[Cell[TwoDimensionalSpace]] = engine.currentMatrix.map(c => c)
         engine.startEngine
         Thread.sleep(100)
-        val newState = engine.currentMatrix.flatMap(it => it.map(cell => cell))
+        val newState = engine.currentMatrix.map(c => c)
         engine.stopEngine
         initialState.collect {
             case cell => (cell, newState.filter(c => c.position == cell.position).head)

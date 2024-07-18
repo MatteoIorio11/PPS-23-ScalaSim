@@ -34,10 +34,10 @@ object DummyAutomatonEnvironment extends ViewBag:
     private case class DummyAutomatonEnvironmentImpl(val side: Int, val cellularAutomata: CellularAutomaton[TwoDimensionalSpace]) 
         extends SimpleEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D:
       require(side > 0)
-      var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
+      var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().generalInitialization((side, side))(DummyState.DEAD)
       initialise()
       override protected def initialise() = 
-        matrix = matrix.spawnCell(DummyState.DEAD)(DummyState.ALIVE)
+        matrix = matrix.generalMultipleSpawn((side, side))(side / 2)(DummyState.ALIVE)
       override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
           import domain.automaton.NeighborRuleUtility.MooreNeighbourhood
           Neighbour(
@@ -52,9 +52,9 @@ object DummyToroidEnv extends ViewBag:
       extends SimpleEnvironment[TwoDimensionalSpace] with ArrayToroidEnvironment:
     require(width > 0)
     require(heigth > 0)
-    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().initializeSpace(DummyState.DEAD)
+    var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().generalInitialization((width, heigth))(DummyState.DEAD)
     initialise()
-    override protected def initialise() = matrix = matrix.spawnCell(DummyState.DEAD)(DummyState.ALIVE)
+    override protected def initialise() = matrix = matrix.generalSpawn((width, heigth))(DummyState.DEAD)(DummyState.ALIVE)
     override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
       import domain.automaton.NeighborRuleUtility.MooreNeighbourhood
       Neighbour(
