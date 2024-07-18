@@ -172,11 +172,18 @@ che risultano importanti per questo elaborato:
 
 ## Environment
 
-Il secondo macro concetto che e stato affrontato per il simulatore, e stato
-l'Environment. L'*Environment* fa sempre riferimento ad un singolo *Cellular
-Automaton*, in questo modo sara possibile fornire il *Neighbour* appropriato
-dal momento in cui solo l'*Environment* e a conoscenza della disposizione delle
-varie *Cell* nello spazio.
+Il secondo macro concetto che è costituito dalla componente `Environment`.
+L'*Environment* fa sempre riferimento ad un singolo automa cellulare, ed è
+responsabile del mantenimento dello stato attuale della *griglia* (l'insieme di
+celle). Questo significa che l'ambiente deve poter essere in grado di
+effettuare tre importanti compiti:
+
+- Manipolazione della griglia;
+- Calcolo di un vicinato;
+- Applicazione e salvataggio delle regole dell'automa cellulare sulle celle
+  della griglia.
+
+![Diagramma UML delle classi che compongono l'ambiente e lo spazio.](./img/enva.png)
 
 ### Astrazione dello spazio
 
