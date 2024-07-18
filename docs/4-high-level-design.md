@@ -47,3 +47,5 @@ scelta tecnologica che non risulta complessivamente cruciale per via
 dell'impiego di MVC, è la scelta del framework per la realizzazione di
 interfacce grafiche (swing o scalafx), poiché la sua scelta non si riflette
 minimamente sull'intero design del sistema prodotto.
+
+[Indice](./index.md) | [Capitolo Precedente](./3-analysis.md) | [Capitolo Successivo](./5-design.md)

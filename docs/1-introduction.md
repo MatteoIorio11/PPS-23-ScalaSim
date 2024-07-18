@@ -10,3 +10,5 @@ costituita da celle che rappresentano delle entità che evolvono nel tempo.
 Ciascuna di queste celle può assumere un insieme finito di stati e in ogni
 unità di tempo la griglia viene aggiornata seguendo delle regole definite dalla
 tipologia di automa simulato.
+
+[Indice](./index.md) | [Capitolo Successivo](./2-development-process.md)

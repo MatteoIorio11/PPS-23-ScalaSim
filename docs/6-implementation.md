@@ -239,3 +239,5 @@ ADD mixin
 ## Engine
 
 ## Interfaccia Grafica
+
+[Indice](./index.md) | [Capitolo Precedente](./5-design.md) | [Capitolo Successivo](./7-conclusions.md)

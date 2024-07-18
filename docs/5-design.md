@@ -155,3 +155,5 @@ Dal momento in cui possono esserci diverse modalita con la quale voler eseguire 
 
 ## Design Interfaccia Grafica
 [TODO: VINCI]
+
+[Indice](./index.md) | [Capitolo Precedente](./4-high-level-design.md) | [Capitolo Successivo](./6-implementation.md)

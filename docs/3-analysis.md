@@ -94,3 +94,5 @@ aspetti più avanzati come la configurazione della simulazione.
 - Implementazione di tutti gli automi cellulari listati nei [Requisiti-Funzionali](#Requisiti-Funzionali);
 - Caricamento da file standard (JSON, XML, YAML) della configurazione del simulatore.
 - Caricamento da file standard delle specifiche di un semplice automa cellulare.
+
+[Indice](./index.md) | [Capitolo Precedente](./2-development-process.md) | [Capitolo Successivo](./4-high-level-design.md)

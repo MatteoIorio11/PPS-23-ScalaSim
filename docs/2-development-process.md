@@ -45,4 +45,4 @@ La fase preliminare alla scrittura del codice e quella di _Red Green Refactor_, 
 2. __Fase Green__: scrivere il codice di produzione che soddisfi il test definito della fase precedente;
 3. __Refactor__: ristrutturare il codice di testing e sia quello di produzione.
 
-[Index](./index.md) / [Capitolo Precedente](./1-introduction.md) / [Capitolo Successivo](./3-analysis.md)
+[Indice](./index.md) | [Capitolo Precedente](./1-introduction.md) | [Capitolo Successivo](./3-analysis.md)
