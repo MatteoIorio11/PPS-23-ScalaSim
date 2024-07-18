@@ -1,5 +1,5 @@
 
-# Conclusioni
+# Retrospettiva
 
 Il progetto sviluppato è complessivamente soddisfacente per tutti i membri del
 gruppo. Sono risultate fondamentali una buona progettazione a priori delle
