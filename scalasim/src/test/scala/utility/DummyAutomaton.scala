@@ -37,7 +37,7 @@ object DummyAutomatonEnvironment extends ViewBag:
       var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().generalInitialization((side, side))(DummyState.DEAD)
       initialise()
       override protected def initialise() = 
-        matrix = matrix.generalMultipleSpawn((side, side))(side / 2)(DummyState.ALIVE)
+        matrix = matrix.generalSpawn((side, side))(DummyState.DEAD)(DummyState.ALIVE)
       override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
           import domain.automaton.NeighborRuleUtility.MooreNeighbourhood
           Neighbour(
