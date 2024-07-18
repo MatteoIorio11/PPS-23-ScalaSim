@@ -21,6 +21,15 @@ racchiuse all'intero del _package_: _domain.automaton_, dove al suo interno
 sono contenute tutte le componenti software a supporto del concetto di automa
 cellulare.
 
+<!-- Dal momento in cui esistono diverse categorie di *Cellular Automaton*, tra cui -->
+<!-- una specifica categoria la quale per un singolo stato di una *Cell* potrebbero -->
+<!-- venire applicate piu di una regola contemporaneamente, si e deciso di -->
+<!-- utilizzare un *type parameter* per la definizione della struttura dati nella -->
+<!-- quale andare a memorizzare le diverse regole che compongono il *Cellular -->
+<!-- Automaton*. A supporto di questa funzionalita inoltre si e deciso di -->
+<!-- implementare, tramite l'utilizzo di *mixin*, diverse strutture dati gia -->
+<!-- funzionanti da utilizzare per memorizzare lavorare su tali regole. -->
+
 ### Dimension
 
 Per rappresentare il concetto di dimensione, all'interno della quale l'automa

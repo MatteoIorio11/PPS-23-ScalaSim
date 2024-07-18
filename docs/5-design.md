@@ -25,11 +25,17 @@ personalizzabile, in modo da facilitare la creazione di simulazioni.
 
 ## Cellular Automaton
 
-Il _Cellular Automaton_, puo essere visto come un contenitore di regole che fanno riferimento ai diversi stati che compongono il Cellular Automaton stesso. Per ogni _Cell_ che viene memorizzata all'interno dell'_Environment_ verra scelta una regola specifica, in modo da calcolare correttamente lo stato sucessivo o gli stati successivi, a seconda del Cellular Automaton che si sta modellando fino a quel momento (WaTor coinvolge sempre la modifca dello stato di due celle contemporaneamente).
+Il *Cellular Automaton*, puo essere visto come un contenitore di regole che
+fanno riferimento ai diversi stati che compongono il Cellular Automaton stesso.
+Per ogni *Cell* che viene memorizzata all'interno dell'*Environment* verrà
+scelta una regola specifica, in modo da calcolare correttamente lo stato
+sucessivo o gli stati successivi, a seconda del Cellular Automaton che si sta
+modellando fino a quel momento (WaTor coinvolge sempre la modifca dello stato
+di due celle contemporaneamente).
 
-Dal momento in cui esistono diverse categorie di _Cellular Automaton_, tra cui una specifica categoria la quale per un singolo stato di una _Cell_ potrebbero venire applicate piu di una regola contemporaneamente, si e deciso di utilizzare un _type parameter_ per la definizione della struttura dati nella quale andare a memorizzare le diverse regole che compongono il _Cellular Automaton_. A supporto di questa funzionalita inoltre si e deciso di implementare, tramite l'utilizzo di _mixin_, diverse strutture dati gia funzionanti da utilizzare per memorizzare lavorare su tali regole.
-
-Il design che riguarda il _Cellular Automaton_ ha richiesto una serie di scelte importanti, affinche fosse possibile riuscire ad incapsulare la sua astrazione in una serie di diversi componenti. 
+Il design che riguarda il *Cellular Automaton* ha richiesto una serie di scelte
+importanti, affinche fosse possibile riuscire ad incapsulare la sua astrazione
+in una serie di diversi componenti.
 
 ### Cell
 
@@ -76,7 +82,7 @@ In generale, il concetto di `Neighbour` presenta due componenti principali:
    vicinato.
 
 Durante il corso di questo documento e all'interno del progetto, si fa spesso
-riferimento a concetti di posizione _relativa_ e _assoluta_: con i due termini
+riferimento a concetti di posizione *relativa* e *assoluta*: con i due termini
 si indicano due modalità differenti per esprimere le posizioni dei vicini
 componenti un vicinato rispetto al centro. Nel caso in cui si parli di
 posizione relativa, si intende che le posizioni assunte dai vicini saranno
@@ -133,27 +139,62 @@ prevedono la modifica simultanea di più celle in base allo stato di un centro,
 oppure per modellare il concetto di movimento di una certa entità all'interno
 dello spazio (e.g. l'automa cellulare WaTor).
 
+---
+
+Dopo aver mostrato come sono composte le componenti fondamentali di un
+automa cellulare, è possibile esprimere un `CellularAutomaton` come
+illustrato in figura
+
 ## Environment
 
-
-Il secondo macro concetto che e stato affrontato per il simulatore, e stato l'Environment. L'_Environment_ fa sempre riferimento ad un singolo _Cellular Automaton_, in questo modo sara possibile fornire il _Neighbour_ appropriato dal momento in cui solo l'_Environment_ e a conoscenza della disposizione delle varie _Cell_ nello spazio.
+Il secondo macro concetto che e stato affrontato per il simulatore, e stato
+l'Environment. L'*Environment* fa sempre riferimento ad un singolo *Cellular
+Automaton*, in questo modo sara possibile fornire il *Neighbour* appropriato
+dal momento in cui solo l'*Environment* e a conoscenza della disposizione delle
+varie *Cell* nello spazio.
 
 ### Astrazione dello spazio
 
-Un aspetto molto importante riguardante l'_Environment_ e la modalita con la quale rappresentare lo spazio in cui salvare le _Cell_. Per fare in modo di lasciare maggiore liberta allo user, nel definirsi la propria struttura dati con la quale rappresentare lo spazio si e deciso di sfruttare un meccanismo di Scala ovvero i _type_ parameters. Attraverso l'utilizzo di questo modalita sara possibile utilizzare qualsiasi tipo di struttura dati per modellare lo spazio in cui salvare le _Cell_ riguardanti la simulazione.
+Un aspetto molto importante riguardante l'*Environment* e la modalita con la
+quale rappresentare lo spazio in cui salvare le *Cell*. Per fare in modo di
+lasciare maggiore liberta allo user, nel definirsi la propria struttura dati
+con la quale rappresentare lo spazio si e deciso di sfruttare un meccanismo di
+Scala ovvero i *type* parameters. Attraverso l'utilizzo di questo modalita sara
+possibile utilizzare qualsiasi tipo di struttura dati per modellare lo spazio
+in cui salvare le *Cell* riguardanti la simulazione.
 
 ### Configurazione tramite Mixin (IMPLEMENTAZIONE)
-La modellazione dello spazio tramite il _type_ ha reso possibile l'utilizzo dei _Mixin_. La configurazione della struttura dati con la quale modellare lo spazio e definito tramite uno o piu trait che vanno a comporre il _Cake Pattern_, attraverso il quale vengono configurate le diverse informazioni dell'_Environment_.
 
-Questo meccanismo viene in oltre utilizzato per modellare la geometria dello spazio del _Cellular Automaton_. Ovvero ogni _Cellular Automaton_ ha la propria concezione di spazio, ad esempio un semplice rettangolo, o uno spazio piu complesso come quello toroidale. Anche per ls modellazione di questo comportamento dell'_Environment_ vengono utilizzati i _Mixin_ attraverso cui e possibile specificare i diversi comportamenti riguardanti lo spazio geometrico ed inoltre le varie modalita con la quale percepire lo spazio stesso.
+La modellazione dello spazio tramite il *type* ha reso possibile l'utilizzo dei
+*Mixin*. La configurazione della struttura dati con la quale modellare lo
+spazio e definito tramite uno o piu trait che vanno a comporre il *Cake
+Pattern*, attraverso il quale vengono configurate le diverse informazioni
+dell'*Environment*.
+
+Questo meccanismo viene in oltre utilizzato per modellare la geometria dello
+spazio del *Cellular Automaton*. Ovvero ogni *Cellular Automaton* ha la propria
+concezione di spazio, ad esempio un semplice rettangolo, o uno spazio piu
+complesso come quello toroidale. Anche per ls modellazione di questo
+comportamento dell'*Environment* vengono utilizzati i *Mixin* attraverso cui e
+possibile specificare i diversi comportamenti riguardanti lo spazio geometrico
+ed inoltre le varie modalita con la quale percepire lo spazio stesso.
 
 ## Engine
 
-L'ultimo componente necessario alla realizzazione dell'intero sistema e l'_Engine_, ovvero il motore attraverso il quale e possibile sviluppare l'intera simulazione, apportando modifiche all'_Environment_ e facendo evolvere lo stato della simulazione ad ogni nuova iterazione. Ogni _Engine_ al suo interno deve fare riferimento ad un singolo _Environment_, cosi che si faccia riferimento sempre ad una sola simulazione.
+L'ultimo componente necessario alla realizzazione dell'intero sistema e
+l'*Engine*, ovvero il motore attraverso il quale e possibile sviluppare
+l'intera simulazione, apportando modifiche all'*Environment* e facendo evolvere
+lo stato della simulazione ad ogni nuova iterazione. Ogni *Engine* al suo
+interno deve fare riferimento ad un singolo *Environment*, cosi che si faccia
+riferimento sempre ad una sola simulazione.
 
-Dal momento in cui possono esserci diverse modalita con la quale voler eseguire la simulazione, ad esempio visualizzazione real time con GUI, simulazione con output finale un video etc etc, si e deciso di sviluppare le diverse modalita di esecuzione tramite l'utilizzo dei _Mixin_.
+Dal momento in cui possono esserci diverse modalita con la quale voler eseguire
+la simulazione, ad esempio visualizzazione real time con GUI, simulazione con
+output finale un video etc etc, si e deciso di sviluppare le diverse modalita
+di esecuzione tramite l'utilizzo dei *Mixin*.
 
 ## Design Interfaccia Grafica
+
 [TODO: VINCI]
 
 [Indice](./index.md) | [Capitolo Precedente](./4-high-level-design.md) | [Capitolo Successivo](./6-implementation.md)
