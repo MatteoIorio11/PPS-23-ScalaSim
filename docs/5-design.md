@@ -242,19 +242,21 @@ arrivati al seguente modello.
 
 ![Diagramma UML del motore del simulatore e le sue specializzazioni](./img/engine.png)
 
-In base alla tipologia di `Environment`, esistono le corrispettive specializzazioni
-del motore; è presente inoltre un'ulteriore specializzazione per i casi di ambienti
-bidimensionali che fanno utilizzo di griglie iterabili: `IterableEngine2D`. Questo
-motore si occupa di generalizzare il concetto di salvataggio e interrogazione della
-griglia. Quanto dichiarato nei paragrafi precedenti ha portato lo sviluppo di ulteriori
-specilizzazioni di quest'ultimo motore, in particolare:
+In base alla tipologia di `Environment`, esistono le corrispettive
+specializzazioni del motore (`Complex` e `Simple`); Quanto dichiarato nei
+paragrafi precedenti ha portato lo sviluppo di ulteriori specilizzazioni del
+motore più generale, in particolare:
 
 1. `GUIEngine2D` &rarr; motore in grado di permettere l'aggancio di
    un'interfaccia grafica in tempo reale.
-2. `IterableTimerEngine2D` &rarr; motore con un numero di step finiti (utile
+2. `TimerEngine2D` &rarr; motore con un numero di step finiti (utile
    per la generazione di video/immagini ).
-3. `IterableThreadEngine2D` &rarr; versione ad alte prestazioni e *thread-safe*
+3. `ThreadEngine2D` &rarr; versione ad alte prestazioni e *thread-safe*
    del motore.
+
+Come per l'environment, nel [capitolo successivo](./6-implementation.md) verrà
+illustrata l'intersecarsi di queste istanze per la costruzione di un engine
+che meglio si adatti alle esigenze della modalità di simulazione.
 
 ## Design Interfaccia Grafica
 

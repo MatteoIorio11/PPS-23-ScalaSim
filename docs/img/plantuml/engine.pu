@@ -17,11 +17,9 @@ interface ComplexEngine<D: Dimension, R> {
     # environment: ComplexEnvironment<D>
 }
 
-interface IterableEngine2D
+interface ThreadEngine2D {}
 
-interface IterableThreadEngine2D
-
-interface IterableTimerEngine2D {
+interface TimerEngine2D {
     + timer: Int
     # startTimer(): Unit
 }
@@ -33,13 +31,10 @@ interface GUIEngine2D {
 
 SimpleEngine --|> GeneralEngine
 ComplexEngine --|> GeneralEngine
-IterableEngine2D --|> GeneralEngine
 
-IterableThreadEngine2D --|> Thread
-IterableThreadEngine2D --|> IterableEngine2D
-
-IterableTimerEngine2D --|> IterableEngine2D
-
-GUIEngine2D --|> IterableEngine2D
+ThreadEngine2D -left-|> Thread
+ThreadEngine2D -up-|> GeneralEngine
+TimerEngine2D -up-|> GeneralEngine
+GUIEngine2D -up-|> GeneralEngine
 
 @enduml
