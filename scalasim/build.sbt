@@ -25,7 +25,9 @@ lazy val root = project
     Test / javaOptions ++= Seq("--enable-preview"),
 
     fork := true,
-    
-    assembly / assemblyJarName := "scalasim.jar"
+
+    coverageEnabled := true,
+
+    assembly / assemblyJarName := "scalasim.jar",
  )
 
