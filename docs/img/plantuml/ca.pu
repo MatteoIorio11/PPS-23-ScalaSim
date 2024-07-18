@@ -1,0 +1,35 @@
+@startuml ca
+
+interface GenericCellularAutomaton<D: Dimension, I, O, R: Rule> {
+    + applyRule(input: I): O
+    + addRule(rule: R): Unit
+}
+
+interface CellularAutomaton<D: Dimension> {
+    type Rules
+    # rules(): Rules
+    + applyRule(input: Neighbour<D>): Cell<D>
+    + addRule(rule: NeighbourRule<D>): Unit
+}
+
+interface MultiOutputCellularAutomaton<D: Dimension> {
+    # rules(): Map<State, MultipleOutputNeighbourRule<D>>
+    + applyRule(input: Neighbour<D>): Iterable<Cell<D>>
+    + addRule(rule: MultipleOutputNeighbourRule<D>): Unit
+}
+
+interface MapSingleRules<D: Dimension> {
+    type Rules = Map<State, NeighbourRule<D>>
+}
+
+interface MapMultipleRules<D: Dimension> {
+    type Rules = Map<State, Set<NeighbourRule<D>>>
+}
+
+CellularAutomaton --|> GenericCellularAutomaton
+MultiOutputCellularAutomaton --|> GenericCellularAutomaton
+
+MapSingleRules --|> CellularAutomaton
+MapMultipleRules --|> CellularAutomaton
+
+@enduml

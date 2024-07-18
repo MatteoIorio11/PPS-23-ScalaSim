@@ -141,9 +141,34 @@ dello spazio (e.g. l'automa cellulare WaTor).
 
 ---
 
-Dopo aver mostrato come sono composte le componenti fondamentali di un
-automa cellulare, è possibile esprimere un `CellularAutomaton` come
-illustrato in figura
+Dopo aver mostrato come sono composte le componenti fondamentali è possibile
+capire di cosa si compone un automa cellulare e quali siano gli scopi e i
+compiti delle sue componenti.
+
+Ogni automa cellulare ha un comportamento più o meno complesso: risulta perciò
+fondamentale astrarre in una struttura generale ogni possibile automa, e via
+via raffinare il suo comportamento mediante specializzazioni sempre più
+specifiche per un singolo automa.
+
+![Diagramma UML delle varie specializzazioni di `CellularAutomaton`](./img/ca.png)
+
+Come mostrato nel diagramma UML, esiste un concetto genrale di automa, da cui
+ereditano tutte le specializzazioni. Possiamo distinguere due macro categorie
+che risultano importanti per questo elaborato:
+
+- `CellularAutomaton` &rarr; un semplice automa cellulare, capace di mantenere
+  e applicare `NeighbourRule`. Questo componente a sua volta può essere
+  raffinato in due ulteriori realizzazioni:
+  - `MapSingleRules` dove la collezione delle regole è rappresentata da una
+     mappa da stato a regola, risultando quindi in un automa dove, per ogni
+     stato esiste una ed una sola regola.
+  - `MapMultipleRules` dove, essendo associato per ogni stato un insieme di
+     regole, è impiegato per tutti quei casi dove per ogni stato sono associate
+     più regole che possono produrre un output valido.
+- `MultiOutputCellularAutomaton` &rarr; in questo caso, associato per ogni
+  stato esiste una `MultipleOutputNeighbourRule`, la quale, come già
+  illustrato, produce un insieme di celle in output una volta applicata ad un
+  vicinato.
 
 ## Environment
 
