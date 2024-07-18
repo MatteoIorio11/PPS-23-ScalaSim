@@ -257,6 +257,23 @@ determinata regola dato uno specifico _Neighbour_ per poi sucessivamente
 salvare il risulato all'intero della struttura dati che si occupa di mantenere
 tutte le celle della simulazione.
 
+
+### Configurazione tramite Mixin (IMPLEMENTAZIONE)
+
+La modellazione dello spazio tramite il *type* ha reso possibile l'utilizzo dei
+*Mixin*. La configurazione della struttura dati con la quale modellare lo
+spazio e definito tramite uno o piu trait che vanno a comporre il *Cake
+Pattern*, attraverso il quale vengono configurate le diverse informazioni
+dell'*Environment*.
+
+Questo meccanismo viene in oltre utilizzato per modellare la geometria dello
+spazio del *Cellular Automaton*. Ovvero ogni *Cellular Automaton* ha la propria
+concezione di spazio, ad esempio un semplice rettangolo, o uno spazio piu
+complesso come quello toroidale. Anche per ls modellazione di questo
+comportamento dell'*Environment* vengono utilizzati i *Mixin* attraverso cui e
+possibile specificare i diversi comportamenti riguardanti lo spazio geometrico
+ed inoltre le varie modalita con la quale percepire lo spazio stesso.
+
 ### Space
 
 Come formulato in precedenza, e fondamentale avere all'interno di una

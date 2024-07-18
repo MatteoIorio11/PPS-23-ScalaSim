@@ -210,23 +210,51 @@ Di seguito una breve descrizione per le principali componenti:
   interessante rilievo è una sua ulteriore sotto-specializzazione per la
   rappresentazione di ambienti Toroidali.
 
-L'uso di questa grande mole di specializzazioni verrà illustrato nel capitolo
-riguardante [l'implementazione](./6-implementation.md), tramite l'impiego
-di *mixin*.
+L'uso di questa grande mole di specializzazioni verrà illustrato in dettaglio
+nel capitolo riguardante [l'implementazione](./6-implementation.md).
 
 ## Engine
 
-L'ultimo componente necessario alla realizzazione dell'intero sistema e
-l'*Engine*, ovvero il motore attraverso il quale e possibile sviluppare
-l'intera simulazione, apportando modifiche all'*Environment* e facendo evolvere
-lo stato della simulazione ad ogni nuova iterazione. Ogni *Engine* al suo
-interno deve fare riferimento ad un singolo *Environment*, cosi che si faccia
-riferimento sempre ad una sola simulazione.
+L'ultimo componente appartenente al cuore del sistema software è il motore del
+simulatore. Suo compito è quello di mantenere, interrogare e richiedere la
+modifica di un `Environment`. Come precedentemente illustrato, esistendo una
+grande quantità di tipologie di ambiente, l'implementazione del motore dovrebbe
+essere agnostica rispetto l'istanza di ambiente assegnatagli.
 
-Dal momento in cui possono esserci diverse modalita con la quale voler eseguire
-la simulazione, ad esempio visualizzazione real time con GUI, simulazione con
-output finale un video etc etc, si e deciso di sviluppare le diverse modalita
-di esecuzione tramite l'utilizzo dei *Mixin*.
+Un ulteriore compito del motore è quello di scandire le iterazioni della
+simulazione stessa, siano esse potenzialmente infinite e interrompibili da un
+utente, oppure ben definite al momento della creazione del motore.
+
+Infine, essendo il motore ciò che rende possibile l'evolversi di un automa
+cellulare nel tempo, costituisce uno dei principali fattori di attenzione alle
+prestazioni, e la sua implementazione dovrebbe tenere in considerazione il
+requisito non funzionale di prestazioni sufficientemente elevate per le
+simulazioni richieste.
+
+Dal momento in cui possono esserci diverse modalità con la quale voler eseguire
+la simulazione (e.g. visualizzazione real time con GUI, simulazione con
+output finale un video, ...) è necessario creare concetti generali di un `Engine`,
+che via via vengono raffinati in implementazioni capaci di adattarsi al meglio
+per la specifica modalità d'esecuzione.
+
+In base al design desiderato e ai [requisiti elencati](./3-analysis.md), si è
+arrivati al seguente modello.
+
+![Diagramma UML del motore del simulatore e le sue specializzazioni](./img/engine.png)
+
+In base alla tipologia di `Environment`, esistono le corrispettive specializzazioni
+del motore; è presente inoltre un'ulteriore specializzazione per i casi di ambienti
+bidimensionali che fanno utilizzo di griglie iterabili: `IterableEngine2D`. Questo
+motore si occupa di generalizzare il concetto di salvataggio e interrogazione della
+griglia. Quanto dichiarato nei paragrafi precedenti ha portato lo sviluppo di ulteriori
+specilizzazioni di quest'ultimo motore, in particolare:
+
+1. `GUIEngine2D` &rarr; motore in grado di permettere l'aggancio di
+   un'interfaccia grafica in tempo reale.
+2. `IterableTimerEngine2D` &rarr; motore con un numero di step finiti (utile
+   per la generazione di video/immagini ).
+3. `IterableThreadEngine2D` &rarr; versione ad alte prestazioni e *thread-safe*
+   del motore.
 
 ## Design Interfaccia Grafica
 
