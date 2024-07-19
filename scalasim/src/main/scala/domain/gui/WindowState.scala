@@ -5,21 +5,16 @@ import States.*
 import State.*
 import domain.Environment.GenericEnvironment
 import domain.automaton.CellularAutomaton.State as BasicState
-import domain.automaton.Cell
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
-import domain.engine.Engine.{EngineView, GUIEngine2D}
-import domain.engine.{Engine2D, GUIEngine2D}
+import domain.engine.Engine2D
 import domain.gui.EnvironmentOption
-import domain.gui.WindowStateImpl.Window
-import domain.simulations.WaTorCellularAutomaton.WatorState.{Fish, Shark}
+import domain.simulations.WaTorCellularAutomaton.WatorState.Fish
 import domain.simulations.briansbrain.BriansBrain.CellState
 import domain.simulations.gameoflife.GameOfLife.CellState as GameOfLifeState
-import domain.simulations.gameoflife.GameOfLifeEnvironment
-import cats.effect.IO
 import domain.exporter.{Exporter, JCodecVideoGenerator, SimpleMatrixToImageConverter}
 
-import java.awt.{Color, Graphics}
-import javax.swing.{JButton, JComboBox, JFrame, JLabel, JOptionPane, JPanel, JSlider, JTextField}
+import java.awt.Color
+import javax.swing.{JFrame, JOptionPane}
 import java.util.function.Supplier
 
 trait WindowState:

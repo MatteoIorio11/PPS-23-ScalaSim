@@ -12,7 +12,6 @@ import java.util.concurrent.*
 import java.util.function.*
 import scala.collection.mutable
 import domain.engine.Engine.GUIEngine2D
-import domain.gui.EnvironmentOption
 import domain.simulations.gameoflife.GameOfLife.CellState
 
 object SwingFunctionalFacade {
