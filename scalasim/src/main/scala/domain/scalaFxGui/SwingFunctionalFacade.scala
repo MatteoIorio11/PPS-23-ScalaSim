@@ -1,32 +1,35 @@
 package domain.scalaFxGui
 
 import domain.Environment.GenericEnvironment
-import domain.base.Dimensions.TwoDimensionalSpace
+import domain.automaton.CellularAutomaton.State
+import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
 import domain.engine
 import domain.engine.GUIEngine2D
 
 import javax.swing.*
-import java.awt.*
+import java.awt.{Color, *}
 import java.util.concurrent.*
 import java.util.function.*
 import scala.collection.mutable
 import domain.engine.Engine.GUIEngine2D
+import domain.scalaFxGui.EnvironmentOption
 import domain.simulations.gameoflife.GameOfLife.CellState
-import scalafx.scene.text.FontWeight.Black
 
 object SwingFunctionalFacade {
 
     trait Frame {
         def setSize(width: Int, height: Int): Frame
         def addButton(text: String, name: String): Frame
-        def addLabel(text: String, name: String): Frame
-        def addComboBox(items: Array[String], name: String): Frame
+        def addLabel(text: String): Frame
+        def addComboBox(items: Array[EnvironmentOption[? <: Dimension, ?]], name: String): Frame
         def addAutomaton(name: String): Frame
         def addPixelPanel(name: String, panel: String): Frame
-        def addInput(name: String, panel: String): Frame
+        def addInput(name: String): Frame
         def getAutomatonPanel(name: String): JPanel
-        def getSelectedComboBoxItem(name: String): String
-        def startEngine(env: GenericEnvironment[TwoDimensionalSpace, ?], name: String): Frame
+        def getSelectedComboBoxItem(name: String): EnvironmentOption[?, ?]
+        def clearSouthPanel(): Frame
+        def getInputText(name: String): String
+        def startEngine(env: GenericEnvironment[TwoDimensionalSpace, ?], name: String, colors: Map[State, Color]): Frame
         def showToLabel(text: String, name: String): Frame
         def show(): Frame
         def showAutomaton(name: String): Frame
@@ -39,13 +42,15 @@ object SwingFunctionalFacade {
         private val jframe = new JFrame()
         private val buttons = mutable.Map[String, JButton]()
         private val labels = mutable.Map[String, JLabel]()
-        private val comboBoxes = mutable.Map[String, JComboBox[String]]()
+        private val comboBoxes = mutable.Map[String, JComboBox[?]]()
         private val automatonPanels = mutable.Map[String, PixelPanel]()
         private val pixelPanels = mutable.Map[String, JPanel]()
         private val inputs = mutable.Map[String, JTextField]()
+        private val options = mutable.Map[String, EnvironmentOption[? <: Dimension, ?]]()
         private var currentAutomaton = ""
         private val eventQueue = new LinkedBlockingQueue[String]()
         private val northPanel = new JPanel()
+        private val southPanel = new JPanel()
 
         private var guiE: Option[GUIEngine2D] = None
 
@@ -59,13 +64,15 @@ object SwingFunctionalFacade {
 
         jframe.setLayout(new BorderLayout())
         jframe.add(northPanel, BorderLayout.NORTH)
+        jframe.add(southPanel, BorderLayout.SOUTH)
         northPanel.setLayout(new FlowLayout())
+        southPanel.setLayout(new FlowLayout())
         override def setSize(width: Int, height: Int): Frame = {
             jframe.setSize(width, height)
             this
         }
 
-        override def addButton(text: String, name: String): Frame = {
+        override def addButton(text: String, name: String): Frame =
             val jb = new JButton(text)
             jb.setActionCommand(name)
             buttons.put(name, jb)
@@ -78,31 +85,27 @@ object SwingFunctionalFacade {
             })
             northPanel.add(jb, BorderLayout.SOUTH)
             this
-        }
 
-        override def addLabel(text: String, name: String): Frame = {
+        override def addLabel(text: String): Frame =
             val jl = new JLabel(text)
-            labels.put(name, jl)
-            northPanel.add(jl, BorderLayout.NORTH)
+            southPanel.add(jl)
             this
-        }
 
-        override def addComboBox(items: Array[String], name: String): Frame = {
-            val comboBox = new JComboBox[String](items)
+        override def addComboBox(items: Array[EnvironmentOption[? <: Dimension, ?]], name: String): Frame =
+            val comboBox = new JComboBox[String](items.map(i => i.name))
             comboBox.setName(name)
             comboBoxes.put(name, comboBox)
             comboBox.addActionListener(_ => {
                 try {
-                    eventQueue.put(name + "Selected")
+                    eventQueue.put(name)
                 } catch {
                     case _: InterruptedException => // Handle the exception
                 }
             })
             northPanel.add(comboBox, BorderLayout.NORTH)
             this
-        }
 
-        override def addAutomaton(name: String): Frame = {
+        override def addAutomaton(name: String): Frame =
             if (automatonPanels.contains(name)) {
                 throw new IllegalArgumentException(s"An automaton panel with name $name already exists.")
             }
@@ -113,10 +116,11 @@ object SwingFunctionalFacade {
             pixelPanel.setPixelSize(3)
             automatonPanels.put(name, pixelPanel)
             this
-        }
 
-        override def startEngine(env: GenericEnvironment[TwoDimensionalSpace, ?], name: String): Frame = {
-            val pixelPanel = this.automatonPanels.get(name).get
+
+        override def startEngine(env: GenericEnvironment[TwoDimensionalSpace, ?], name: String, colors: Map[State, Color]): Frame =
+            val pixelPanel = PixelPanel((1000, 1000), colors)
+            pixelPanel.setPixelSize(3)
             guiE = Some(engine.GUIEngine2D(env, pixelPanel))
             jframe.add(pixelPanel, BorderLayout.CENTER)
             jframe.revalidate()
@@ -124,12 +128,27 @@ object SwingFunctionalFacade {
 
             guiE.foreach(engine => engine.startEngine)
             this
-        }
 
-        override def getSelectedComboBoxItem(name: String): String = {
+
+        override def getSelectedComboBoxItem(name: String): EnvironmentOption[?, ?] =
             val comboBox = comboBoxes(name)
-            comboBox.getSelectedItem.asInstanceOf[String]
-        }
+            val selectedOption = comboBox.getSelectedItem.asInstanceOf[String]
+            EnvironmentOption.options.find(o => o.name == selectedOption).getOrElse {
+                throw new NoSuchElementException(s"No environment option found for selected item: $selectedOption")
+            }
+
+
+        override def getInputText(name: String): String =
+            inputs(name).getText
+
+        override def clearSouthPanel(): Frame =
+            inputs.clear()
+            southPanel.removeAll()
+            southPanel.revalidate()
+            southPanel.repaint()
+            this
+
+
 
         override def events(): Supplier[String] = eventsSupplier
 
@@ -154,14 +173,16 @@ object SwingFunctionalFacade {
             this
         }
 
-        override def addInput(name: String, panel: String): Frame = {
+        override def addInput(name: String): Frame = {
             if (inputs.contains(name)) {
                 throw new IllegalArgumentException(s"An input with name $name already exists.")
             }
-            val input = new JTextField()
+            val input = new JTextField(10)
             inputs.put(name, input)
             input.setVisible(true)
-            pixelPanels(panel).add(input)
+            southPanel.add(input)
+            southPanel.revalidate()
+            southPanel.repaint()
             this
         }
 

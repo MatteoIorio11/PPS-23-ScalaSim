@@ -18,7 +18,7 @@ import domain.simulations.langtonsant.LangtonsAntEnvironment
 import java.awt.{Color, Graphics}
 import javax.swing.{JButton, JComboBox, JFrame, JLabel, JOptionPane, JPanel, JSlider, JTextField}
 import scala.collection.immutable.LazyList
-case class EnvironmentOption[D <: Dimension, R](name: String, createEnvironment: (Int, Int, Map[State, Int]) => GenericEnvironment[D, R], colors: Map[State, Color], isToroidal: Boolean, states: List[State])
+case class EnvironmentOption[D <: Dimension, R](name: String, createEnvironment: (Int, Int, Map[? <: State, Int]) => GenericEnvironment[D, R], colors: Map[State, Color], isToroidal: Boolean, states: List[State])
 
 object EnvironmentOption:
   val options = List(
