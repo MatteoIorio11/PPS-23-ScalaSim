@@ -12,4 +12,6 @@
 
 - [Implementazione](./6-implementation.md)
 
-- [Conclusioni](./7-conclusions.md)
+- [Testing](./7-testing.md)
+
+- [Conclusioni](./8-conclusions.md)
