@@ -4,7 +4,7 @@ import domain.Environment.SquareArrayEnvironment2D
 import domain.automaton.Cell
 import domain.automaton.CellularAutomaton.AnyState
 import domain.automaton.CellularAutomaton.CellularAutomaton
-import domain.automaton.CellularAutomaton.ComplexCellularAutomaton
+import domain.automaton.CellularAutomaton.MultiOutputCellularAutomaton
 import domain.automaton.CellularAutomaton.State
 import domain.automaton.MultipleOutputNeighbourRule
 import domain.automaton.NeighborRuleUtility.RelativePositions
@@ -39,8 +39,8 @@ object LangtonsAntEnvironment extends ViewBag with States:
     Set(WHITE, BLACK, ANT(WHITE), ANT(BLACK))
 
   private class LangtonsAntEnvironmentImpl(
-      override val side: Int,
-      override val cellularAutomata: ComplexCellularAutomaton[TwoDimensionalSpace],
+                                            override val side: Int,
+                                            override val cellularAutomata: MultiOutputCellularAutomaton[TwoDimensionalSpace],
     ) extends LangtonsAntEnvironment:
 
     var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]()
@@ -61,7 +61,7 @@ object LangtonsAntEnvironment extends ViewBag with States:
 /**
   * TODO: write how this CA work.
   */
-trait LangtonsAntAutomaton extends ComplexCellularAutomaton[TwoDimensionalSpace]
+trait LangtonsAntAutomaton extends MultiOutputCellularAutomaton[TwoDimensionalSpace]
 object LangtonsAntAutomaton:
   import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
   import domain.automaton.NeighborRuleUtility.RelativePositions.*

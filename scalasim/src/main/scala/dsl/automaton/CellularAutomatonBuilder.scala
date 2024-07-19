@@ -31,7 +31,7 @@ trait CellularAutomatonBuilder[D <: Dimension]:
     *
     * @return the built [[CellularAutomaton]]
     */
-  def build(): CellularAutomaton[TwoDimensionalSpace]
+  def build(): CellularAutomaton[D]
 
 /**
   * A [[CellularAutomatonBuilder]] companion object for two dimensional space.

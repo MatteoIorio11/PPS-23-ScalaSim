@@ -62,7 +62,7 @@ object Environment:
       /**
         * Cellular Automaton that will be used inside this environment.
         */
-      def cellularAutomata: ComplexCellularAutomaton[D]
+      def cellularAutomata: MultiOutputCellularAutomaton[D]
       override def applyRule(neighbors: Neighbour[D]): Iterable[Cell[D]] = 
           val newCell = cellularAutomata.applyRule(neighbors)
           saveCell(newCell.toSeq*)
@@ -96,7 +96,7 @@ object Environment:
         * @param cell input cell for which It is necessary to search the Neighbours.
         * @return A collection where are stored all the neighbours of the input cell.
         */
-      def neighbours(cell: Cell[D]): Neighbour[TwoDimensionalSpace]
+      def neighbours(cell: Cell[D]): Neighbour[D]
       /**
         * Space dimension of the Environment.
         */

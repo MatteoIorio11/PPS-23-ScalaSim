@@ -23,8 +23,7 @@ class EnvironmentTest extends AnyFunSuite:
         env.currentMatrix should not be (ArrayBuffer.empty[ArrayBuffer[Cell[TwoDimensionalSpace]]])
     
     test("Initialization should also add alive cells"):
-        env.currentMatrix.asInstanceOf[ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]]
-            .flatMap(array => array.map(cell => cell.state))
+        env.currentMatrix.map(c => c.state)
             .filter(state => state == DummyState.ALIVE).length should not be 0
     
     test("The neighboors of a cell should always exits"):
@@ -42,8 +41,7 @@ class ToroidEnvironmentTest extends AnyFunSuite:
         env.currentMatrix should not be (ArrayBuffer.empty[ArrayBuffer[Cell[TwoDimensionalSpace]]])
     
     test("Initialization should also add alive cells"):
-        env.currentMatrix.asInstanceOf[ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]]
-            .flatMap(array => array.map(cell => cell.state))
+        env.currentMatrix.map(c => c.state)
             .filter(state => state == DummyState.ALIVE).length shouldNot be (0)
     
     test("The neighboors of a cell should always exits and they have to respect the toroid's space"):

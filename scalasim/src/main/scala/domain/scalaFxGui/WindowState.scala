@@ -219,6 +219,7 @@ object WindowStateImpl extends WindowState:
                 case "Langton's Ant" => langtonsAnt
                 case _ => throw new IllegalArgumentException(s"Unknown environment: ${option.name}")
         yield ()
+
       case "StopButton" => toLabel("Stop button clicked", "Label1")
       case "ExitButton" => exec(sys.exit())
     })

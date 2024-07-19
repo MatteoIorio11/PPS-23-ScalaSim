@@ -8,6 +8,7 @@ import domain.automaton.Neighbour
 import CellularAutomaton.State
 
 import scala.annotation.targetName
+import domain.automaton.CellularAutomaton.AnyState
 
 /**
   * A generic rule for specifying the behaviour of a [[CellularAutomaton]].
@@ -70,18 +71,34 @@ trait MultipleOutputRule[D <: Dimension, I, O <: Iterable[?], P] extends Rule[I,
   * a D dimensional [[Neighbour]] into a D dimensional [[Cell]] with
   * (hopefully) a mutated state.
   *
+  * Neighbour center's state is matched
+  * against this rule matcher: if this matcher is not empty and different
+  * than [[AnyState]], and the provied center's state does not match
+  * with the matcher, the unaltered center is returned.
+  *
   * @param D the dimension of the space.
   */
-trait NeighbourRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D], State]
+trait NeighbourRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D], State]:
+   override def applyTransformation(ca: Neighbour[D]): Cell[D] = matcher match
+      case Some(state) if state != AnyState & state != ca.center.state => ca.center
+      case _ => super.applyTransformation(ca)
 
 /**
   * A [[MultipleOutputRule]] for a [[Neighbour]] object; Unlike a standard [[NeighbourRule]]
   * this rule returns an [[Iterable]] of [[Cell]]s representing the result of the application 
   * of the associated transformation function.
   * 
+  * Neighbour center's state is matched
+  * against this rule matcher: if this matcher is not empty and different
+  * than [[AnyState]], and the provied center's state does not match
+  * with the matcher, any empty list is returned.
+  *
   * @param D the dimension of the space.
   */
-trait MultipleOutputNeighbourRule[D <: Dimension] extends MultipleOutputRule[D, Neighbour[D], Iterable[Cell[D]], State]
+trait MultipleOutputNeighbourRule[D <: Dimension] extends MultipleOutputRule[D, Neighbour[D], Iterable[Cell[D]], State]:
+   override def applyTransformation(ca: Neighbour[D]): Iterable[Cell[D]] = matcher match
+      case Some(state) if state != AnyState & state != ca.center.state => List.empty
+      case _ => super.applyTransformation(ca)
 
 /**
   * Companion object for a generic [[NeighbourRule]].

@@ -61,6 +61,17 @@ class WaTorTest extends AnyFunSuite:
     fish.find(_.position == newFish.position).get.state.asInstanceOf[Fish].value shouldBe 0
     fish.find(_.position == oldFish.position).get.state.asInstanceOf[Fish].value shouldBe 1
 
+  test("A fish should not move if no free are available"):
+    val n: Neighbour[TwoDimensionalSpace] = Neighbour(
+      Cell(Position(1, 1), Fish()),
+      List(Cell(Position(2, 1), Fish()), Cell(Position(0, 1), Shark()))
+    )
+
+    val res = waTorCa.applyRule(n)
+
+    res.size shouldBe 1
+    res.head shouldBe Cell(Position(1, 1), Fish(1))
+
   test("A shark should move to a free cell and should consume energy and increment chronon"):
     val n: Neighbour[TwoDimensionalSpace] = Neighbour(
       Cell(Position(1, 1), Shark()),
@@ -134,3 +145,17 @@ class WaTorTest extends AnyFunSuite:
         neighbours = neighbours.map(c => if c.position == shark.position then otherCell else c)
 
       currIter += 1
+
+  test("A shark does not move if surrounded by other sharks"):
+    val n: Neighbour[TwoDimensionalSpace] = Neighbour(
+      Cell(Position(1, 1), Shark()),
+      List(
+        Cell(Position(2, 1), Shark()),
+        Cell(Position(0, 1), Shark()),
+      )
+    )
+
+    val res = waTorCa.applyRule(n)
+
+    res.size shouldBe 1
+    res.head shouldBe Cell(Position(1, 1), Shark(SharkInfo(1, sharkInitialEnergy - sharkEnergyConsmptionPerStep)))

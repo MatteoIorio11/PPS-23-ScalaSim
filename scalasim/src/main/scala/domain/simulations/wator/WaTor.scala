@@ -1,6 +1,6 @@
 package domain.simulations
 
-import domain.automaton.CellularAutomaton.ComplexCellularAutomaton
+import domain.automaton.CellularAutomaton.MultiOutputCellularAutomaton
 import domain.automaton.Cell
 import domain.base.Dimensions.TwoDimensionalSpace
 import scala.util.Random
@@ -29,7 +29,7 @@ object WaTorEnvironment extends ViewBag:
 
     def apply(w: Int, h: Int, initialCells: Map[? <: State , Int]): ComplexEnvironment[TwoDimensionalSpace] = WaTorEnvironmentImpl(w, h, initialCells, WaTorCellularAutomaton())
 
-    private class WaTorEnvironmentImpl(val width: Int, val heigth: Int, val initialCells: Map[? <: State , Int], val cellularAutomata: ComplexCellularAutomaton[TwoDimensionalSpace])
+    private class WaTorEnvironmentImpl(val width: Int, val heigth: Int, val initialCells: Map[? <: State , Int], val cellularAutomata: MultiOutputCellularAutomaton[TwoDimensionalSpace])
         extends ComplexEnvironment[TwoDimensionalSpace] with ArrayToroidEnvironment:
 
         require(initialCells.values.sum < width * heigth)
@@ -70,15 +70,15 @@ object WaTorCellularAutomaton:
 
         object Water extends State
 
-    private class WaTorCellularAutomatonImpl extends ComplexCellularAutomaton[TwoDimensionalSpace]:
+    private class WaTorCellularAutomatonImpl extends MultiOutputCellularAutomaton[TwoDimensionalSpace]:
       protected var rules: Map[State, MultipleOutputNeighbourRule[TwoDimensionalSpace]] = Map()
 
       override def addRule(rule: MultipleOutputNeighbourRule[TwoDimensionalSpace]): Unit = 
         rules = rules + (rule.matcher.getOrElse(AnyState) -> rule)
         
 
-    def apply(): ComplexCellularAutomaton[TwoDimensionalSpace] =
-        val ca: ComplexCellularAutomaton[TwoDimensionalSpace] = WaTorCellularAutomatonImpl()
+    def apply(): MultiOutputCellularAutomaton[TwoDimensionalSpace] =
+        val ca: MultiOutputCellularAutomaton[TwoDimensionalSpace] = WaTorCellularAutomatonImpl()
         ca.addRule(fishRule)
         ca.addRule(sharkRule)
         ca
