@@ -104,18 +104,6 @@ object WindowStateImpl extends WindowState:
 
 @main def windowStateExample =
   import WindowStateImpl.*
-
-  val windowCreation = for
-    _ <- setSize(1000, 600)
-    _ <- addButton(text = "Start", name = "StartButton")
-    _ <- addButton(text = "Stop", name = "StopButton")
-    _ <- addButton(text = "Exit", name = "ExitButton")
-    _ <- addButton(text = "Export Video", name = "ExportButton")
-    _ <- addComboBox(EnvironmentOption.options, "AutomatonsComboBox")
-    _ <- show()
-    e <- eventStream()
-  yield e
-
   val gameOfLife = for
     _ <- addLabel("Width")
     _ <- addInput("Width")
@@ -123,7 +111,7 @@ object WindowStateImpl extends WindowState:
     _ <- addInput("Height")
     _ <- addLabel("ALIVE")
     _ <- addInput("Alive")
-  yield()
+  yield ()
 
   val waTor = for
     _ <- addLabel("Width")
@@ -147,6 +135,32 @@ object WindowStateImpl extends WindowState:
     _ <- addLabel("ON")
     _ <- addInput("On")
   yield ()
+
+  def initializeFirstEnvironment(): State[Window, Unit] = for
+    automatonOpt <- getSelectedComboBoxItem("AutomatonsComboBox")
+    _ <- automatonOpt match {
+      case option: EnvironmentOption[_, _] =>
+        option.name match {
+          case "Brian's Brain" => briansBrain
+          case "Game of Life" => gameOfLife
+          case "Wa Tor" => waTor
+          case "Langton's Ant" => langtonsAnt
+          case _ => throw new IllegalArgumentException(s"Unknown environment: ${option.name}")
+        }
+    }
+  yield ()
+
+  val windowCreation = for
+    _ <- setSize(1000, 600)
+    _ <- addButton(text = "Start", name = "StartButton")
+    _ <- addButton(text = "Stop", name = "StopButton")
+    _ <- addButton(text = "Exit", name = "ExitButton")
+    _ <- addButton(text = "Export Video", name = "ExportButton")
+    _ <- addComboBox(EnvironmentOption.options, "AutomatonsComboBox")
+    _ <- show()
+    _ <- initializeFirstEnvironment()
+    e <- eventStream()
+  yield e
 
   def createEnvironment(option: EnvironmentOption[_, _]): State[Window, GenericEnvironment[TwoDimensionalSpace, _]] = {
     option.name match {
