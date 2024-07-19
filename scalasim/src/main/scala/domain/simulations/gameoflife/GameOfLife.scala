@@ -28,10 +28,10 @@ trait GameOfLifeEnvironment extends SimpleEnvironment[TwoDimensionalSpace] with 
 object GameOfLifeEnvironment extends ViewBag:
     private val initialCell: Cell[TwoDimensionalSpace] = Cell(Position(-1, -1), CellState.DEAD)
 
-    def apply(height: Int, width: Int,  initialCells: Map[State, Int]): GameOfLifeEnvironment =
+    def apply(height: Int, width: Int,  initialCells: Map[? <: State, Int]): GameOfLifeEnvironment =
         GameOfLifeEnvironmentImpl(height, width, initialCells, cellularAutomata = GameOfLife())
 
-    private class GameOfLifeEnvironmentImpl(val heigth: Int, val width: Int, val  initialCells: Map[State, Int], val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
+    private class GameOfLifeEnvironmentImpl(val heigth: Int, val width: Int, val  initialCells: Map[? <: State, Int], val cellularAutomata: CellularAutomaton[TwoDimensionalSpace])
         extends GameOfLifeEnvironment:
 
         require(heigth > 0, width > 0)

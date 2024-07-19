@@ -27,9 +27,9 @@ object WaTorEnvironment extends ViewBag:
         Water -> Color.CYAN,
     )
 
-    def apply(w: Int, h: Int, initialCells: Map[State , Int]): ComplexEnvironment[TwoDimensionalSpace] = WaTorEnvironmentImpl(w, h, initialCells, WaTorCellularAutomaton())
+    def apply(w: Int, h: Int, initialCells: Map[? <: State , Int]): ComplexEnvironment[TwoDimensionalSpace] = WaTorEnvironmentImpl(w, h, initialCells, WaTorCellularAutomaton())
 
-    private class WaTorEnvironmentImpl(val width: Int, val heigth: Int, val initialCells: Map[State , Int], val cellularAutomata: ComplexCellularAutomaton[TwoDimensionalSpace])
+    private class WaTorEnvironmentImpl(val width: Int, val heigth: Int, val initialCells: Map[? <: State , Int], val cellularAutomata: ComplexCellularAutomaton[TwoDimensionalSpace])
         extends ComplexEnvironment[TwoDimensionalSpace] with ArrayToroidEnvironment:
 
         require(initialCells.values.sum < width * heigth)
