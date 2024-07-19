@@ -26,13 +26,13 @@ object Engine:
     def environment(): GenericEnvironment[D, ?]
     var running: Boolean
 
-    var history: LazyList[Cell[D]] = LazyList()
+    var history: LazyList[LazyList[Cell[D]]] = LazyList()
 
     protected def nextIteration: Unit =
         environment().nextIteration
         saveInHistory
 
-    protected def saveInHistory: Unit = history = history.appendedAll(currentMatrix)
+    protected def saveInHistory: Unit = history = history appended currentMatrix
     /**
       * This method is based on the used environment, the matrix that will be returned is the environment's matrix deep copy.
       * @return the deep copy of the current matrix.
