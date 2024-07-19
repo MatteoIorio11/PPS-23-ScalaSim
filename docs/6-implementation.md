@@ -299,16 +299,17 @@ CellularAutomatonBuilder.fromRuleBuilder:
 
 ## Environment
 
-Il secondo macro componente che e stato necessario sviluppare e
+Il secondo macro componente che e stato necessario sviluppare è
 l'*Environment*. Questo componente software incapsula lo spazio all'interno
 della quale vengono memorizzate le *Cell* di un *Cellular Automaton*. Per
 modellare questa astrazione nel tipo di simulazione che si vuole implementare,
 e stato necessario fare in modo che l'intero *Environment* fosse generico nel
 tipo di *Cellular Automaton* che si sta utilizzando. Per fare in modo di avere
-una rappresentazione generale dell'ambiente, e stato realizzato il *trait
-Generic Environment*, il quale e definito in due campi generici, il primo fa
-riferimento alla *Dimension* della simulazione, mentre il secondo generico
-riguarda il tipo di ritorno dopo l'applicazione di una specifica regola.
+una rappresentazione generale dell'ambiente, è stato realizzato il *trait*
+`GenericEnvironment`, il quale è definito in due campi generici, il primo fa
+riferimento alla dimensione dello spazio della simulazione, mentre il secondo
+generico riguarda il tipo di ritorno dopo l'applicazione di una specifica
+regola.
 
 ```scala
 trait GenericEnvironment[D <: Dimension, R] extends Space[D]:
@@ -316,8 +317,8 @@ trait GenericEnvironment[D <: Dimension, R] extends Space[D]:
   def applyRule(neighbors: Neighbour[D]): R
 ```
 
-La definizione di questo *Environment* permette all'utente di applicare una
-determinata regola dato uno specifico *Neighbour* per poi sucessivamente
+La definizione di questo `Environment` permette all'utente di applicare una
+determinata regola dato uno specifico `Neighbour` per poi sucessivamente
 salvare il risulato all'intero della struttura dati che si occupa di mantenere
 tutte le celle della simulazione.
 
@@ -329,22 +330,22 @@ spazio e definito tramite uno o piu trait che vanno a comporre il *Cake
 Pattern*, attraverso il quale vengono configurate le diverse informazioni
 dell'*Environment*.
 
-Questo meccanismo viene in oltre utilizzato per modellare la geometria dello
+Questo meccanismo viene inoltre utilizzato per modellare la geometria dello
 spazio del *Cellular Automaton*. Ovvero ogni *Cellular Automaton* ha la propria
-concezione di spazio, ad esempio un semplice rettangolo, o uno spazio piu
-complesso come quello toroidale. Anche per ls modellazione di questo
-comportamento dell'*Environment* vengono utilizzati i *Mixin* attraverso cui e
+concezione di spazio, ad esempio un semplice rettangolo, o uno spazio più
+complesso come quello toroidale. Anche per la modellazione di questo
+comportamento dell'*Environment* vengono utilizzati i *Mixin* attraverso cui è
 possibile specificare i diversi comportamenti riguardanti lo spazio geometrico
-ed inoltre le varie modalita con la quale percepire lo spazio stesso.
+ed inoltre le varie modalità con la quale percepire lo spazio stesso.
 
 ### Space
 
-Come formulato in precedenza, e fondamentale avere all'interno di una
+Come formulato in precedenza, è fondamentale avere all'interno di una
 simulazione una strtuttura dati al cui interno vengono memorizzate tutte le
 *Cell* inerenti ad una simulazione. Per la rappresentazione di questo
-particolare aspetto si e sviluppato uno specifico *trait* all'interno
-dell'*Environment* denominato *Space* generico nella dimensione. La dimensione
-dello spazio e dell'automa cellulare sara sempre la stessa dal momento in cui
+particolare aspetto si è sviluppato uno specifico *trait* all'interno
+di *Environment* denominato *Space* generico nella dimensione. La dimensione
+dello spazio e dell'automa cellulare sarà sempre la stessa dal momento in cui
 vengono definite tramite lo stesso generico in input all'*Environment*.
 
 ```scala
@@ -358,23 +359,23 @@ trait Space[D <: Dimension]:
    protected def availableCells(positions: Iterable[Position[D]]): Iterable[Cell[D]]
 ```
 
-Dal momento in cui non e possibile sapere in anticipo il tipo di dimensione, la
-struttura dati all'interno della quale verranno memorizzate le *Cell* e
-definita tramite un *type* in questo modo lo user avra libera scelta nella
-tipologia di struttura dati da utilizare. Questo *trait* in oltre si occupa
-anche di andare a definire alcune operazioni di utility per lavorare sulla
-struttura dati utilizzata. Uno dei passaggi fondamentali per una qualsiasi
-simulazione riguarda l'inizializzazione dello spazio. Proprio per questo e
-stato definito il metodo *initialise*, al cui interno verra definita lo stato
-iniziale della simulazione.
+Dal momento in cui non è possibile sapere in anticipo il tipo di dimensione, la
+struttura dati all'interno della quale verranno memorizzate le *Cell* è
+definita tramite un *type* in questo modo l'utilizzatore avrà libera scelta
+nella tipologia di struttura dati da utilizare. Questo *trait* inoltre si
+occupa anche di andare a definire alcune operazioni di utility per lavorare
+sulla struttura dati utilizzata. Uno dei passaggi fondamentali per una
+qualsiasi simulazione riguarda l'inizializzazione dello spazio. Proprio per
+questo è stato definito il metodo *initialise*, al cui interno verrà definita
+lo stato iniziale della simulazione.
 
 ### Tipologie di Space
 
 Come descritto in precedenza, un automa cellulare ha il proprio spazio in cui
 evolve, lo spazio potrebbe essere rappresentato da un semplice rettangolo
-dimensionale, a forme molto piu complesse come quelle di cubi e toroidi. Per
-rappresentare questa diversita di struttura dell'*Environment* sono state
-definite una serie di *trait* che possono rappresentare diverse strutture
+dimensionale, a forme molto più complesse come quelle di cubi e toroidi. Per
+rappresentare questa diversità di struttura dell'*Environment* sono stati
+definiti una serie di *trait* che possono rappresentare diverse strutture
 spaziali da utilizzare nella simulazione.
 
 ```scala
