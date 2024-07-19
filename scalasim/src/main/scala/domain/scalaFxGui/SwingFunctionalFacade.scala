@@ -18,6 +18,7 @@ import domain.simulations.gameoflife.GameOfLife.CellState
 object SwingFunctionalFacade {
 
     trait Frame {
+        def frame(): JFrame
         def setSize(width: Int, height: Int): Frame
         def addButton(text: String, name: String): Frame
         def addLabel(text: String): Frame
@@ -28,8 +29,10 @@ object SwingFunctionalFacade {
         def getAutomatonPanel(name: String): JPanel
         def getSelectedComboBoxItem(name: String): EnvironmentOption[?, ?]
         def clearSouthPanel(): Frame
+        def clearPanel(): Frame
         def getInputText(name: String): String
         def startEngine(env: GenericEnvironment[TwoDimensionalSpace, ?], name: String, colors: Map[State, Color]): Frame
+        def stopEngine(): Frame
         def showToLabel(text: String, name: String): Frame
         def show(): Frame
         def showAutomaton(name: String): Frame
@@ -51,6 +54,7 @@ object SwingFunctionalFacade {
         private val eventQueue = new LinkedBlockingQueue[String]()
         private val northPanel = new JPanel()
         private val southPanel = new JPanel()
+        private val centerPanel = new JPanel()
 
         private var guiE: Option[GUIEngine2D] = None
 
@@ -65,8 +69,13 @@ object SwingFunctionalFacade {
         jframe.setLayout(new BorderLayout())
         jframe.add(northPanel, BorderLayout.NORTH)
         jframe.add(southPanel, BorderLayout.SOUTH)
+        jframe.add(centerPanel, BorderLayout.CENTER)
         northPanel.setLayout(new FlowLayout())
         southPanel.setLayout(new FlowLayout())
+        centerPanel.setLayout(new BorderLayout())
+
+        override def frame(): JFrame =
+            jframe
         override def setSize(width: Int, height: Int): Frame = {
             jframe.setSize(width, height)
             this
@@ -122,11 +131,15 @@ object SwingFunctionalFacade {
             val pixelPanel = PixelPanel((1000, 1000), colors)
             pixelPanel.setPixelSize(3)
             guiE = Some(engine.GUIEngine2D(env, pixelPanel))
-            jframe.add(pixelPanel, BorderLayout.CENTER)
-            jframe.revalidate()
-            jframe.repaint()
+            centerPanel.add(pixelPanel, BorderLayout.CENTER)
+            centerPanel.revalidate()
+            centerPanel.repaint()
 
             guiE.foreach(engine => engine.startEngine)
+            this
+
+        override def stopEngine(): Frame =
+            guiE.foreach(guiEngine => guiEngine.stopEngine)
             this
 
 
@@ -148,7 +161,12 @@ object SwingFunctionalFacade {
             southPanel.repaint()
             this
 
-
+        override def clearPanel(): Frame =
+            inputs.clear()
+            centerPanel.removeAll()
+            centerPanel.revalidate()
+            centerPanel.repaint()
+            this
 
         override def events(): Supplier[String] = eventsSupplier
 

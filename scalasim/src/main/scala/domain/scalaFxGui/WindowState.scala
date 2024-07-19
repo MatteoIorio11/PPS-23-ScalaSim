@@ -8,7 +8,7 @@ import domain.automaton.CellularAutomaton.State as BasicState
 import domain.automaton.Cell
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
 import domain.engine.Engine.{EngineView, GUIEngine2D}
-import domain.engine.GUIEngine2D
+import domain.engine.{Engine2D, GUIEngine2D}
 import domain.scalaFxGui.EnvironmentOption
 import domain.scalaFxGui.WindowStateImpl.Window
 import domain.simulations.WaTorCellularAutomaton.WatorState.{Fish, Shark}
@@ -16,6 +16,7 @@ import domain.simulations.briansbrain.BriansBrain.CellState
 import domain.simulations.gameoflife.GameOfLife.CellState as GameOfLifeState
 import domain.simulations.gameoflife.GameOfLifeEnvironment
 import cats.effect.IO
+import domain.exporter.{Exporter, JCodecVideoGenerator, SimpleMatrixToImageConverter}
 
 import java.awt.{Color, Graphics}
 import javax.swing.{JButton, JComboBox, JFrame, JLabel, JOptionPane, JPanel, JSlider, JTextField}
@@ -24,6 +25,7 @@ import java.util.function.Supplier
 trait WindowState:
   type Window
   def initialWindow: Window
+  def frame: State[Window, JFrame]
   def setSize(width: Int, height: Int): State[Window, Unit]
   def addButton(text: String, name: String): State[Window, Unit]
   def addLabel(text: String): State[Window, Unit]
@@ -34,7 +36,9 @@ trait WindowState:
   def getInputText(name: String): State[Window, String]
   def getSelectedComboBoxItem(name: String): State[Window, EnvironmentOption[? <: Dimension, ?]]
   def clearSouthPanel(): State[Window, Unit]
+  def clearPanel(): State[Window, Unit]
   def startEngine(env: GenericEnvironment[TwoDimensionalSpace, ?], automaton: String, colors: Map[BasicState, Color]): State[Window, Unit]
+  def stopEngine(): State[Window, Unit]
   def toLabel(text: String, name: String): State[Window, Unit]
   def show(): State[Window, Unit]
   def showAutomaton(name: String): State[Window, Unit]
@@ -49,8 +53,9 @@ object WindowStateImpl extends WindowState:
   type Window = Frame
 
 
+  def frame: State[Window, JFrame] =
+    State(w => (w, w.frame()))
   def initialWindow: Window = createFrame()
-
   def setSize(width: Int, height: Int): State[Window, Unit] =
     State(w => ((w.setSize(width, height)), {}))
   def addButton(text: String, name: String): State[Window, Unit] =
@@ -75,6 +80,11 @@ object WindowStateImpl extends WindowState:
     State(w => (w, w.getInputText(name)))
   def startEngine(env: GenericEnvironment[TwoDimensionalSpace, ?], automaton: String, colors: Map[BasicState, Color]): State[Window, Unit] =
     State(w => ((w.startEngine(env, automaton, colors)), {}))
+  def stopEngine(): State[Window, Unit] =
+    State(w => ((w.stopEngine()), {}))
+
+  def clearPanel(): State[Window, Unit] =
+    State(w => (w, w.clearPanel()))
   def toLabel(text: String, name: String): State[Window, Unit] =
     State(w => ((w.showToLabel(text, name)), {}))
   def show(): State[Window, Unit] =
@@ -86,6 +96,11 @@ object WindowStateImpl extends WindowState:
     State(w => (w, cmd))
   def eventStream(): State[Window, LazyList[String]] =
     State(w => (w, LazyList.generate(w.events())))
+  def dialog(text: String): State[Window, Unit] =
+    for
+      frame <- frame
+      _ <- exec(JOptionPane.showMessageDialog(frame, text))
+    yield ()
 
 @main def windowStateExample =
   import WindowStateImpl.*
@@ -133,83 +148,106 @@ object WindowStateImpl extends WindowState:
     _ <- addInput("On")
   yield ()
 
-
+  def createEnvironment(option: EnvironmentOption[_, _]): State[Window, GenericEnvironment[TwoDimensionalSpace, _]] = {
+    option.name match {
+      case "Brian's Brain" =>
+        for {
+          dimensionStr <- getInputText("Dimension")
+          onCellsStr <- getInputText("On")
+        } yield {
+          val dimension = dimensionStr.toIntOption.getOrElse(200)
+          val onCells = onCellsStr.toIntOption.getOrElse(dimension * dimension / 3)
+          val initialCells = Map(CellState.ON -> onCells)
+          option.createEnvironment(dimension, dimension, initialCells)
+        }
+      case "Game of Life" =>
+        for {
+          heightStr <- getInputText("Height")
+          widthStr <- getInputText("Width")
+          aliveCellsStr <- getInputText("Alive")
+        } yield {
+          val height = heightStr.toIntOption.getOrElse(200)
+          val width = widthStr.toIntOption.getOrElse(200)
+          val aliveCells = aliveCellsStr.toIntOption.getOrElse(height * width / 3)
+          val initialCells = Map(GameOfLifeState.ALIVE -> aliveCells)
+          option.createEnvironment(width, height, initialCells)
+        }
+      case "Wa Tor" =>
+        for {
+          heightStr <- getInputText("Height")
+          widthStr <- getInputText("Width")
+          fishCellsStr <- getInputText("Fish")
+        } yield {
+          val height = heightStr.toIntOption.getOrElse(200)
+          val width = widthStr.toIntOption.getOrElse(200)
+          val fishCells = fishCellsStr.toIntOption.getOrElse(height * width / 3)
+          val initialCells = Map(Fish() -> fishCells)
+          option.createEnvironment(width, height, initialCells)
+        }
+      case "Langton's Ant" =>
+        for {
+          heightStr <- getInputText("Height")
+          widthStr <- getInputText("Width")
+        } yield {
+          val height = heightStr.toIntOption.getOrElse(200)
+          val width = widthStr.toIntOption.getOrElse(200)
+          val initialCells = Map()
+          option.createEnvironment(width, height, initialCells)
+        }
+      case _ => throw new IllegalArgumentException(s"Unknown environment: ${option.name}")
+    }
+  }
 
   val windowEventsHandling = for
     _ <- windowCreation
     e <- eventStream()
     _ <- seqN(e.map {
       case "StartButton" =>
-        for
+        for {
           automatonOpt <- getSelectedComboBoxItem("AutomatonsComboBox")
-          _ <- automatonOpt match
+          _ <- automatonOpt match {
             case option: EnvironmentOption[_, _] =>
-              option.name match
-                case "Brian's Brain" =>
-                  for
-                    dimensionStr <- getInputText("Dimension")
-                    onCellsStr <- getInputText("On")
-                    _ <- {
-                      val dimension = dimensionStr.toIntOption.getOrElse(200)
-                      val onCells = onCellsStr.toIntOption.getOrElse(dimension*dimension/3)
-                      val initialCells = Map(
-                        CellState.ON -> onCells,
-                      )
-                      val environment = option.createEnvironment(dimension, dimension, initialCells)
-                      startEngine(environment, option.name, option.colors)
-                    }
-                  yield ()
-                case "Game of Life" =>
-                  for
-                    heightStr <- getInputText("Height")
-                    widthStr <- getInputText("Width")
-                    aliveCellsStr <- getInputText("Alive")
-                    _ <- {
-                      val height = heightStr.toIntOption.getOrElse(200)
-                      val width = widthStr.toIntOption.getOrElse(200)
-                      val aliveCells = aliveCellsStr.toIntOption.getOrElse(height*width/3)
-                      val initialCells = Map(
-                        GameOfLifeState.ALIVE -> aliveCells,
-                      )
-                      val environment = option.createEnvironment(width, height, initialCells)
-                      startEngine(environment, option.name, option.colors)
-                    }
-                  yield ()
-                case "Wa Tor" =>
-                  for
-                    heightStr <- getInputText("Height")
-                    widthStr <- getInputText("Width")
-                    fishCellsStr <- getInputText("Fish")
-                    _ <- {
-                      val height = heightStr.toIntOption.getOrElse(200)
-                      val width = widthStr.toIntOption.getOrElse(200)
-                      val fishCells = fishCellsStr.toIntOption.getOrElse(height * width / 3)
-                      val initialCells = Map(
-                        Fish() -> fishCells,
-                      )
-                      val environment = option.createEnvironment(width, height, initialCells)
-                      startEngine(environment, option.name, option.colors)
-                    }
-                  yield ()
-                case "Langton's Ant" =>
-                  for
-                    heightStr <- getInputText("Height")
-                    widthStr <- getInputText("Width")
-                    _ <- {
-                      val height = heightStr.toIntOption.getOrElse(200)
-                      val width = widthStr.toIntOption.getOrElse(200)
-                      val initialCells = Map()
-                      val environment = option.createEnvironment(width, height, initialCells)
-                      startEngine(environment, option.name, option.colors)
-                    }
-                  yield ()
-                case _ => throw new IllegalArgumentException(s"Unknown environment: ${option.name}")
+              for {
+                environment <- createEnvironment(option)
+                _ <- stopEngine()
+                _ <- startEngine(environment, option.name, option.colors)
+              } yield ()
+          }
+        } yield ()
+      case "ExportButton" =>
+        for {
+          automatonOpt <- getSelectedComboBoxItem("AutomatonsComboBox")
+          _ <- automatonOpt match {
+            case option: EnvironmentOption[_, _] =>
+              for {
+                environment <- createEnvironment(option)
+                _ <- {
 
-        yield ()
+                  val engine = Engine2D(environment, 5)
+                  engine.startEngine
+                  Thread.sleep(2000)
+                  engine.stopEngine
+
+                  Exporter.exportMatrix(
+                    engine,
+                    option.colors,
+                    converter = SimpleMatrixToImageConverter,
+                    videoGenerator = JCodecVideoGenerator,
+                    cellSize = 10,
+                    videoFilename = "output.mp4",
+                    secondsPerImage = 0.1
+                  )
+                  dialog("Video exported as output.mp4")
+                }
+              } yield ()
+          }
+        } yield ()
       case "AutomatonsComboBox" =>
         for
           automaton <- getSelectedComboBoxItem("AutomatonsComboBox")
           _ <- clearSouthPanel()
+          _ <- clearPanel()
+          _ <- stopEngine()
           _ <- automaton match
             case option: EnvironmentOption[_, _] =>
               option.name match
@@ -219,8 +257,10 @@ object WindowStateImpl extends WindowState:
                 case "Langton's Ant" => langtonsAnt
                 case _ => throw new IllegalArgumentException(s"Unknown environment: ${option.name}")
         yield ()
-
-      case "StopButton" => toLabel("Stop button clicked", "Label1")
+      case "StopButton" =>
+        for
+          _ <- stopEngine()
+        yield()
       case "ExitButton" => exec(sys.exit())
     })
   yield ()
