@@ -54,7 +54,7 @@ object DummyToroidEnv extends ViewBag:
     require(heigth > 0)
     var matrix: Matrix = ArrayBuffer[ArrayBuffer[Cell[TwoDimensionalSpace]]]().generalInitialization((width, heigth))(DummyState.DEAD)
     initialise()
-    override protected def initialise() = matrix = matrix.generalSpawn((width, heigth))(DummyState.DEAD)(DummyState.ALIVE)
+    override protected def initialise() = matrix = matrix.generalSpawn(dimension)(DummyState.DEAD)(DummyState.ALIVE)
     override def neighbours(cell: Cell[TwoDimensionalSpace]) = 
       import domain.automaton.NeighborRuleUtility.MooreNeighbourhood
       Neighbour(
