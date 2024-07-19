@@ -89,7 +89,6 @@ object WindowStateImpl extends WindowState:
     State(w => ((w.showToLabel(text, name)), {}))
   def show(): State[Window, Unit] =
     State(w => (w.show(), {}))
-
   def showAutomaton(name: String): State[Window, Unit] =
     State(w => (w.showAutomaton(name), {}))
   def exec(cmd: =>Unit): State[Window, Unit] =
@@ -138,16 +137,14 @@ object WindowStateImpl extends WindowState:
 
   def initializeFirstEnvironment(): State[Window, Unit] = for
     automatonOpt <- getSelectedComboBoxItem("AutomatonsComboBox")
-    _ <- automatonOpt match {
+    _ <- automatonOpt match
       case option: EnvironmentOption[_, _] =>
-        option.name match {
+        option.name match
           case "Brian's Brain" => briansBrain
           case "Game of Life" => gameOfLife
           case "Wa Tor" => waTor
           case "Langton's Ant" => langtonsAnt
           case _ => throw new IllegalArgumentException(s"Unknown environment: ${option.name}")
-        }
-    }
   yield ()
 
   val windowCreation = for
@@ -162,7 +159,7 @@ object WindowStateImpl extends WindowState:
     e <- eventStream()
   yield e
 
-  def createEnvironment(option: EnvironmentOption[_, _]): State[Window, GenericEnvironment[TwoDimensionalSpace, _]] = {
+  def createEnvironment(option: EnvironmentOption[?, ?]): State[Window, GenericEnvironment[TwoDimensionalSpace, ?]] = {
     option.name match {
       case "Brian's Brain" =>
         for {
@@ -217,26 +214,24 @@ object WindowStateImpl extends WindowState:
     e <- eventStream()
     _ <- seqN(e.map {
       case "StartButton" =>
-        for {
+        for
           automatonOpt <- getSelectedComboBoxItem("AutomatonsComboBox")
-          _ <- automatonOpt match {
+          _ <- automatonOpt match
             case option: EnvironmentOption[_, _] =>
-              for {
+              for
                 environment <- createEnvironment(option)
                 _ <- stopEngine()
                 _ <- startEngine(environment, option.name, option.colors)
-              } yield ()
-          }
-        } yield ()
+              yield ()
+        yield ()
       case "ExportButton" =>
-        for {
+        for
           automatonOpt <- getSelectedComboBoxItem("AutomatonsComboBox")
-          _ <- automatonOpt match {
+          _ <- automatonOpt match
             case option: EnvironmentOption[_, _] =>
-              for {
+              for
                 environment <- createEnvironment(option)
                 _ <- {
-
                   val engine = Engine2D(environment, 5)
                   engine.startEngine
                   Thread.sleep(2000)
@@ -253,9 +248,8 @@ object WindowStateImpl extends WindowState:
                   )
                   dialog("Video exported as output.mp4")
                 }
-              } yield ()
-          }
-        } yield ()
+              yield ()
+        yield ()
       case "AutomatonsComboBox" =>
         for
           automaton <- getSelectedComboBoxItem("AutomatonsComboBox")

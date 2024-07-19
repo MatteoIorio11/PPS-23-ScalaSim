@@ -17,7 +17,7 @@ trait MatrixToImageConverter[D <: Dimension, M] {
 }
 
 object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]] {
-  def convert(matrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]], cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage = {
+  def convert(matrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]], cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage =
     val rows = matrix.size
     val cols = matrix.head.size
 
@@ -37,7 +37,6 @@ object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensiona
 
     graphics.dispose()
     bufferedImage
-  }
 }
 
 trait VideoGenerator {
@@ -45,24 +44,21 @@ trait VideoGenerator {
 }
 
 object JCodecVideoGenerator extends VideoGenerator {
-  def generate(videoFilename: String, images: Seq[BufferedImage], secondsPerImage: Double): Unit = {
+  def generate(videoFilename: String, images: Seq[BufferedImage], secondsPerImage: Double): Unit =
     var out: SeekableByteChannel = null
-    try {
+    try
       out = NIOUtils.writableFileChannel(videoFilename)
       val encoder = new AWTSequenceEncoder(out, Rational.R(25, 1))
       val framesPerImage = (secondsPerImage * 25).toInt
 
       images.foreach { image =>
-        for (_ <- 1 to framesPerImage) {
+        for (_ <- 1 to framesPerImage)
           encoder.encodeImage(image)
-        }
       }
 
       encoder.finish()
-    } finally {
+    finally
       NIOUtils.closeQuietly(out)
-    }
-  }
 }
 
 object Exporter {
@@ -72,7 +68,7 @@ object Exporter {
     }.toList
 
     videoGenerator.generate(videoFilename, images, secondsPerImage)
-    
+
      */
   }
 }

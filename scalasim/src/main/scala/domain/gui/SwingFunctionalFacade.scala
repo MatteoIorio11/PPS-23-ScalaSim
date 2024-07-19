@@ -76,22 +76,15 @@ object SwingFunctionalFacade {
 
         override def frame(): JFrame =
             jframe
-        override def setSize(width: Int, height: Int): Frame = {
+        override def setSize(width: Int, height: Int): Frame =
             jframe.setSize(width, height)
             this
-        }
 
         override def addButton(text: String, name: String): Frame =
             val jb = new JButton(text)
             jb.setActionCommand(name)
             buttons.put(name, jb)
-            jb.addActionListener(_ => {
-                try {
-                    eventQueue.put(name)
-                } catch {
-                    case _: InterruptedException => // Handle the exception
-                }
-            })
+            jb.addActionListener(_ => eventQueue.put(name))
             northPanel.add(jb, BorderLayout.SOUTH)
             this
 
@@ -104,20 +97,13 @@ object SwingFunctionalFacade {
             val comboBox = new JComboBox[String](items.map(i => i.name))
             comboBox.setName(name)
             comboBoxes.put(name, comboBox)
-            comboBox.addActionListener(_ => {
-                try {
-                    eventQueue.put(name)
-                } catch {
-                    case _: InterruptedException => // Handle the exception
-                }
-            })
+            comboBox.addActionListener(_ => eventQueue.put(name))
             northPanel.add(comboBox, BorderLayout.NORTH)
             this
 
         override def addAutomaton(name: String): Frame =
-            if (automatonPanels.contains(name)) {
+            if (automatonPanels.contains(name))
                 throw new IllegalArgumentException(s"An automaton panel with name $name already exists.")
-            }
             val pixelPanel = PixelPanel((1000, 1000), Map(
                 CellState.ALIVE -> Color.BLUE,
                 CellState.DEAD -> Color.YELLOW
@@ -170,31 +156,26 @@ object SwingFunctionalFacade {
 
         override def events(): Supplier[String] = eventsSupplier
 
-        override def showToLabel(text: String, name: String): Frame = {
+        override def showToLabel(text: String, name: String): Frame =
             labels(name).setText(text)
             this
-        }
 
-        override def show(): Frame = {
+        override def show(): Frame =
             jframe.setVisible(true)
             this
-        }
 
-        override def addPixelPanel(name: String, panel: String): Frame = {
-            if (pixelPanels.contains(name)) {
+        override def addPixelPanel(name: String, panel: String): Frame =
+            if (pixelPanels.contains(name))
                 throw new IllegalArgumentException(s"A pixel panel with name $name already exists.")
-            }
             val jp = new JPanel()
             pixelPanels.put(name, jp)
             jp.setVisible(true)
             automatonPanels(panel).add(jp)
             this
-        }
 
-        override def addInput(name: String): Frame = {
-            if (inputs.contains(name)) {
+        override def addInput(name: String): Frame =
+            if (inputs.contains(name))
                 throw new IllegalArgumentException(s"An input with name $name already exists.")
-            }
             val input = new JTextField(10)
             inputs.put(name, input)
             input.setVisible(true)
@@ -202,22 +183,17 @@ object SwingFunctionalFacade {
             southPanel.revalidate()
             southPanel.repaint()
             this
-        }
 
-        override def getAutomatonPanel(name: String): JPanel = {
+        override def getAutomatonPanel(name: String): JPanel =
             automatonPanels(name)
-        }
 
-        override def showAutomaton(name: String): Frame = {
-            if (!automatonPanels.contains(name)) {
+        override def showAutomaton(name: String): Frame =
+            if (!automatonPanels.contains(name))
                 throw new IllegalArgumentException(s"An automaton with name $name does not exist.")
-            }
-            if (currentAutomaton.nonEmpty) {
+            if (currentAutomaton.nonEmpty)
                 automatonPanels(currentAutomaton).setVisible(false)
-            }
             currentAutomaton = name
             automatonPanels(currentAutomaton).setVisible(true)
             this
-        }
     }
 }
