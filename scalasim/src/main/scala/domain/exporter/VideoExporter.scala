@@ -12,32 +12,32 @@ import org.jcodec.api.awt.AWTSequenceEncoder
 import java.awt.Color
 import java.awt.image.BufferedImage
 import domain.engine.Engine.GeneralEngine
-trait MatrixToImageConverter[D <: Dimension, M] {
-  def convert(matrix: M, cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage
+trait MatrixToImageConverter[D <: Dimension] {
+  def convert(matrix: LazyList[Cell[D]], cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage
 }
 
-object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensionalSpace, Iterable[Iterable[Cell[TwoDimensionalSpace]]]] {
-  def convert(matrix: Iterable[Iterable[Cell[TwoDimensionalSpace]]], cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage =
-    val rows = matrix.size
-    val cols = matrix.head.size
+  object SimpleMatrixToImageConverter extends MatrixToImageConverter[TwoDimensionalSpace] {
+    def convert(matrix: LazyList[Cell[TwoDimensionalSpace]], cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage = {
+      val (maxRow, maxCol) = matrix.foldLeft((0, 0)) {
+        case ((maxRow, maxCol), cell) => (math.max(maxRow, cell.position.coordinates.head), math.max(maxCol, cell.position.coordinates.last))
+      }
 
-    val imgWidth = cols * cellSize
-    val imgHeight = rows * cellSize
+      val imgWidth = (maxCol + 1) * cellSize
+      val imgHeight = (maxRow + 1) * cellSize
 
-    val bufferedImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB)
-    val graphics = bufferedImage.createGraphics()
+      val bufferedImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB)
+      val graphics = bufferedImage.createGraphics()
 
-    matrix.zipWithIndex.foreach { case (row, rowIndex) =>
-      row.zipWithIndex.foreach { case (cell, colIndex) =>
+      matrix.foreach { cell =>
         val color = stateColorMap.getOrElse(cell.state, Color.WHITE)
         graphics.setColor(color)
-        graphics.fillRect(colIndex * cellSize, rowIndex * cellSize, cellSize, cellSize)
+        graphics.fillRect(cell.position.coordinates.head * cellSize, cell.position.coordinates.last * cellSize, cellSize, cellSize)
       }
-    }
 
-    graphics.dispose()
-    bufferedImage
-}
+      graphics.dispose()
+      bufferedImage
+    }
+  }
 
 trait VideoGenerator {
   def generate(videoFilename: String, images: Seq[BufferedImage], secondsPerImage: Double): Unit
@@ -62,14 +62,12 @@ object JCodecVideoGenerator extends VideoGenerator {
 }
 
 object Exporter {
-  def exportMatrix[D <: Dimension, M, S <: State](engine: GeneralEngine[D], colors: Map[State, Color], converter: MatrixToImageConverter[D, M], videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double): Unit = {
-    /*val images = engine.history.zipWithIndex.map { case (matrix, _) =>
+  def exportMatrix[D <: Dimension, S <: State](engine: GeneralEngine[D], colors: Map[State, Color], converter: MatrixToImageConverter[D], videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double): Unit = {
+    val images = engine.history.zipWithIndex.map { case (matrix, _) =>
       converter.convert(matrix, cellSize, colors)
     }.toList
 
     videoGenerator.generate(videoFilename, images, secondsPerImage)
-
-     */
   }
 }
 

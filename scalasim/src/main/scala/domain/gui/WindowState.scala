@@ -236,7 +236,7 @@ object WindowStateImpl extends WindowState:
                 _ <- {
                   val engine = Engine2D(environment, 5)
                   engine.startEngine
-                  Thread.sleep(2000)
+                  Thread.sleep(5000)
                   engine.stopEngine
 
                   Exporter.exportMatrix(
