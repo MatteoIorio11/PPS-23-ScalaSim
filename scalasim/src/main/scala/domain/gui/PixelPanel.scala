@@ -1,4 +1,4 @@
-package domain.scalaFxGui
+package domain.gui
 
 import domain.automaton.Cell
 import domain.base.Dimensions.TwoDimensionalSpace

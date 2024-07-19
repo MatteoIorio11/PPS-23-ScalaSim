@@ -1,4 +1,4 @@
-package domain.scalaFxGui
+package domain.gui
 import Monads.*
 import Monad.*
 import States.*
@@ -9,8 +9,8 @@ import domain.automaton.Cell
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
 import domain.engine.Engine.{EngineView, GUIEngine2D}
 import domain.engine.{Engine2D, GUIEngine2D}
-import domain.scalaFxGui.EnvironmentOption
-import domain.scalaFxGui.WindowStateImpl.Window
+import domain.gui.EnvironmentOption
+import domain.gui.WindowStateImpl.Window
 import domain.simulations.WaTorCellularAutomaton.WatorState.{Fish, Shark}
 import domain.simulations.briansbrain.BriansBrain.CellState
 import domain.simulations.gameoflife.GameOfLife.CellState as GameOfLifeState

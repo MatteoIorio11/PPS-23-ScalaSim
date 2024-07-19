@@ -1,4 +1,4 @@
-package domain.scalaFxGui
+package domain.gui
 
 import domain.Environment.GenericEnvironment
 import domain.automaton.CellularAutomaton.State
@@ -7,12 +7,12 @@ import domain.engine
 import domain.engine.GUIEngine2D
 
 import javax.swing.*
-import java.awt.{Color, *}
+import java.awt.*
 import java.util.concurrent.*
 import java.util.function.*
 import scala.collection.mutable
 import domain.engine.Engine.GUIEngine2D
-import domain.scalaFxGui.EnvironmentOption
+import domain.gui.EnvironmentOption
 import domain.simulations.gameoflife.GameOfLife.CellState
 
 object SwingFunctionalFacade {

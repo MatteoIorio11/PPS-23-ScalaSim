@@ -72,7 +72,7 @@ object Exporter {
     }.toList
 
     videoGenerator.generate(videoFilename, images, secondsPerImage)
-
+    
      */
   }
 }

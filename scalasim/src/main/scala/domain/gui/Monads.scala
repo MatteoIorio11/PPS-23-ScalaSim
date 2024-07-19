@@ -1,4 +1,4 @@
-package domain.scalaFxGui
+package domain.gui
 
 object Monads:
 

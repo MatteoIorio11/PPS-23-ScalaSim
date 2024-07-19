@@ -1,4 +1,4 @@
-package domain.scalaFxGui
+package domain.gui
 
 import domain.Environment.GenericEnvironment
 import domain.automaton.CellularAutomaton.State
