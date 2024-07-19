@@ -8,7 +8,7 @@ import domain.automaton.CellularAutomaton.State as BasicState
 import domain.base.Dimensions.{Dimension, TwoDimensionalSpace}
 import domain.engine.Engine2D
 import domain.gui.EnvironmentOption
-import domain.simulations.WaTorCellularAutomaton.WatorState.Fish
+import domain.simulations.WaTorCellularAutomaton.WatorState.{Fish, Shark}
 import domain.simulations.briansbrain.BriansBrain.CellState
 import domain.simulations.gameoflife.GameOfLife.CellState as GameOfLifeState
 import domain.exporter.{Exporter, JCodecVideoGenerator, SimpleMatrixToImageConverter}
@@ -114,6 +114,8 @@ object WindowStateImpl extends WindowState:
     _ <- addInput("Height")
     _ <- addLabel("FISH")
     _ <- addInput("Fish")
+    _ <- addLabel("SHARK")
+    _ <- addInput("Shark")
   yield ()
 
   val langtonsAnt = for
@@ -183,11 +185,16 @@ object WindowStateImpl extends WindowState:
           heightStr <- getInputText("Height")
           widthStr <- getInputText("Width")
           fishCellsStr <- getInputText("Fish")
+          sharkCellsStr <- getInputText("Shark")
         } yield {
           val height = heightStr.toIntOption.getOrElse(200)
           val width = widthStr.toIntOption.getOrElse(200)
           val fishCells = fishCellsStr.toIntOption.getOrElse(height * width / 3)
-          val initialCells = Map(Fish() -> fishCells)
+          val sharkCells = sharkCellsStr.toIntOption.getOrElse(height * width / 3)
+          val initialCells = Map(
+            Fish() -> fishCells,
+            Shark() -> sharkCells
+          )
           option.createEnvironment(width, height, initialCells)
         }
       case "Langton's Ant" =>
