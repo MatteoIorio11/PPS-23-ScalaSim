@@ -1,0 +1,40 @@
+@startuml engine
+interface GeneralEngine<D: Dimension> {
+    - running: Boolean
+    # environment: GenericEnvironment<D>
+    + history: LazyList[Cell[D]]
+    + matrix: LazyList[Cell[D]]
+    # nextIteration(): Unit
+    + start(): Unit
+    + stop(): Unit
+}
+
+interface SimpleEngine<D: Dimension, R> {
+    # environment: SimpleEnvironment<D>
+}
+
+interface ComplexEngine<D: Dimension, R> {
+    # environment: ComplexEnvironment<D>
+}
+
+interface ThreadEngine2D {}
+
+interface TimerEngine2D {
+    + timer: Int
+    # startTimer(): Unit
+}
+
+interface GUIEngine2D {
+    + view: EngineView[TwoDimensionalSpace]
+    + updateView(): Unit
+}
+
+SimpleEngine --|> GeneralEngine
+ComplexEngine --|> GeneralEngine
+
+ThreadEngine2D -left-|> Thread
+ThreadEngine2D -up-|> GeneralEngine
+TimerEngine2D -up-|> GeneralEngine
+GUIEngine2D -up-|> GeneralEngine
+
+@enduml

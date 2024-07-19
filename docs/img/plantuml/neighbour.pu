@@ -1,0 +1,23 @@
+@startuml neighbour
+interface Neighbour<D: Dimension> {
+    + center: Cell<D>
+    + neighbourhood: Iterable<Cell<D>>
+}
+
+interface NeighbourhoodLocator<D: Dimension> {
+    + relativeNeighboursLocation(): Iterable<Position<D>>
+    + absoluteNeighboursLocation(center: Cell<D>): Iterable<Position<D>>
+}
+
+interface Environment<D: Dimension> {
+    + getNeighbours(c: Cell<D>): Neighbour<D>
+}
+
+object MooreNeighbourhood
+object VonNeumannNeighbourhood
+
+Environment o-- NeighbourhoodLocator
+Environment o-right- Neighbour
+MooreNeighbourhood -up-|> NeighbourhoodLocator
+VonNeumannNeighbourhood -up-|> NeighbourhoodLocator
+@enduml
