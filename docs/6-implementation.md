@@ -22,6 +22,11 @@ quale si ritiene/ritengono maggiormente responsabile/i gli studenti coinvolti.
     - [Implementations](#implementations) V-I-F
   - [Engine](#engine) V-I
   - [Interfaccia Grafica](#interfaccia-grafica) V
+  - [Simulazioni](#simulazioni) V-I-F
+    - [Conway's Game of Life](#conways-game-of-life) V
+    - [Brian's Brain](#brians-brain) V
+    - [Langton's Ant](#langtons-ant) F
+    - [WaTor](#wator) I-F
 
 In generale, tutti i componenti del gruppo hanno lavorato cooperando
 e in maniera simultanea allo sviluppo dell'intera parte del modello
@@ -400,17 +405,137 @@ rettangolo in uno spazio bidimensionale. Questo tipo di visione permette di
 introdurre specifici metodi da utilizzare per modellare lo spazio
 correttamente.
 
-### Cellular Automaton's Type
-
-ADD mixin
-
-### Space
-
-### Implementations
-
-
 ## Engine
 
 ## Interfaccia Grafica
 
 [Indice](./index.md) | [Capitolo Precedente](./5-design.md) | [Capitolo Successivo](./7-conclusions.md)
+
+## Simulazioni
+
+Di seguito sono elencate le simulazioni sviluppate e presenti *built-in*
+all'interno del simulatore. Per ogni simulazione devono essere specificati:
+
+- L'ambiente della simulazione, dove in particolare è necessario specificare:
+  1. Come inizializzare l'ambiente;
+  2. La forma dei vicinati (e.g. Moore, VonNeumann o custom);
+- L'automa cellulare, composto semplicemente da un insieme di regole.
+
+### Conway's Game of Life
+
+Per la definzione dell'automa cellulare, è possibile specificare il suo
+comportamento tramite il builder.
+
+```Scala
+def apply(): CellularAutomaton[TwoDimensionalSpace] =
+  CellularAutomatonBuilder.fromRuleBuilder {
+    DeclarativeRuleBuilder.configureRules:
+      DEAD when fewerThan(2) withState ALIVE whenCenterIs ALIVE
+      ALIVE when surroundedBy(2) withState ALIVE whenCenterIs ALIVE
+      ALIVE when surroundedBy(3) withState ALIVE whenCenterIs ALIVE
+      DEAD when atLeastSurroundedBy(4) withState ALIVE whenCenterIs ALIVE
+      ALIVE when surroundedBy(3) withState ALIVE whenCenterIs DEAD
+  }.build()
+```
+
+A questo punto l'ambiente definisce il vicinato come vicinato di Moore, e inizializza
+la matrice con un numero di celle con stato `ALIVE` pari al numero passato in input,
+mentre le rimanenti vengono imopostate a `DEAD`.
+
+### Brian's Brain
+
+Come per *Game of Life*, viene definito l'automa cellulare tramite il DSL nel
+seguente modo:
+
+```Scala
+def apply(): CellularAutomaton[TwoDimensionalSpace] =
+  CellularAutomatonBuilder.fromRuleBuilder {
+    DeclarativeRuleBuilder.configureRules:
+      DYING whenNeighbourhoodIsExactlyLike(c(ON))
+      ON when surroundedBy(2) withState ON whenCenterIs OFF otherwise OFF
+      OFF whenNeighbourhoodIsExactlyLike(c(DYING))
+  }.build()
+```
+
+Similmente a Game of Life, la definizione dell'ambiente di Brian's Brain
+prevede una forma del vicinato pari al vicinato di Moore, e l'inizializzazione
+della griglia avviene specificando un certo numero di celle `ON` e `DYING`, le
+restanti sono considerate `OFF`.
+
+### Langton's Ant
+
+Langton's Ant, necessitando di un concetto di **movimento** tra le celle, fa
+impiego del tipo di regola `MultipleOutputNeighbourRule`. In particolare,
+l'output della regola sarà sempre composto da 2 celle: la prima rappresenta la
+cella di partenza prima di effettuare il movimento, mentre la seconda
+rappresenta la cella di arrivo dopo aver effettuato il movimento.
+
+È possibile perciò definire il comportamento dell'automa come segue:
+
+```Scala
+def antRule(n: Neighbour[TwoDimensionalSpace], moveCenterTo: RelativePositions): Iterable[Cell[TwoDimensionalSpace]] =
+    val oldPositionState = n.center.state.asInstanceOf[ANT].cellColor.invert
+    val direction = oldPositionState.invert match
+      case WHITE => n.center.state.asInstanceOf[ANT].direction.clockWiseRotate
+      case BLACK => n.center.state.asInstanceOf[ANT].direction.counterClockWiseRotate
+    val newPosition = n.center.position.moveTo(direction)
+    val newPositionState = n.neighbourhood.find(_.position == newPosition).get.state.asInstanceOf[CellState]
+
+    Iterable(
+      Cell(n.center.position, oldPositionState),
+      Cell(newPosition, ANT(newPositionState, direction))
+    )
+```
+
+In questo caso, esistono 2 stati per il colore delle celle della griglia e uno
+stato speciale per la rappresentazione della formica: in qualsiasi istante di
+tempo, lo stato `ANT` sarà sempre assegnato ad una ed una sola cella. Questo
+stato mantiente due ulteriori informazioni:
+
+- Il colore della cella sottostante la formica;
+- La direzione corrente della formica.
+
+In questo modo, assegnando all'automa cellulare la regola per lo stato `ANT`, e
+una regola vuota per gli stati `WHITE` e `BLACK`, è possibile modellare
+correnttamente il comportamento di Langton's Ant.
+
+### WaTor
+
+WaTor rappresenta l'automa cellulare più complesso modellato per questo
+elaborato. Come per Langton's Ant, esiste un concetto di movimento, ma in questo
+caso il movimento è previsto per tutte le celle attive (*Fish* e *Shark*).
+
+In questo caso lo stato raffigura una specifica entità, e si definiscono Fish e
+Shark come estensioni di `ValuedState`. Per lo stato Fish è sufficiente
+assegnare al valore dello stato il *chronon* (contatore del numero di iterazioni
+in cui l'entità è sopravvissuta), mentre Shark necessita di portare con se anche
+l'informazione riguardante l'energia consumata o guadagnata durante il corso
+della simulazione.
+
+Possiamo così riassumere la regola comportamentale delle entità `Fish`:
+
+```Scala
+MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(Fish())): n =>
+  findRandomCellThat(n.neighbourhood)(_.state == Water) match
+    case None => Iterable(incrementChronon(n.center))
+    case Some(freeCell) => moveFishTo(n.center, freeCell)
+```
+
+Mentre per le entità `Shark` la logica risulta lievemente più complessa:
+
+```Scala
+MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(Shark())): n =>
+  if n.center.state.asShark.value.energy == 0
+  then Iterable(Cell[TwoDimensionalSpace](n.center.position, Water))
+  else findRandomCellThat(n.neighbourhood)(_.state == Fish()) match
+    case None => findRandomCellThat(n.neighbourhood)(_.state == Water) match
+      case None => Iterable(incrementSharkStats(n.center))
+      case Some(freeCell) => moveSharkTo(n.center, freeCell)
+    case Some(fishCell) => moveSharkTo(n.center, fishCell, true)
+```
+
+dove la funzione `moveXxxTo` ha il compito di controllare se il *chronon*
+dell'entità ha raggiunto la soglia di riproduzione, e in caso positivo creare
+una nuova entità all'interno della cella di partenza prima del movimento. Inoltre,
+nel caso di `moveSharkTo`, viene rappresentato da un flag booleano se lo squalo,
+effettuando il movimento, mangia un pesce incrementandone quindi l'energia.
