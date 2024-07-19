@@ -37,3 +37,8 @@ class PositionTest extends org.scalatest.funsuite.AnyFunSuite:
     Position(10, 20) - 10 shouldBe Position(0, 10)
     Position(10, 20) - Position(10, 20) shouldBe Position(0, 0)
     Position(10, 20) + Position(-1, -1) shouldBe Position(9, 19)
+
+  test("Position with more than three coordintes should not be yet implemented"):
+    intercept[NotImplementedError]:
+      Position(10, 20, 30, 40)
+
