@@ -434,6 +434,60 @@ Per via dei requisiti di prestazioni, tutte le istanze utilizzate includono
 come mixin sempre il *trait* `ThreadEngine2D`. Successivamente, ogni istanza
 implementa i concetti più specifici per il proprio ruolo.
 
+### Interazione `Engine` - `Environment`
+
+Un'aspetto interessante riguarda la modalità con cui viene eseguita ogni iterazione.
+In prima battuta, la responsabilità di richiamare l'aggiornamento delle celle era
+delegata all'`Engine` stesso. In particolare, l'aggiornamento era richiamato
+come segue:
+
+```Scala
+override def nextIteration: Unit = 
+  environment().matrix
+    .flatMap(_.map(cell => cell))
+    .map(cell => env.applyRule(env.neighbours(cell)))
+  saveInHistory
+```
+
+Per quanto questo approccio possa funzionare correttamente per la maggior parte
+delle simulaizoni, per tutte quelle simulazioni che necessitano di un
+processamento diverso (per esempio simulazioni che si compongono di precisi
+step di sense-decide-act), questo comporta una certa rigidità nel software,
+dovendo necessariamente costruire un ulteriore `Engine` adatto alle specifiche
+della simulazione.
+
+Essendo una simulazione descritta da una specifica istanza di un
+`CellularAutomaton` e uno specifico `Environment` e tenendo in considerazione i
+fattori descritti precendentemente, la logica di aggiornamento della matrice è
+stata spostata nella classe responsabile della matrice stessa: `Environment`.
+Grazie a questa modifica, il motore ad ogni iterazione non farà altro che
+richiamare `environment.nextIteration` e salvare correttamente nella storia la
+matrice corrente, delegando completamente all'ambiente stesso l'implementazione
+della logica di aggiornamento. In questo modo, il comportamento di un automa
+cellulare può essere correttamente manipolato dall'ambiente in un modo corretto
+e, in caso di necessità, in modo custom.
+
+Un esempio di un'automa cellulare che beneficia di questo cambiamento può
+essere l'automa *Rule110*, il quale invece che processare ogni singola cella
+dell'intera matrice, può interagire ad ogni step su una riga per volta, a
+partire da quella superiore, fino ad arrivare a quella inferiore. In questo
+modo, oltre a risparmiare una grande quantità di aggiornamenti, viene ottenuta
+una maggiore correttezza dell'automa stesso e il comportamento di esso risulta
+più predicibile.
+
+Un'ulteriore automa che necessita di un comporamento custom per quanto riguarda
+l'aggiornamento delle celle è rappresentato dal modello di traffico di
+[Biham-Middleton-Levin](https://en.wikipedia.org/wiki/Biham–Middleton–Levine_traffic_model).
+Questo automa infatti prevede due tipologie di entità, le quali si muovono in
+modo alternato in base al numero corrente dell'iterazione (e.g. entità blu si
+muovono per numero di iterazioni pari, entità rosse per numero di iterazioni
+dispari).
+
+Grazie a questa modifica quindi, la componente `Engine` risulta generale e
+indipendente verso il tipo di automa cellulare e il tipo di ambiente che esso
+necessità, rendendo future implementazioni di ulteriori automi completamente
+agnositiche verso il tipo di `Engine` impiegato.
+
 ## Interfaccia Grafica
 
 
