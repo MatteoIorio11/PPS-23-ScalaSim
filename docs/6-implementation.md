@@ -19,7 +19,6 @@ quale si ritiene/ritengono maggiormente responsabile/i gli studenti coinvolti.
     - [Configurazione tramite Mixin](#configurazione-tramite-mixin) I
     - [Space](#space) I-F
     - [Tipologie di Space](#tipologie-di-space) I
-    - [Implementations](#implementations) V-I-F
   - [Engine](#engine) I
   - [Interfaccia Grafica](#interfaccia-grafica) V
   - [Simulazioni](#simulazioni) V-I-F
@@ -117,7 +116,7 @@ stato.
 
 Per questo motivo è stato esteso lo stato ad un generico stato con valore:
 
-```Scala
+```scala
 trait ValuedState[T]:
   def value: T
   def update(f: T => T): ValuedState[T] =
@@ -137,7 +136,7 @@ funzione `equals` è sufficiente a discriminare stati diversi. Nel caso di un
 nell'atto di comparazione. Per esempio, per l'automa WaTor è stato definito
 un *trait* che permette di comparare solo grazie all'istanza della classe,
 e successivamente esteso per gli stati *Shark* e *Fish*:
-```Scala
+```scala
 sealed trait StateComparison:
   override def equals(x: Any) = x.getClass() == this.getClass()
 ```
@@ -181,7 +180,7 @@ grazie agli oggetti che espongono il DSL vero e proprio.
 Di seguito due esempi dell'impego delle due diverse modalità di costruzione
 delle regole.
 
-```Scala
+```scala
 DeclarativeRuleBuilder.configureRules:
   DEAD when fewerThan(2) withState ALIVE whenCenterIs ALIVE
   ALIVE when surroundedBy(2) withState ALIVE whenCenterIs ALIVE
@@ -225,7 +224,7 @@ Come illustrato in figura, si considerino le regole che costituiscono l'automa R
 Tramite l'impiego per composizione di `ExplicitNeighbourRuleBuilder` all'interno
 del builder dichiarativo è possibile specificare le regole in modo immediato tramite:
 
-```Scala
+```scala
 DeclarativeRuleBuilder.configureRules:
   White whenNeighbourhoodIsExactlyLike:
     neighbour(Black) | c(Black) | neighbour(Black)
@@ -260,7 +259,7 @@ Successivamente viene definito il vicinato attraverso la seguente sintassi:
 
 L'intera sintassi può essere osservata con il seguente esempio:
 
-```Scala
+```scala
 DeclarativeRuleBuilder.configureRules:
   Alive whenNeighbourhoodIsExactlyLike:
     neighbour(Alive) | x       | neighbour(Alive) | n |
@@ -275,7 +274,7 @@ dove, se il centro ha stato `Dead` e il suo vicinato assume il pattern indicato
 Per la modellazione dell'automa cellulare Brian's Brain, è possibile osservare
 gran parte della sintassi del DSL costruito:
 
-```Scala
+```scala
 DeclarativeRuleBuilder.configureRules:
   DYING whenNeighbourhoodIsExactlyLike(c(ON))
   ON when surroundedBy(2) withState ON whenCenterIs OFF otherwise OFF
@@ -288,7 +287,7 @@ maniera dichiarativa, è stata creato un semplice *builder* per automi cellulari
 che impiegano tale sintassi. In questo modo è possibile creare un semplice
 `CellularAutomaton` in uno spazio bidimensionale tramite:
 
-```Scala
+```scala
 CellularAutomatonBuilder.fromRuleBuilder:
   DeclarativeRuleBuilder.configureRules:
     dead when fewerThan(2) withState alive whenCenterIs(alive)
@@ -441,7 +440,7 @@ In prima battuta, la responsabilità di richiamare l'aggiornamento delle celle e
 delegata all'`Engine` stesso. In particolare, l'aggiornamento era richiamato
 come segue:
 
-```Scala
+```scala
 override def nextIteration: Unit = 
   environment().matrix
     .flatMap(_.map(cell => cell))
@@ -506,7 +505,7 @@ all'interno del simulatore. Per ogni simulazione devono essere specificati:
 Per la definzione dell'automa cellulare, è possibile specificare il suo
 comportamento tramite il builder.
 
-```Scala
+```scala
 def apply(): CellularAutomaton[TwoDimensionalSpace] =
   CellularAutomatonBuilder.fromRuleBuilder {
     DeclarativeRuleBuilder.configureRules:
@@ -527,7 +526,7 @@ mentre le rimanenti vengono imopostate a `DEAD`.
 Come per *Game of Life*, viene definito l'automa cellulare tramite il DSL nel
 seguente modo:
 
-```Scala
+```scala
 def apply(): CellularAutomaton[TwoDimensionalSpace] =
   CellularAutomatonBuilder.fromRuleBuilder {
     DeclarativeRuleBuilder.configureRules:
@@ -552,7 +551,7 @@ rappresenta la cella di arrivo dopo aver effettuato il movimento.
 
 È possibile perciò definire il comportamento dell'automa come segue:
 
-```Scala
+```scala
 def antRule(n: Neighbour[TwoDimensionalSpace], moveCenterTo: RelativePositions): Iterable[Cell[TwoDimensionalSpace]] =
     val oldPositionState = n.center.state.asInstanceOf[ANT].cellColor.invert
     val direction = oldPositionState.invert match
@@ -594,7 +593,7 @@ della simulazione.
 
 Possiamo così riassumere la regola comportamentale delle entità `Fish`:
 
-```Scala
+```scala
 MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(Fish())): n =>
   findRandomCellThat(n.neighbourhood)(_.state == Water) match
     case None => Iterable(incrementChronon(n.center))
@@ -603,7 +602,7 @@ MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(Fish())): n =>
 
 Mentre per le entità `Shark` la logica risulta lievemente più complessa:
 
-```Scala
+```scala
 MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(Shark())): n =>
   if n.center.state.asShark.value.energy == 0
   then Iterable(Cell[TwoDimensionalSpace](n.center.position, Water))
