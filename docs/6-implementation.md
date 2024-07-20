@@ -435,7 +435,28 @@ come mixin sempre il *trait* `ThreadEngine2D`. Successivamente, ogni istanza
 implementa i concetti più specifici per il proprio ruolo.
 
 ## Interfaccia Grafica
+L'implementazione dell'interfaccia grafica è progettata per consentire agli utenti di configurare e visualizzare le simulazioni. L'interfaccia si basa su un'architettura dichiarativa e immutabile, utilizzando monadi e stati immutabili per gestire la finestra dell'interfaccia. Questo approccio garantisce una gestione coerente e prevedibile dello stato dell'interfaccia grafica.
 
+### SwingFunctionalFacade
+
+Componente principale dell'interfaccia grafica, che fornisce un insieme di metodi per costruire e manipolare l'interfaccia tramite l'utilizzo di Swing. La facciata consente di creare frame, aggiungere bottoni, label, combo box, pannelli di pixel, input text e gestire la visualizzazione dei vari automi.
+
+### WindowState
+
+La gestione dello stato della finestra è realizzata tramite l'interfaccia `WindowState`, che definisce vari metodi per manipolare lo stato della finestra. Utilizzando la monade State, ogni operazione restituisce un nuovo stato della finestra senza modificare lo stato originale.
+
+### Esempio di utilizzo
+
+```Scala
+val windowCreation = for
+    _ <- setSize(1000, 600)
+    _ <- addButton(text = "Start", name = "StartButton")
+    _ <- addButton(text = "Stop", name = "StopButton")
+    _ <- addButton(text = "Exit", name = "ExitButton")
+    _ <- addComboBox(EnvironmentOption.options, "AutomatonsComboBox")
+    _ <- show()
+  yield 
+  ```
 
 ## Simulazioni
 

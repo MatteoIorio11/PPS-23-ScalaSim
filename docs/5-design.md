@@ -272,7 +272,7 @@ Rappresenta una finestra principale dell'applicazione. Gestisce la disposizione 
 Include metodi per l'aggiunta dei vari componenti grafici. 
 
 `WindowState`
-Gestisce lo stato della finestra e le sue transizioni. Implementa un modello di stato per la gestione della GUI.
+Gestisce lo stato della finestra e le sue transizioni. Definisce una serie di operazioni che possono essere eseguite sulla finestra. Ogni operazione è modellata come una State Monad, che trasforma lo stato della finestra.
 
 ### Uso delle Monadi
 
