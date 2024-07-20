@@ -1,0 +1,50 @@
+@startuml engineimpl
+
+interface GeneralEngine<D: Dimension> {
+    - running: Boolean
+    # environment: GenericEnvironment<D>
+    + history: LazyList<LazyList<Cell<D>>>
+    + matrix: LazyList<Cell<D>>
+    # nextIteration(): Unit
+    + start(): Unit
+    + stop(): Unit
+}
+
+interface ThreadEngine2D <<Thread>> {}
+
+interface TimerEngine2D {
+    + timer: Int
+    # startTimer(): Unit
+}
+
+interface GUIEngine2D {
+    + view: EngineView<TwoDimensionalSpace>
+    + updateView(): Unit
+}
+
+ThreadEngine2D -up-|> GeneralEngine
+TimerEngine2D -up-|> GeneralEngine
+GUIEngine2D -up-|> GeneralEngine
+
+class Engine2D {
+    - tick: Int
+    + env: GenericEnvironment
+}
+
+class TimerEngine2DImpl {
+    + timer: Int
+    + env: GenericEnvironment
+}
+
+class GUIEngine2DImpl {
+    + view: EngineVIew
+    + env: GenericEnvironment
+}
+
+Engine2D -up-|> ThreadEngine2D
+TimerEngine2DImpl -up-|> ThreadEngine2D
+TimerEngine2DImpl -up-|> TimerEngine2D
+GUIEngine2DImpl -up-|> GUIEngine2D
+GUIEngine2DImpl -up-|> ThreadEngine2D
+
+@enduml
