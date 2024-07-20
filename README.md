@@ -1,6 +1,18 @@
 # PPS-23-ScalaSim
 [Link alla Relazione](https://matteoiorio11.github.io/PPS-23-ScalaSim/)
 
+## Istruzioni
+
+Il progetto necessita di essere lanciato con l'opzione JVM `--enable-preview`.
+L'opzione è già inserita all'interno del file `build.sbt`, ma per l'esecuzione
+del jar è necessario specificarla all'interno del comando `java
+--enable-preview -jar scalasim.jar`.
+
+È presente lo script `./build_and_run_jar.sh` per poter costruire e lanciare
+correttamente il jar in caso di problemi con il jar all'interno della release.
+
+## Proposta di Progetto
+
 **Deadline**: 22 Luglio 2024
 
 **Acronimo**: ScalaSim

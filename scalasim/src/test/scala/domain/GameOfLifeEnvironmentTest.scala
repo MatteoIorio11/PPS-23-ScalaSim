@@ -8,13 +8,16 @@ import org.scalatest.BeforeAndAfterEach
 import domain.base.Dimensions.TwoDimensionalSpace
 import automaton.Cell
 import base.Position
+import scala.collection.mutable.ArrayBuffer
 
 class GameOfLifeEnvironmentTest extends AnyFunSuite with BeforeAndAfterEach:
-    val dimension = 100
-    val env = GameOfLifeEnvironment(dimension)
+    val (width, height)= (100, 100)
+    val env = GameOfLifeEnvironment(height, width, Map(
+        CellState.ALIVE -> width*height/3
+    ))
 
     test("Initialise environment with dimension <= 0 should throw an error"):
-        val exception = intercept[RuntimeException](GameOfLifeEnvironment(0))
+        val exception = intercept[RuntimeException](GameOfLifeEnvironment(0,0, Map()))
         exception shouldBe a[IllegalArgumentException]
 
 
@@ -22,8 +25,7 @@ class GameOfLifeEnvironmentTest extends AnyFunSuite with BeforeAndAfterEach:
         env.currentMatrix.length should not be 0
     
     test("Initialization should also add alive cells"):
-        env.currentMatrix.flatMap(array => array.map(cell => cell.state))
-            .filter(state => state == CellState.ALIVE).length should not be 0
+        env.currentMatrix.filter(c => c.state == CellState.ALIVE).length should not be 0
     
     test("The neighboors of a cell should always exits"):
         val cell: Cell[TwoDimensionalSpace] = Cell(Position(0, 0), CellState.DEAD)
