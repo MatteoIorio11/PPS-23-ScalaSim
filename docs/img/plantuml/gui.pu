@@ -1,0 +1,39 @@
+@startuml
+interface Monads {
+  + unit[A](a: A): M[A]
+  + flatMap[A, B](m: M[A], f: A -> M[B]): M[B]
+  + map[A, B](m: M[A], f: A -> B): M[B]
+}
+
+interface States {
+  + apply(s: S): (S, A)
+}
+
+interface SwingFunctionalFacade {
+  + createFrame(): Frame
+}
+
+class Frame {
+  + frame(): JFrame
+}
+
+interface WindowState {
+  + initialWindow: Window
+  + frame: State[Window, Frame]
+}
+
+interface Engine2D {
+  + startEngine(): Unit
+  + stopEngine(): Unit
+}
+
+Monads --|> States
+SwingFunctionalFacade o-- Frame
+WindowState o-- Frame
+
+Frame *-- States
+Frame *-- Engine2D
+WindowState *-- States
+
+
+@enduml

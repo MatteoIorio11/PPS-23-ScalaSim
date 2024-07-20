@@ -260,6 +260,22 @@ che meglio si adatti alle esigenze della modalità di simulazione.
 
 ## Design Interfaccia Grafica
 
-[TODO: VINCI]
+La parte di interfaccia grafica del sistema fornisce agli utenti un modo intuitivo per interagire con le simulazioni. Questa interfaccia consente la configurazione specifica di ogni simulazione e l'avvio di essa e la successiva visualizzazione in tempo reale dei risultati. La progettazione si basa sull'uso della State Monad per gestire lo stato della finestra.
 
-[Indice](./index.md) | [Capitolo Precedente](./4-high-level-design.md) | [Capitolo Successivo](./6-implementation.md)
+![Diagramma UML Interfaccia grafica](img/gui.png)
+
+`SwingFunctionalFacade`
+Punto di accesso principale per la creazione e gestione della GUI. Permette la creazione di Frame, la visualizzazione di elementi grafici, e gestione degli eventi.
+
+`Frame`
+Rappresenta una finestra principale dell'applicazione. Gestisce la disposizione dei componenti e la loro interazione.
+Include metodi per l'aggiunta dei vari componenti grafici. 
+
+`WindowState`
+Gestisce lo stato della finestra e le sue transizioni. Implementa un modello di stato per la gestione della GUI.
+
+### Uso delle Monadi
+
+State Monad
+La State Monad viene utilizzata per gestire lo stato della finestra e facilitare la composizione delle operazioni che lo modificano. Questo approccio permette di mantenere l'immutabilità dello stato e di garantire operazioni sicure e prevedibili sulla GUI.
+
