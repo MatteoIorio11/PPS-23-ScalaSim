@@ -168,7 +168,7 @@ object ExplicitNeighbourRuleBuilder:
 
     private var i: Int = 0
     private var j: Int = 0
-    // TODO: change access modifiers in order to let tests pass
+
     var center: Option[Cell[TwoDimensionalSpace]] = Option.empty
     var cells: List[Cell[TwoDimensionalSpace]] = List.empty
     var rules: Set[NeighbourRule[TwoDimensionalSpace]] = Set.empty

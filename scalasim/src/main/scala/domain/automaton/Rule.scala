@@ -110,6 +110,7 @@ object NeighbourRule:
      *
      * @param state the [[State]] that this rule must match in order to be applied.
      * @param f the transformation funtcion body that (hopefully) mutates [[Neighbour]] center state.
+     * @param D the dimensionality of the space.
      * @return a new [[NeigbourRule]] with the specified behaviour.
      */
    def apply[D <: Dimension](state: Option[State])(f: Neighbour[D] => Cell[D]): NeighbourRule[D] = new NeighbourRule[D]:
@@ -118,11 +119,14 @@ object NeighbourRule:
 
 object MultipleOutputNeighbourRule:
    /**
-    * TODO
-    * @param s
-    * @param f
-    * @tparam D
-    * @return
+    * Creates a [[D]] dimensioanl [[NeighbourRule]] that matches the fiven [[State]] [[s]], and
+    * if the state matches, the given transformation function [[f]] can be applied, returning
+    * an output composed, hopefully, by multiple cells.
+    *
+    * @param s the matching [[State]] for this rule.
+    * @param f the transformation function body.
+    * @param D the dimensionality of the space.
+    * @return a new [[MulitpleOutputNeighbourRule]] with the specified behaviour.
     */
   def apply[D <: Dimension](s: Option[State])(f: Neighbour[D] => Iterable[Cell[D]]): MultipleOutputNeighbourRule[D] =
     new MultipleOutputNeighbourRule[D]:
