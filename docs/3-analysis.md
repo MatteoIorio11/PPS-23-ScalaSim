@@ -188,7 +188,7 @@ aspetti più avanzati come la configurazione della simulazione.
 
 - Utilizzo della Java Virtual Machine
 - Utilizzo di Scala 3.x
-- JDK?
+- JDK >= 19
 
 ### Requisiti Opzionali
 

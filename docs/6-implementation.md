@@ -19,7 +19,6 @@ quale si ritiene/ritengono maggiormente responsabile/i gli studenti coinvolti.
     - [Configurazione tramite Mixin](#configurazione-tramite-mixin) I
     - [Space](#space) I-F
     - [Tipologie di Space](#tipologie-di-space) I
-    - [Implementations](#implementations) V-I-F
   - [Engine](#engine) I
   - [Interfaccia Grafica](#interfaccia-grafica) V
   - [Simulazioni](#simulazioni) V-I-F
@@ -117,7 +116,7 @@ stato.
 
 Per questo motivo è stato esteso lo stato ad un generico stato con valore:
 
-```Scala
+```scala
 trait ValuedState[T]:
   def value: T
   def update(f: T => T): ValuedState[T] =
@@ -137,7 +136,7 @@ funzione `equals` è sufficiente a discriminare stati diversi. Nel caso di un
 nell'atto di comparazione. Per esempio, per l'automa WaTor è stato definito
 un *trait* che permette di comparare solo grazie all'istanza della classe,
 e successivamente esteso per gli stati *Shark* e *Fish*:
-```Scala
+```scala
 sealed trait StateComparison:
   override def equals(x: Any) = x.getClass() == this.getClass()
 ```
@@ -181,7 +180,7 @@ grazie agli oggetti che espongono il DSL vero e proprio.
 Di seguito due esempi dell'impego delle due diverse modalità di costruzione
 delle regole.
 
-```Scala
+```scala
 DeclarativeRuleBuilder.configureRules:
   DEAD when fewerThan(2) withState ALIVE whenCenterIs ALIVE
   ALIVE when surroundedBy(2) withState ALIVE whenCenterIs ALIVE
@@ -225,7 +224,7 @@ Come illustrato in figura, si considerino le regole che costituiscono l'automa R
 Tramite l'impiego per composizione di `ExplicitNeighbourRuleBuilder` all'interno
 del builder dichiarativo è possibile specificare le regole in modo immediato tramite:
 
-```Scala
+```scala
 DeclarativeRuleBuilder.configureRules:
   White whenNeighbourhoodIsExactlyLike:
     neighbour(Black) | c(Black) | neighbour(Black)
@@ -260,7 +259,7 @@ Successivamente viene definito il vicinato attraverso la seguente sintassi:
 
 L'intera sintassi può essere osservata con il seguente esempio:
 
-```Scala
+```scala
 DeclarativeRuleBuilder.configureRules:
   Alive whenNeighbourhoodIsExactlyLike:
     neighbour(Alive) | x       | neighbour(Alive) | n |
@@ -275,7 +274,7 @@ dove, se il centro ha stato `Dead` e il suo vicinato assume il pattern indicato
 Per la modellazione dell'automa cellulare Brian's Brain, è possibile osservare
 gran parte della sintassi del DSL costruito:
 
-```Scala
+```scala
 DeclarativeRuleBuilder.configureRules:
   DYING whenNeighbourhoodIsExactlyLike(c(ON))
   ON when surroundedBy(2) withState ON whenCenterIs OFF otherwise OFF
@@ -288,7 +287,7 @@ maniera dichiarativa, è stata creato un semplice *builder* per automi cellulari
 che impiegano tale sintassi. In questo modo è possibile creare un semplice
 `CellularAutomaton` in uno spazio bidimensionale tramite:
 
-```Scala
+```scala
 CellularAutomatonBuilder.fromRuleBuilder:
   DeclarativeRuleBuilder.configureRules:
     dead when fewerThan(2) withState alive whenCenterIs(alive)
@@ -434,6 +433,60 @@ Per via dei requisiti di prestazioni, tutte le istanze utilizzate includono
 come mixin sempre il *trait* `ThreadEngine2D`. Successivamente, ogni istanza
 implementa i concetti più specifici per il proprio ruolo.
 
+### Interazione `Engine` - `Environment`
+
+Un'aspetto interessante riguarda la modalità con cui viene eseguita ogni iterazione.
+In prima battuta, la responsabilità di richiamare l'aggiornamento delle celle era
+delegata all'`Engine` stesso. In particolare, l'aggiornamento era richiamato
+come segue:
+
+```scala
+override def nextIteration: Unit = 
+  environment().matrix
+    .flatMap(_.map(cell => cell))
+    .map(cell => env.applyRule(env.neighbours(cell)))
+  saveInHistory
+```
+
+Per quanto questo approccio possa funzionare correttamente per la maggior parte
+delle simulaizoni, per tutte quelle simulazioni che necessitano di un
+processamento diverso (per esempio simulazioni che si compongono di precisi
+step di sense-decide-act), questo comporta una certa rigidità nel software,
+dovendo necessariamente costruire un ulteriore `Engine` adatto alle specifiche
+della simulazione.
+
+Essendo una simulazione descritta da una specifica istanza di un
+`CellularAutomaton` e uno specifico `Environment` e tenendo in considerazione i
+fattori descritti precendentemente, la logica di aggiornamento della matrice è
+stata spostata nella classe responsabile della matrice stessa: `Environment`.
+Grazie a questa modifica, il motore ad ogni iterazione non farà altro che
+richiamare `environment.nextIteration` e salvare correttamente nella storia la
+matrice corrente, delegando completamente all'ambiente stesso l'implementazione
+della logica di aggiornamento. In questo modo, il comportamento di un automa
+cellulare può essere correttamente manipolato dall'ambiente in un modo corretto
+e, in caso di necessità, in modo custom.
+
+Un esempio di un'automa cellulare che beneficia di questo cambiamento può
+essere l'automa *Rule110*, il quale invece che processare ogni singola cella
+dell'intera matrice, può interagire ad ogni step su una riga per volta, a
+partire da quella superiore, fino ad arrivare a quella inferiore. In questo
+modo, oltre a risparmiare una grande quantità di aggiornamenti, viene ottenuta
+una maggiore correttezza dell'automa stesso e il comportamento di esso risulta
+più predicibile.
+
+Un'ulteriore automa che necessita di un comporamento custom per quanto riguarda
+l'aggiornamento delle celle è rappresentato dal modello di traffico di
+[Biham-Middleton-Levin](https://en.wikipedia.org/wiki/Biham–Middleton–Levine_traffic_model).
+Questo automa infatti prevede due tipologie di entità, le quali si muovono in
+modo alternato in base al numero corrente dell'iterazione (e.g. entità blu si
+muovono per numero di iterazioni pari, entità rosse per numero di iterazioni
+dispari).
+
+Grazie a questa modifica quindi, la componente `Engine` risulta generale e
+indipendente verso il tipo di automa cellulare e il tipo di ambiente che esso
+necessità, rendendo future implementazioni di ulteriori automi completamente
+agnositiche verso il tipo di `Engine` impiegato.
+
 ## Interfaccia Grafica
 L'implementazione dell'interfaccia grafica è progettata per consentire agli utenti di configurare e visualizzare le simulazioni. L'interfaccia si basa su un'architettura dichiarativa e immutabile, utilizzando monadi e stati immutabili per gestire la finestra dell'interfaccia. Questo approccio garantisce una gestione coerente e prevedibile dello stato dell'interfaccia grafica.
 
@@ -473,7 +526,7 @@ all'interno del simulatore. Per ogni simulazione devono essere specificati:
 Per la definzione dell'automa cellulare, è possibile specificare il suo
 comportamento tramite il builder.
 
-```Scala
+```scala
 def apply(): CellularAutomaton[TwoDimensionalSpace] =
   CellularAutomatonBuilder.fromRuleBuilder {
     DeclarativeRuleBuilder.configureRules:
@@ -494,7 +547,7 @@ mentre le rimanenti vengono imopostate a `DEAD`.
 Come per *Game of Life*, viene definito l'automa cellulare tramite il DSL nel
 seguente modo:
 
-```Scala
+```scala
 def apply(): CellularAutomaton[TwoDimensionalSpace] =
   CellularAutomatonBuilder.fromRuleBuilder {
     DeclarativeRuleBuilder.configureRules:
@@ -519,7 +572,7 @@ rappresenta la cella di arrivo dopo aver effettuato il movimento.
 
 È possibile perciò definire il comportamento dell'automa come segue:
 
-```Scala
+```scala
 def antRule(n: Neighbour[TwoDimensionalSpace], moveCenterTo: RelativePositions): Iterable[Cell[TwoDimensionalSpace]] =
     val oldPositionState = n.center.state.asInstanceOf[ANT].cellColor.invert
     val direction = oldPositionState.invert match
@@ -561,7 +614,7 @@ della simulazione.
 
 Possiamo così riassumere la regola comportamentale delle entità `Fish`:
 
-```Scala
+```scala
 MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(Fish())): n =>
   findRandomCellThat(n.neighbourhood)(_.state == Water) match
     case None => Iterable(incrementChronon(n.center))
@@ -570,7 +623,7 @@ MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(Fish())): n =>
 
 Mentre per le entità `Shark` la logica risulta lievemente più complessa:
 
-```Scala
+```scala
 MultipleOutputNeighbourRule[TwoDimensionalSpace](Some(Shark())): n =>
   if n.center.state.asShark.value.energy == 0
   then Iterable(Cell[TwoDimensionalSpace](n.center.position, Water))
@@ -587,4 +640,4 @@ una nuova entità all'interno della cella di partenza prima del movimento. Inolt
 nel caso di `moveSharkTo`, viene rappresentato da un flag booleano se lo squalo,
 effettuando il movimento, mangia un pesce incrementandone quindi l'energia.
 
-[Indice](./index.md) | [Capitolo Precedente](./5-design.md) | [Capitolo Successivo](./7-conclusions.md)
+[Indice](./index.md) | [Capitolo Precedente](./5-design.md) | [Capitolo Successivo](./7-testing.md)

@@ -19,8 +19,12 @@ import Environment.*
 import domain.automaton.Neighbour
 
 /**
-  * TODO: write how this CA work.
-  */
+ * In each time step, a cell turns on if it was off but had exactly two neighbors
+ * that were on, just like the birth rule for Seeds. All cells that were "on" go
+ * into the "dying" state, which is not counted as an "on" cell in the neighbor
+ * count, and prevents any cell from being born there. Cells that were in the dying
+ * state go into the off state.
+ */
 trait BriansBrainEnvironment extends SimpleEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D
 
 object BriansBrainEnvironment extends ViewBag:

@@ -25,3 +25,5 @@ correttezza del codice implementato.
 ## Testing non automatizzato
 
 GUI e video exporter
+
+[Indice](./index.md) | [Capitolo Precedente](./6-implementation.md) | [Capitolo Successivo](./8-conclusions.md)

@@ -20,6 +20,18 @@ import scala.collection.mutable.ArrayBuffer
 import dsl.automaton.rule.ExplicitNeighbourRuleBuilder.CustomNeighbourhoodDSL.neighbour
 import domain.automaton.CellularAutomaton.AnyState
 
+/**
+ * Time passes in discrete jumps, which I shall call chronons. During each chronon
+ * a fish or shark may move north, east, south or west to an adjcent point,
+ * provided the point is not already occupied by a member of its own species. A
+ * random-number generator makes the actual choice. For a fish the choice is
+ * simple: select one unoccupied adjacent point at random and move there. If all
+ * four adjacent points are occupied, the fish does not move. Since hunting for
+ * fish takes priority over mere movement, the rules for a shark are more
+ * complicated: from the adjacent points occupied by fish, select one at random,
+ * move there and devour the fish. If no fish are in the neighborhood, the shark
+ * moves just as a fish does, avoiding its fellow sharks.
+ */
 object WaTorEnvironment extends ViewBag:
     override def colors: Map[State, Color] = Map(
         Fish() -> Color.apply(0, 100, 0),

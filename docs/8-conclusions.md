@@ -43,4 +43,4 @@ Tra gli eventuali sviluppi futuri si possono includere:
   del DSL, è risultato troppo elevato, ma può essere sicuramente oggetto di
   discussione di eventuali lavori di miglioramento futuri.
 
-[Indice](./index.md) | [Capitolo Precedente](./6-implementation.md)
+[Indice](./index.md) | [Capitolo Precedente](./7-testing.md)
