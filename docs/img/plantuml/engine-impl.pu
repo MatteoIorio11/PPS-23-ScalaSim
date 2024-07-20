@@ -1,4 +1,5 @@
-@startuml engine
+@startuml engineimpl
+
 interface GeneralEngine<D: Dimension> {
     - running: Boolean
     # environment: GenericEnvironment<D>
@@ -9,15 +10,7 @@ interface GeneralEngine<D: Dimension> {
     + stop(): Unit
 }
 
-interface SimpleEngine<D: Dimension, R> {
-    # environment: SimpleEnvironment<D>
-}
-
-interface ComplexEngine<D: Dimension, R> {
-    # environment: ComplexEnvironment<D>
-}
-
-interface ThreadEngine2D {}
+interface ThreadEngine2D <<Thread>> {}
 
 interface TimerEngine2D {
     + timer: Int
@@ -29,12 +22,29 @@ interface GUIEngine2D {
     + updateView(): Unit
 }
 
-SimpleEngine --|> GeneralEngine
-ComplexEngine --|> GeneralEngine
-
-ThreadEngine2D -left-|> Thread
 ThreadEngine2D -up-|> GeneralEngine
 TimerEngine2D -up-|> GeneralEngine
 GUIEngine2D -up-|> GeneralEngine
+
+class Engine2D {
+    - tick: Int
+    + env: GenericEnvironment
+}
+
+class TimerEngine2DImpl {
+    + timer: Int
+    + env: GenericEnvironment
+}
+
+class GUIEngine2DImpl {
+    + view: EngineVIew
+    + env: GenericEnvironment
+}
+
+Engine2D -up-|> ThreadEngine2D
+TimerEngine2DImpl -up-|> ThreadEngine2D
+TimerEngine2DImpl -up-|> TimerEngine2D
+GUIEngine2DImpl -up-|> GUIEngine2D
+GUIEngine2DImpl -up-|> ThreadEngine2D
 
 @enduml

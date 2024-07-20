@@ -20,7 +20,7 @@ quale si ritiene/ritengono maggiormente responsabile/i gli studenti coinvolti.
     - [Space](#space) I-F
     - [Tipologie di Space](#tipologie-di-space) I
     - [Implementations](#implementations) V-I-F
-  - [Engine](#engine) V-I
+  - [Engine](#engine) I
   - [Interfaccia Grafica](#interfaccia-grafica) V
   - [Simulazioni](#simulazioni) V-I-F
     - [Conway's Game of Life](#conways-game-of-life) V
@@ -122,7 +122,7 @@ trait ValuedState[T]:
   def value: T
   def update(f: T => T): ValuedState[T] =
     val v: T = f(value)
-    new ValuedState[T] { override def value: T = v}
+    new ValuedState[T] { override def value: T = v }
 ```
 
 Il valore trattenuto può rappresentare un qualsiasi oggetto, e una comoda
@@ -408,9 +408,34 @@ correttamente.
 
 ## Engine
 
+Similmente come per la componente `Environment`, la presenza di molteplici
+specializzazioni dei motori come mostrato nel [capitolo di
+design](./5-design.md) serve per modellare al meglio il concetto di modularità
+e configurazione di uno specifico `Engine`. Il punto di partenza è il motore
+più generale e generico, il quale contiene al suo interno un `Environment` da
+poter interrogare e modificare in base all'evoluzione della simulazione.
+Successivamente vengono esposti metodi standard per interagire con il motore
+stesso, il quale dopo la chiamata del metodo `start`, effettuarà una serie
+di chiamate al metodo `nextIteration` il quale incapsula la logica di
+aggiornamento della griglia della simulaizone.
+Ad ogni iterazione inoltre, viene salvato lo stato della matrice corrente
+all'interno di una collezione di matrici, la quale rappresenta la storia della
+simulazione.
+
+Tramite i mixin creati, come `TimerEngine` e `ThreadEngine` insieme alle
+specializzazioni in base al tipo di `Environment`, è possibile creare istanze
+che abbiano componenti "pluggabili" in base alle esigenze dello specifico motore.
+Di seguito un diagramma UML che riassume le classi generate e impiegate all'interno
+del simulatore.
+
+![Diagramma UML delle Realizzazioni tramite mixin della componente `Engine`](./img/engineimpl.png)
+
+Per via dei requisiti di prestazioni, tutte le istanze utilizzate includono
+come mixin sempre il *trait* `ThreadEngine2D`. Successivamente, ogni istanza
+implementa i concetti più specifici per il proprio ruolo.
+
 ## Interfaccia Grafica
 
-[Indice](./index.md) | [Capitolo Precedente](./5-design.md) | [Capitolo Successivo](./7-conclusions.md)
 
 ## Simulazioni
 
@@ -540,3 +565,5 @@ dell'entità ha raggiunto la soglia di riproduzione, e in caso positivo creare
 una nuova entità all'interno della cella di partenza prima del movimento. Inoltre,
 nel caso di `moveSharkTo`, viene rappresentato da un flag booleano se lo squalo,
 effettuando il movimento, mangia un pesce incrementandone quindi l'energia.
+
+[Indice](./index.md) | [Capitolo Precedente](./5-design.md) | [Capitolo Successivo](./7-conclusions.md)
