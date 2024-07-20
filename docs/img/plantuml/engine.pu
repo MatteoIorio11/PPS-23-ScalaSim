@@ -2,8 +2,8 @@
 interface GeneralEngine<D: Dimension> {
     - running: Boolean
     # environment: GenericEnvironment<D>
-    + history: LazyList[Cell[D]]
-    + matrix: LazyList[Cell[D]]
+    + history: LazyList<LazyList<Cell<D>>>
+    + matrix: LazyList<Cell<D>>
     # nextIteration(): Unit
     + start(): Unit
     + stop(): Unit
@@ -25,7 +25,7 @@ interface TimerEngine2D {
 }
 
 interface GUIEngine2D {
-    + view: EngineView[TwoDimensionalSpace]
+    + view: EngineView<TwoDimensionalSpace>
     + updateView(): Unit
 }
 
