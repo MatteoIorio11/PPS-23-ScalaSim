@@ -20,6 +20,14 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import domain.Environment.ComplexEnvironment
 
+/**
+ * Squares on a plane are colored variously either black or white. We arbitrarily
+ * identify one square as the "ant". The ant can travel in any of the four cardinal
+ * directions at each step it takes. The "ant" moves according to the rules below:
+ * 
+ * - At a white square, turn 90° clockwise, flip the color of the square, move forward one unit
+ * - At a black square, turn 90° counter-clockwise, flip the color of the square, move forward one unit
+ */
 trait LangtonsAntEnvironment extends ComplexEnvironment[TwoDimensionalSpace] with SquareArrayEnvironment2D
 
 object LangtonsAntEnvironment extends ViewBag with States:
@@ -58,9 +66,6 @@ object LangtonsAntEnvironment extends ViewBag with States:
       matrix = matrix.generalInitialization(dimension)(WHITE)
       matrix(side/2)(side/2) = Cell(Position[TwoDimensionalSpace](side/2, side/2), ANT(WHITE))
 
-/**
-  * TODO: write how this CA work.
-  */
 trait LangtonsAntAutomaton extends MultiOutputCellularAutomaton[TwoDimensionalSpace]
 object LangtonsAntAutomaton:
   import domain.automaton.NeighborRuleUtility.PositionArithmeticOperations.*
