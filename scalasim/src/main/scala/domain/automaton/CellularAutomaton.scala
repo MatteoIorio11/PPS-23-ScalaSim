@@ -16,6 +16,8 @@ object CellularAutomaton:
 
     /**
       * A [[State]] representing a state with an associated value of type [[T]].
+      * 
+      * @tparam T the type of value held by this state.
       */
     trait ValuedState[T] extends State:
       /**
@@ -38,6 +40,7 @@ object CellularAutomaton:
     * A cellular automaton must define a collection of rules, where inside each rule is stored the logic
     * to apply to a particular cell. The cellular automaton can be seen as a collection of rules,
     * where each rule must be used only in a specific state. The cellular automaton manages the logic for all Its Cells.
+    * 
     * @tparam D space dimension
     * @tparam I input type for applying a rule
     * @tparam O output type after applying a rule
@@ -52,7 +55,8 @@ object CellularAutomaton:
       * method 'applyRule' is [[Neighbour]] and the output of this method is a single [[Cell]]. This kind of cellular automaton
       * referrs to a simple Generic Cellular Automaton that works always with one single [[Cell]], the output after applying each rule
       * returns always one new single cell.
-      * @param D the [[Dimension]] of the space;
+
+      * @tparam D the [[Dimension]] of the space;
       */
     trait CellularAutomaton[D <: Dimension] extends GenericCellularAutomaton[D, Neighbour[D], Cell[D], NeighbourRule[D]]:
         /**
@@ -73,7 +77,8 @@ object CellularAutomaton:
      * Multiple Output Cellular Automaton trait. It defines a specifc type of cellular automaton that works with multiple cells, in fact this
      * type of Cellular Automaton returns a collection of new cells after applying a rule. This type of cellular automaton also has a
      * different type input for the rule definition, because It uses a [[MultipleOutputNeighbourRule]].
-     * @tparam D space dimension.
+
+     * @tparam D the [[Dimension]] of the space;
      */
     trait MultiOutputCellularAutomaton[D <: Dimension] extends GenericCellularAutomaton[D, Neighbour[D], Iterable[Cell[D]], MultipleOutputNeighbourRule[D]]:
       protected def rules: Map[State, MultipleOutputNeighbourRule[D]]
@@ -87,6 +92,8 @@ object CellularAutomaton:
 
     /**
       * Trait in which the type Rules is represented by a Map of: [[State]] -> [[Rule]]
+      * 
+      * @tparam D the [[Dimension]] of the space.
       */
     trait MapSingleRules[D <: Dimension] extends CellularAutomaton[D]:
       override type Rules = Map[State, NeighbourRule[D]]
@@ -95,9 +102,12 @@ object CellularAutomaton:
         ruleCollection.get(cell.state) match
           case Some(rule) => rule.applyTransformation(neighbors)
           case None => cell
+
     /**
       * Trait that will be used in more complex Cellular Automatons where mapped on a single state there can be multiple rules to apply on a
       * single cell. The criteria of the rules that is applied is: the first rule that modifies the state or position or both of the input cell.
+      *
+      * @tparam D the [[Dimension]] of the space.
       */
     trait MapMultipleRules[D <: Dimension] extends CellularAutomaton[D]:
       override type Rules = Map[State, Set[NeighbourRule[D]]]
@@ -114,6 +124,7 @@ object CellularAutomaton:
       */
     trait MultipleRuleCellularAutomaton[D <: Dimension] extends MapMultipleRules[D]:
       override def rules: Rules = ruleCollection
+
     /**
       * Factory for Multiple Rules Cellular Automaton.
       */

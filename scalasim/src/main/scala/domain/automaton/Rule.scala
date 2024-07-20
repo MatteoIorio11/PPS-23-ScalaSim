@@ -17,9 +17,9 @@ import domain.automaton.CellularAutomaton.AnyState
   * logic then is composed by the a matchin state and the logic
   * defined inside the input function.
   * 
-  * @param I the input type for the transformation function.
-  * @param O the output type for the transformation funtcion.
-  * @param P the type of the matcher used to match this rule against an object of type [[P]].
+  * @tparam I the input type for the transformation function.
+  * @tparam O the output type for the transformation funtcion.
+  * @tparam P the type of the matcher used to match this rule against an object of type [[P]].
   */
 trait Rule[I, O, P]:
    /**
@@ -50,18 +50,18 @@ trait Rule[I, O, P]:
 /**
   * [[Rule]] that matches multiple rules
   * 
-  * @param I this rule input type.
-  * @param O this rule output type after applying the transformation.
+  * @tparam I this rule input type.
+  * @tparam O this rule output type after applying the transformation.
   */
 trait MultipleStateRule[I, O] extends Rule[I, O, Iterable[State]]
 
 /**
   * [[Rule]] that yields an [[Iterable]] output.
   *
-  * @param D the dimension of the space.
-  * @param I the transformation function input type.
-  * @param O the transformation function output type.
-  * @param P the type of the matcher used to match this rule against an object of type [[P]].
+  * @tparam D the dimension of the space.
+  * @tparam I the transformation function input type.
+  * @tparam O the transformation function output type.
+  * @tparam P the type of the matcher used to match this rule against an object of type [[P]].
   */
 trait MultipleOutputRule[D <: Dimension, I, O <: Iterable[?], P] extends Rule[I, O, P]
 
@@ -76,7 +76,7 @@ trait MultipleOutputRule[D <: Dimension, I, O <: Iterable[?], P] extends Rule[I,
   * than [[AnyState]], and the provied center's state does not match
   * with the matcher, the unaltered center is returned.
   *
-  * @param D the dimension of the space.
+  * @tparam D the dimension of the space.
   */
 trait NeighbourRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D], State]:
    override def applyTransformation(ca: Neighbour[D]): Cell[D] = matcher match
@@ -93,7 +93,7 @@ trait NeighbourRule[D <: Dimension] extends Rule[Neighbour[D], Cell[D], State]:
   * than [[AnyState]], and the provied center's state does not match
   * with the matcher, any empty list is returned.
   *
-  * @param D the dimension of the space.
+  * @tparam D the dimension of the space.
   */
 trait MultipleOutputNeighbourRule[D <: Dimension] extends MultipleOutputRule[D, Neighbour[D], Iterable[Cell[D]], State]:
    override def applyTransformation(ca: Neighbour[D]): Iterable[Cell[D]] = matcher match
@@ -110,7 +110,7 @@ object NeighbourRule:
      *
      * @param state the [[State]] that this rule must match in order to be applied.
      * @param f the transformation funtcion body that (hopefully) mutates [[Neighbour]] center state.
-     * @param D the dimensionality of the space.
+     * @tparam D the dimensionality of the space.
      * @return a new [[NeigbourRule]] with the specified behaviour.
      */
    def apply[D <: Dimension](state: Option[State])(f: Neighbour[D] => Cell[D]): NeighbourRule[D] = new NeighbourRule[D]:
@@ -125,7 +125,7 @@ object MultipleOutputNeighbourRule:
     *
     * @param s the matching [[State]] for this rule.
     * @param f the transformation function body.
-    * @param D the dimensionality of the space.
+    * @tparam D the dimensionality of the space.
     * @return a new [[MulitpleOutputNeighbourRule]] with the specified behaviour.
     */
   def apply[D <: Dimension](s: Option[State])(f: Neighbour[D] => Iterable[Cell[D]]): MultipleOutputNeighbourRule[D] =
