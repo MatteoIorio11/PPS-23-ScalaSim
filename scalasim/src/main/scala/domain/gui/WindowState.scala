@@ -25,8 +25,6 @@ trait WindowState:
   def addButton(text: String, name: String): State[Window, Unit]
   def addLabel(text: String): State[Window, Unit]
   def addComboBox(items: List[EnvironmentOption[? <: Dimension, ?]], name: String): State[Window, Unit]
-  def addAutomaton(name: String): State[Window, Unit]
-  def addPixelPanel(name: String, panel: String): State[Window, Unit]
   def addInput(name: String): State[Window, Unit]
   def getInputText(name: String): State[Window, String]
   def getSelectedComboBoxItem(name: String): State[Window, EnvironmentOption[? <: Dimension, ?]]
@@ -36,7 +34,6 @@ trait WindowState:
   def stopEngine(): State[Window, Unit]
   def toLabel(text: String, name: String): State[Window, Unit]
   def show(): State[Window, Unit]
-  def showAutomaton(name: String): State[Window, Unit]
   def exec(cmd: =>Unit): State[Window, Unit]
   def eventStream(): State[Window, LazyList[String]]
 
@@ -59,13 +56,8 @@ object WindowStateImpl extends WindowState:
     State(w => ((w.addLabel(text)), {}))
   def addComboBox(items: List[EnvironmentOption[? <: Dimension, ?]], name: String): State[Window, Unit] =
     State(w => ((w.addComboBox(items.toArray, name)), {}))
-  def addPixelPanel(name: String, panel: String): State[Window, Unit] =
-    State(w => ((w.addPixelPanel(name, panel)), {}))
   def addInput(name: String): State[Window, Unit] =
     State(w => ((w.addInput(name)), {}))
-
-  def addAutomaton(name: String): State[Window, Unit] =
-    State(w => ((w.addAutomaton(name)), {}))
   def getSelectedComboBoxItem(name: String): State[Window, EnvironmentOption[? <: Dimension, ?]] =
     State(w => (w, w.getSelectedComboBoxItem(name)))
 
@@ -84,8 +76,6 @@ object WindowStateImpl extends WindowState:
     State(w => ((w.showToLabel(text, name)), {}))
   def show(): State[Window, Unit] =
     State(w => (w.show(), {}))
-  def showAutomaton(name: String): State[Window, Unit] =
-    State(w => (w.showAutomaton(name), {}))
   def exec(cmd: =>Unit): State[Window, Unit] =
     State(w => (w, cmd))
   def eventStream(): State[Window, LazyList[String]] =

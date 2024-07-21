@@ -14,30 +14,150 @@ import scala.collection.mutable
 import domain.engine.Engine.GUIEngine2D
 import domain.simulations.gameoflife.GameOfLife.CellState
 
+/**
+ * SwingFunctionalFacade is used to create and manage a Swing GUI.
+ */
 object SwingFunctionalFacade {
 
+    /**
+     * Frame trait defines the structure and behavior of a GUI frame.
+     */
     trait Frame {
+
+        /**
+         * Returns the underlying JFrame object.
+         *
+         * @return the JFrame object
+         */
         def frame(): JFrame
+
+        /**
+         * Sets the size of the frame.
+         *
+         * @param width  the width of the frame
+         * @param height the height of the frame
+         * @return the current Frame instance
+         */
         def setSize(width: Int, height: Int): Frame
+
+        /**
+         * Adds a button to the frame.
+         *
+         * @param text the text of the button
+         * @param name the name of the button
+         * @return the current Frame instance
+         */
         def addButton(text: String, name: String): Frame
+
+        /**
+         * Adds a label to the frame.
+         *
+         * @param text the text of the label
+         * @return the current Frame instance
+         */
         def addLabel(text: String): Frame
+
+        /**
+         * Adds a combo box to the frame.
+         *
+         * @param items the items of the combo box
+         * @param name  the name of the combo box
+         * @return the current Frame instance
+         */
         def addComboBox(items: Array[EnvironmentOption[? <: Dimension, ?]], name: String): Frame
-        def addAutomaton(name: String): Frame
-        def addPixelPanel(name: String, panel: String): Frame
+
+        /**
+         * Adds an input field to the frame.
+         *
+         * @param name the name of the input field
+         * @return the current Frame instance
+         */
         def addInput(name: String): Frame
-        def getAutomatonPanel(name: String): JPanel
+
+        /**
+         * Retrieves the selected item from the specified combo box.
+         *
+         * @param name the name of the combo box
+         * @return the selected EnvironmentOption
+         */
         def getSelectedComboBoxItem(name: String): EnvironmentOption[?, ?]
+
+        /**
+         * Clears the south panel of the frame.
+         *
+         * @return the current Frame instance
+         */
         def clearSouthPanel(): Frame
+
+        /**
+         * Clears the main panel of the frame.
+         *
+         * @return the current Frame instance
+         */
         def clearPanel(): Frame
+
+        /**
+         * Retrieves the text from the specified input field.
+         *
+         * @param name the name of the input field
+         * @return the text from the input field
+         */
         def getInputText(name: String): String
+
+        /**
+         * Starts the engine for the specified environment and automaton.
+         *
+         * @param env    the environment to use
+         * @param name   the name of the automaton
+         * @param colors the colors for the states of the automaton
+         * @return the current Frame instance
+         */
         def startEngine(env: GenericEnvironment[TwoDimensionalSpace, ?], name: String, colors: Map[State, Color]): Frame
+
+        /**
+         * Stops the engine.
+         *
+         * @return the current Frame instance
+         */
         def stopEngine(): Frame
+
+        /**
+         * Displays text in a label.
+         *
+         * @param text the text to display
+         * @param name the name of the label
+         * @return the current Frame instance
+         */
         def showToLabel(text: String, name: String): Frame
+
+        /**
+         * Makes the frame visible.
+         *
+         * @return the current Frame instance
+         */
         def show(): Frame
+
+        /**
+         * Displays the specified automaton in the frame.
+         *
+         * @param name the name of the automaton
+         * @return the current Frame instance
+         */
         def showAutomaton(name: String): Frame
+
+        /**
+         * Returns a Supplier of event strings.
+         *
+         * @return a Supplier of event strings
+         */
         def events(): Supplier[String]
     }
 
+    /**
+     * Creates and returns a new Frame instance.
+     *
+     * @return a new Frame instance
+     */
     def createFrame(): Frame = new FrameImpl()
 
     private class FrameImpl extends Frame {
@@ -100,18 +220,6 @@ object SwingFunctionalFacade {
             northPanel.add(comboBox, BorderLayout.NORTH)
             this
 
-        override def addAutomaton(name: String): Frame =
-            if (automatonPanels.contains(name))
-                throw new IllegalArgumentException(s"An automaton panel with name $name already exists.")
-            val pixelPanel = PixelPanel((1000, 1000), Map(
-                CellState.ALIVE -> Color.BLUE,
-                CellState.DEAD -> Color.YELLOW
-            ))
-            pixelPanel.setPixelSize(3)
-            automatonPanels.put(name, pixelPanel)
-            this
-
-
         override def startEngine(env: GenericEnvironment[TwoDimensionalSpace, ?], name: String, colors: Map[State, Color]): Frame =
             val pixelPanel = PixelPanel((1000, 1000), colors)
             pixelPanel.setPixelSize(3)
@@ -163,15 +271,6 @@ object SwingFunctionalFacade {
             jframe.setVisible(true)
             this
 
-        override def addPixelPanel(name: String, panel: String): Frame =
-            if (pixelPanels.contains(name))
-                throw new IllegalArgumentException(s"A pixel panel with name $name already exists.")
-            val jp = new JPanel()
-            pixelPanels.put(name, jp)
-            jp.setVisible(true)
-            automatonPanels(panel).add(jp)
-            this
-
         override def addInput(name: String): Frame =
             if (inputs.contains(name))
                 throw new IllegalArgumentException(s"An input with name $name already exists.")
@@ -182,9 +281,6 @@ object SwingFunctionalFacade {
             southPanel.revalidate()
             southPanel.repaint()
             this
-
-        override def getAutomatonPanel(name: String): JPanel =
-            automatonPanels(name)
 
         override def showAutomaton(name: String): Frame =
             if (!automatonPanels.contains(name))
