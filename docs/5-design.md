@@ -289,3 +289,5 @@ Il processo di esportazione inizia con l'ottenimento dello storico (`history`) d
  Una volta ottenuto lo storico, l'Exporter si occuperà di convertire queste matrici in immagini. Durante questo processo, ogni cella viene disegnata sull'immagine in base alla sua posizione e al suo stato, utilizzando una mappa di colori.
 
 Dopo che tutte le matrici sono state convertite ogni immagine viene aggiunta al video per un numero specifico di fotogrammi, in modo da creare un'animazione fluida che rappresenta l'evoluzione dell'automa cellulare nel tempo.
+
+[Indice](./index.md) | [Capitolo Precedente](./4-high-level-design.md) | [Capitolo Successivo](./6-implementation.md)
