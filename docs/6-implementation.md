@@ -488,7 +488,7 @@ necessità, rendendo future implementazioni di ulteriori automi completamente
 agnositiche verso il tipo di `Engine` impiegato.
 
 ## Interfaccia Grafica
-L'implementazione dell'interfaccia grafica è progettata per consentire agli utenti di configurare e visualizzare le simulazioni. L'interfaccia si basa su un'architettura dichiarativa e immutabile, utilizzando monadi e stati immutabili per gestire la finestra dell'interfaccia. Questo approccio garantisce una gestione coerente e prevedibile dello stato dell'interfaccia grafica.
+L'implementazione dell'interfaccia grafica è progettata per consentire agli utenti di configurare e visualizzare le simulazioni. L'interfaccia si basa su un'architettura dichiarativa e immutabile, utilizzando monadi e stati immutabili. Questo approccio garantisce una gestione coerente e prevedibile dello stato dell'interfaccia grafica.
 
 ### SwingFunctionalFacade
 
@@ -496,7 +496,7 @@ Componente principale dell'interfaccia grafica, che fornisce un insieme di metod
 
 ### WindowState
 
-La gestione dello stato della finestra è realizzata tramite l'interfaccia `WindowState`, che definisce vari metodi per manipolare lo stato della finestra. Utilizzando la monade State, ogni operazione restituisce un nuovo stato della finestra senza modificare lo stato originale.
+La gestione dello stato della finestra è realizzata tramite `WindowState`, che definisce vari metodi per manipolare lo stato della finestra. Utilizzando la monade State, ogni operazione restituisce un nuovo stato della finestra senza modificare lo stato originale.
 
 ### Esempio di utilizzo
 
@@ -510,6 +510,49 @@ val windowCreation = for
     _ <- show()
   yield 
   ```
+
+## Video Exporter
+### MatrixToImageConverter
+`MatrixToImageConverter` definisce un metodo per convertire una matrice di celle in un'immagine. Questo permette una facile estensione per diverse dimensioni e rappresentazioni dello spazio.
+
+```Scala
+trait MatrixToImageConverter[D <: Dimension] {
+  def convert(matrix: LazyList[Cell[D]], cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage
+}
+```
+
+`SimpleMatrixToImageConverter` rappresenta un implementazione specifica per uno spazio bidimensionale (`TwoDimensionalSpace`). Converte una matrice di celle in un'BufferedImage, utilizzando una mappa di colori per rappresentare gli stati delle celle.
+
+
+### VideoGenerator
+
+`VideoGenerator` Definisce un metodo per generare un video da una sequenza di immagini.
+
+```scala
+trait VideoGenerator {
+  def generate(videoFilename: String, images: Seq[BufferedImage], secondsPerImage: Double): Unit
+}
+```
+`JCodecVideoGenerator` utilizza la libreria JCodec per creare un video. Converte una sequenza di immagini in un file video, dove ogni immagine viene visualizzata per un determinato numero di secondi.
+
+
+### Exporter
+
+La classe Exporter coordina il processo di conversione della history di un automa cellulare in un video. 
+
+```scala
+object Exporter {
+  def exportMatrix[D <: Dimension, S <: State](engine: GeneralEngine[D], colors: Map[State, Color], converter: MatrixToImageConverter[D], videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double): Unit = {
+    val images = engine.history.zipWithIndex.map { case (matrix, _) =>
+      converter.convert(matrix, cellSize, colors)
+    }.toList
+
+    videoGenerator.generate(videoFilename, images, secondsPerImage)
+  }
+}
+```
+
+
 
 ## Simulazioni
 

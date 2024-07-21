@@ -1,0 +1,30 @@
+@startuml
+
+  interface MatrixToImageConverter {
+    +convert(matrix: LazyList<Cell>, cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage
+  }
+
+  class SimpleMatrixToImageConverter implements MatrixToImageConverter {
+    +convert(matrix: LazyList<Cell>, cellSize: Int, stateColorMap: Map[State, Color]): BufferedImage
+  }
+
+  interface VideoGenerator {
+    +generate(videoFilename: String, images: Seq[BufferedImage], secondsPerImage: Double): Unit
+  }
+
+  class JCodecVideoGenerator implements VideoGenerator {
+    +generate(videoFilename: String, images: Seq[BufferedImage], secondsPerImage: Double): Unit
+  }
+
+  class Exporter {
+    +exportMatrix(engine: GeneralEngine, colors: Map[State, Color], converter: MatrixToImageConverter, videoGenerator: VideoGenerator, cellSize: Int, videoFilename: String, secondsPerImage: Double): Unit
+  }
+
+  interface GeneralEngine {
+    +history: Seq[LazyList[Cell]]
+  }
+  Exporter --> GeneralEngine
+  Exporter --> MatrixToImageConverter
+  Exporter --> VideoGenerator
+
+@enduml

@@ -258,7 +258,7 @@ Come per l'environment, nel [capitolo successivo](./6-implementation.md) verrà
 illustrata l'intersecarsi di queste istanze per la costruzione di un engine
 che meglio si adatti alle esigenze della modalità di simulazione.
 
-## Design Interfaccia Grafica
+## Interfaccia Grafica
 
 La parte di interfaccia grafica del sistema fornisce agli utenti un modo intuitivo per interagire con le simulazioni. Questa interfaccia consente la configurazione specifica di ogni simulazione e l'avvio di essa e la successiva visualizzazione in tempo reale dei risultati. La progettazione si basa sull'uso della State Monad per gestire lo stato della finestra.
 
@@ -279,3 +279,13 @@ Gestisce lo stato della finestra e le sue transizioni. Definisce una serie di op
 State Monad
 La State Monad viene utilizzata per gestire lo stato della finestra e facilitare la composizione delle operazioni che lo modificano. Questo approccio permette di mantenere l'immutabilità dello stato e di garantire operazioni sicure e prevedibili sulla GUI.
 
+## Video Exporter
+
+Il modulo di esportazione è progettato per convertire lo stato di una matrice di celle in immagini e generare un video basato su queste immagini, il video exporter a parti. Questo processo è essenziale per visualizzare e analizzare le simulazioni degli automi cellulari. 
+![Diagramma UML dell' Exporter video](img/exporter.png)
+
+Il processo di esportazione inizia con l'ottenimento dello storico (`history`) degli stati della matrice dall' `Engine` tramite una sequenza di `Cell` che rappresentano gli stati dell'automa cellulare in diversi momenti del tempo.
+
+ Una volta ottenuto lo storico, l'Exporter si occuperà di convertire queste matrici in immagini. Durante questo processo, ogni cella viene disegnata sull'immagine in base alla sua posizione e al suo stato, utilizzando una mappa di colori.
+
+Dopo che tutte le matrici sono state convertite ogni immagine viene aggiunta al video per un numero specifico di fotogrammi, in modo da creare un'animazione fluida che rappresenta l'evoluzione dell'automa cellulare nel tempo.
