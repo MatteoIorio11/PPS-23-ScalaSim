@@ -100,6 +100,8 @@ secondo le seguenti regole:
 
 #### WaTor
 
+![WaTor in esecuzione](./img/wator.png)
+
 WaTor simula l'evoluzione di una popolazione contenente prede e predatori,
 nel nostro caso `Fish` e `Shark` rispettivamente, all'interno di un ambiente
 toroidale. I risultati possono essere interessanti, come l'estinzione di una o
